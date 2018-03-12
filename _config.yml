@@ -1,121 +1,132 @@
-# ---------------- #
-#   Main Configs   #
-# ---------------- #
-baseurl:
-url: http://mazhuang.org
-date_format: "ordinal"
-title: 码志
-subtitle: "打码改变人生"
-description: "马壮的个人博客"
-keywords: 码志, Zhuang Ma, mzlogin, mazhuang
-timezone: Asia/Shanghai
-encoding: "utf-8"
-side_bar_repo_limit: 5
+# Hexo Configuration
+## Docs: http://hexo.io/docs/configuration.html
+## Source: https://github.com/hexojs/hexo/
 
-# ---------------- #
-#      Author      #
-# ---------------- #
-author: Zhuang Ma
-organization: zkh360.com
-organization_url: http://www.zkh360.com
-github_username: mzlogin
-location: Wuhan, China
-email: chumpma@gmail.com
+# Site
+title: Litten的博客
+subtitle: 胆小认生，不易相处
+description: 华中科技大学09级，就职于腾讯SNG。擅长各项前端技能，深入研究移动端开发与前端性能。非专业视觉设计师。此为博客一枚。 
+author: Litten
+email: litten225@qq.com
+keywords: "前端,js,jquery,javascript,html5,开发者,程序猿,程序媛,极客,编程,代码,开源,IT网站,Developer,Programmer,Coder,Geek,html,css,css3,用户体验"
 
-# ---------------- #
-#    Navigation    #
-# ---------------- #
-navs:
-  -
-    href: /
-    label: 首页
+# URL
+## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
+url: //litten.me
+root: /
+permalink: :year/:month/:day/:title/
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+code_dir: downloads/code
+permalink_defaults:
 
-  -
-    href: /categories/
-    label: 分类
+# Directory
+source_dir: source
+public_dir: public
 
-  -
-    href: /wiki/
-    label: 维基
+# Writing
+new_post_name: :title.md # File name of new posts
+default_layout: post
+titlecase: false # Transform title into titlecase
+external_link: true # Open external links in new tab
+filename_case: 0
+render_drafts: false
+post_asset_folder: false
+relative_link: false
+highlight:                                                                                                                                                                                                   
+  enable: true                                                                                                                                                                                               
+  auto_detect: true                                                                                                                                                                                          
+  line_number: true                                                                                                                                                                                          
+  tab_replace: ''
 
-  -
-    href: /links/
-    label: 链接
+# Category & Tag
+default_category: uncategorized
+category_map:
+tag_map:
 
-  -
-    href: /about/
-    label: 关于
+# Archives
+## 2: Enable pagination
+## 1: Disable pagination
+## 0: Fully Disable
+archive: 1
+category: 1
+tag: 1
 
-# ---------------- #
-#       RSS        #
-# ---------------- #
-subscribe_rss: /feed.xml
+# Server
+## Hexo uses Connect as a server
+## You can customize the logger format as defined in
+## http://www.senchalabs.org/connect/logger.html
+port: 4000
+server_ip: localhost
+logger: false
+logger_format: dev
 
-# ---------------- #
-#      Jekyll      #
-# ---------------- #
-markdown: kramdown
-kramdown:
-    input: GFM
-highlighter: rouge
-paginate: 8
-lsi: false
-quiet: false
-excerpt_separator: "\n\n"
-permalink: /:year/:month/:day/:title/
-gems:
-    - jekyll-github-metadata
-    - rouge
-#     - jekyll-html-pipeline
-    - jekyll-paginate
-    - jekyll-sitemap
-    - jekyll-feed
-    - jemoji
-#     - jekyll-mentions
-collections:
-    wiki:
-        output: true
-        permalink: /wiki/:path/
+# Date / Time format
+## Hexo uses Moment.js to parse and display date
+## You can customize the date format as defined in
+## http://momentjs.com/docs/#/displaying/format/
+date_format: YYYY-MM-DD
+time_format: HH:mm:ss
 
-repository: mzlogin/mzlogin.github.io
+# Pagination
+## Set per_page to 0 to disable pagination
+per_page: 8
+pagination_dir: page
 
-# ---------------- #
-#      Comments    #
-# ---------------- #
-# support provider: disqus, gitment, gitalk
-comments_provider: gitalk
-# !!!重要!!! 请修改下面这些信息为你自己申请的
-# !!!Important!!! Please modify infos below to yours
-# https://disqus.com
-disqus:
-    username: 
-# https://imsun.net/posts/gitment-introduction/
-gitment:
-    owner: mzlogin
-    repo: blog-comments
-    oauth:
-        client_id: d2e1cbbd298958076462
-        client_secret: b42a4178e5fd4a7cf63189ef4b1453b05c375709
-# https://github.com/gitalk/gitalk#install
-gitalk:
-    owner: mzlogin
-    repo: blog-comments
-    clientID: d2e1cbbd298958076462
-    clientSecret: b42a4178e5fd4a7cf63189ef4b1453b05c375709
-# 在使用其它评论组件时可点击显示 Disqus
-lazy_load_disqus : false
+# Disqus
+disqus_shortname:
 
-# ---------------- #
-#      Search      #
-# ---------------- #
-simple_jekyll_search:
-    # 是否支持全文搜索
-    fulltext: false
-    # 最多显示多少条搜索结果
-    limit: 10
+# Extensions
+## Plugins: https://github.com/hexojs/hexo/wiki/Plugins
+## Themes: https://github.com/hexojs/hexo/wiki/Themes
+# plugins:
+#  - hexo-generator-feed
+#  - hexo-generator-baidu-sitemap
+#  - hexo-generator-sitemap
 
-# ---------------- #
-#    Analytics     #
-# ---------------- #
-google:
-    analytics_id: UA-80669434-1
+theme: yilia
+exclude_generator:
+
+# Deployment
+## Docs: http://hexo.io/docs/deployment.html
+#deploy:
+#  type: git
+#  repository: git@github.com:litten/litten.github.com.git
+#  branch: master
+
+deploy:
+  type: rsync
+  host: 120.24.181.238
+  user: root
+  root: /usr/local/nginx/litten.me/
+  port: 22
+
+sitemap:
+    path: sitemap.xml
+baidusitemap:
+    path: baidusitemap.xm
+
+feed:
+    type: atom
+    path: atom.xml
+    limit: 100
+
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true
