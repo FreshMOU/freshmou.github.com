@@ -5,9 +5,30 @@
     <description>欢迎来到我的个人站~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 13 Mar 2018 09:51:12 +0800</pubDate>
-    <lastBuildDate>Tue, 13 Mar 2018 09:51:12 +0800</lastBuildDate>
+    <pubDate>Tue, 13 Mar 2018 10:48:12 +0800</pubDate>
+    <lastBuildDate>Tue, 13 Mar 2018 10:48:12 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>第一篇博客</title>
+        <description>&lt;h3 id=&quot;博客打算写什么&quot;&gt;博客打算写什么&lt;/h3&gt;
+
+&lt;p&gt;  就记录一下自己在学习过程中遇到的问题，和自己学到的一些编程技巧。&lt;/p&gt;
+
+&lt;p&gt;  应该还会含括一些框架的编译，相信一般人都会在框架编译的过程中蹉跎很久，像 &lt;a href=&quot;http://caffe.berkeleyvision.org&quot;&gt;caffe&lt;/a&gt; 当时我就编译很久，在网上查了很多资料才把它编出来。&lt;/p&gt;
+
+&lt;p&gt;  深度学习框架网上有很多，大多数人好像都是在用的 &lt;a href=&quot;https://www.tensorflow.org&quot;&gt;Tensorflow&lt;/a&gt; ，不过 Tensorflow 我只是稍微了解过，并没有一直使用，因为 Tensorflow 的模型似乎比较难转出来。现在常用的框架就是 caffe 和 pytorch，接下来应该也会去熟悉了解一下 mxnet 和 torch 。然后还有腾讯的 &lt;a href=&quot;https://github.com/Tencent/ncnn&quot;&gt;ncnn&lt;/a&gt; 框架， ncnn 是给嵌入式设备用的前向框架，大规模的基于 arm 汇编写的卷积让深度学习可以较充分地发挥芯片性能。&lt;/p&gt;
+
+&lt;p&gt;  现在主要使用的语言还是 shell, C, C++, Python，接下来应该还会去学习汇编知识，以便能更好的利用芯片的性能，像 lua 等动态语言应该也会去了解一下。&lt;/p&gt;
+</description>
+        <pubDate>Tue, 13 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/Target/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/Target/</guid>
+        
+        <category>介绍</category>
+        
+        
+      </item>
     
   </channel>
 </rss>
