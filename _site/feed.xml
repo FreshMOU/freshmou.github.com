@@ -5,9 +5,31 @@
     <description>欢迎来到我的个人站~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 13 Mar 2018 11:06:15 +0800</pubDate>
-    <lastBuildDate>Tue, 13 Mar 2018 11:06:15 +0800</lastBuildDate>
+    <pubDate>Tue, 13 Mar 2018 21:00:47 +0800</pubDate>
+    <lastBuildDate>Tue, 13 Mar 2018 21:00:47 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>lua学习入门</title>
+        <description>&lt;h3 id=&quot;mac下安装lua&quot;&gt;Mac下安装lua&lt;/h3&gt;
+
+&lt;p&gt;  brew作为Mac下非常好用的包管理工具，可以直接 install lua。直接在Mac终端输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;brew install lua&lt;/code&gt; ，lua就安装好了。成功后可以测试一下，执行命令 &lt;code class=&quot;highlighter-rouge&quot;&gt;lua&lt;/code&gt; 进入 lua 脚本环境&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt;print('hello world')&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;hello world&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;lua一些常用名词&quot;&gt;lua一些常用名词&lt;/h3&gt;
+&lt;p&gt;  在看torch的代码中，我经常可以看到 require&lt;/p&gt;
+</description>
+        <pubDate>Tue, 13 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/lua/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/lua/</guid>
+        
+        <category>lua</category>
+        
+        
+      </item>
     
       <item>
         <title>第一篇博客</title>

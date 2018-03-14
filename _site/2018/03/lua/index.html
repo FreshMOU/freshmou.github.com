@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>文章</title>
-  <meta name="description" content="欢迎来到我的个人站~">
+  <title>lua学习入门</title>
+  <meta name="description" content="Mac下安装lua">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="文章">
-  <meta name="twitter:description" content="欢迎来到我的个人站~">
+  <meta name="twitter:title" content="lua学习入门">
+  <meta name="twitter:description" content="Mac下安装lua">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="文章">
-  <meta property="og:description" content="欢迎来到我的个人站~">
+  <meta property="og:title" content="lua学习入门">
+  <meta property="og:description" content="Mac下安装lua">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/archive/">
+  <link rel="canonical" href="http://localhost:4000/2018/03/lua/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -156,76 +156,57 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">lua学习入门</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-03-13 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-03-13</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title">文章</h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="mac下安装lua">Mac下安装lua</h3>
+
+<p>  brew作为Mac下非常好用的包管理工具，可以直接 install lua。直接在Mac终端输入 <code class="highlighter-rouge">brew install lua</code> ，lua就安装好了。成功后可以测试一下，执行命令 <code class="highlighter-rouge">lua</code> 进入 lua 脚本环境</p>
+
+<p><code class="highlighter-rouge">&gt;print('hello world')</code></p>
+
+<p><code class="highlighter-rouge">hello world</code></p>
+
+<h3 id="lua一些常用名词">lua一些常用名词</h3>
+<p>  在看torch的代码中，我经常可以看到 require</p>
 
 
-<div class="page card">
-
-
-
-  
-    
-    
-    
-    
-  
-    
-    
-    
-      <div class="hat_title">
-        <h3>2018</h3>
-      </div>
-      <div class="post_list">
-      <ul>
-      
-    
-  
-    <li>
-      <span>
-        2018-03-13
-      </span>
-       &raquo; 
-      <a href="/2018/03/lua/">lua学习入门</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-13
-      </span>
-       &raquo; 
-      <a href="/2018/03/Target/">第一篇博客</a>
-    </li>
- 
-    
-      </ul>
-      
-    
-  
-
-</div>
-</div>
   </section>
 </article>
+
+<section class="post-comments">
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2018/03/lua/";
+        this.page.identifier = "/2018/03/lua/";
+    };
+    var disqus_shortname = 'jer';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+
+</section>
+
 
             <section class="footer">
     <footer>
