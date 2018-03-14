@@ -7,16 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <title>lua学习入门</title>
-  <meta name="description" content="Mac下安装lua">
+  <meta name="description" content="Mac下安装 lua">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="lua学习入门">
-  <meta name="twitter:description" content="Mac下安装lua">
+  <meta name="twitter:description" content="Mac下安装 lua">
   
   <meta property="og:type" content="article">
   <meta property="og:title" content="lua学习入门">
-  <meta property="og:description" content="Mac下安装lua">
+  <meta property="og:description" content="Mac下安装 lua">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -167,16 +167,44 @@
   </header>
 
   <section class="post">
-    <h3 id="mac下安装lua">Mac下安装lua</h3>
+    <h3 id="mac下安装-lua">Mac下安装 lua</h3>
 
 <p>  brew作为Mac下非常好用的包管理工具，可以直接 install lua。直接在Mac终端输入 <code class="highlighter-rouge">brew install lua</code> ，lua就安装好了。成功后可以测试一下，执行命令 <code class="highlighter-rouge">lua</code> 进入 lua 脚本环境</p>
 
-<p><code class="highlighter-rouge">&gt;print('hello world')</code></p>
+<p><code class="highlighter-rouge">&gt;print('hello world')</code><br />
+<code class="highlighter-rouge">hello world</code></p>
 
-<p><code class="highlighter-rouge">hello world</code></p>
+<h3 id="lua-一些常用名词">lua 一些常用名词</h3>
+<p>  在看torch的代码中，我经常可以看到 require, ..等单词或符号，直接看教程有很多语法都是不太用得到的，所以下面我自己整理一下一些常见的语法。</p>
 
-<h3 id="lua一些常用名词">lua一些常用名词</h3>
-<p>  在看torch的代码中，我经常可以看到 require</p>
+<h2 id="require">require</h2>
+
+<p>  <code class="highlighter-rouge">require</code>与 C 和 C++ 中的<code class="highlighter-rouge">#include</code>类似，还有 python 中的<code class="highlighter-rouge">import</code>也是相同的功能，加载模块，加载了模块就可以使用模块的全局函数和全局数据。</p>
+
+<p><code class="highlighter-rouge">require</code>搜索的路径是存在一个全局table package的path和cpath字段里的。</p>
+
+<div class="language-lua highlighter-rouge"><pre class="highlight"><code>  <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="nb">package.path</span><span class="p">)</span>
+  <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="kd">local</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">lua</span><span class="o">/</span><span class="mi">5</span><span class="p">.</span><span class="mi">3</span><span class="o">/</span><span class="err">?</span><span class="p">.</span><span class="n">lua</span><span class="p">;</span>  
+  <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="kd">local</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">lua</span><span class="o">/</span><span class="mi">5</span><span class="p">.</span><span class="mi">3</span><span class="o">/</span><span class="err">?</span><span class="o">/</span><span class="n">init</span><span class="p">.</span><span class="n">lua</span><span class="p">;</span>  
+  <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="kd">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lua</span><span class="o">/</span><span class="mi">5</span><span class="p">.</span><span class="mi">3</span><span class="o">/</span><span class="err">?</span><span class="p">.</span><span class="n">lua</span><span class="p">;</span>  
+  <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="kd">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lua</span><span class="o">/</span><span class="mi">5</span><span class="p">.</span><span class="mi">3</span><span class="o">/</span><span class="err">?</span><span class="o">/</span><span class="n">init</span><span class="p">.</span><span class="n">lua</span><span class="p">;</span>  
+  <span class="p">.</span><span class="o">/</span><span class="err">?</span><span class="p">.</span><span class="n">lua</span><span class="p">;</span>  
+  <span class="p">.</span><span class="o">/</span><span class="err">?</span><span class="o">/</span><span class="n">init</span><span class="p">.</span><span class="n">lua</span>  
+
+  <span class="o">&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="nb">package.cpath</span><span class="p">)</span>
+  <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="kd">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lua</span><span class="o">/</span><span class="mi">5</span><span class="p">.</span><span class="mi">3</span><span class="o">/</span><span class="err">?</span><span class="p">.</span><span class="n">so</span><span class="p">;</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="kd">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lua</span><span class="o">/</span><span class="mi">5</span><span class="p">.</span><span class="mi">3</span><span class="o">/</span><span class="n">loadall</span><span class="p">.</span><span class="n">so</span><span class="p">;.</span><span class="o">/</span><span class="err">?</span><span class="p">.</span><span class="n">so</span>
+</code></pre>
+</div>
+
+<p>  当我们想要加载当前脚本的上级目录时，我们自己可以添加相对路径。</p>
+
+<div class="language-lua highlighter-rouge"><pre class="highlight"><code><span class="nb">package.path</span> <span class="o">=</span> <span class="nb">package.path</span> <span class="o">..</span> <span class="s1">';..\\?.lua'</span>
+</code></pre>
+</div>
+
+<h2>..</h2>
+
+<p>  作为动态语言，lua 同 python 类似，可以直接将字符串连接起来，在 python 中是用<code class="highlighter-rouge">+</code>，而 lua 中则用<code class="highlighter-rouge">..</code>，对于 C++ 来说，lua 就是将<code class="highlighter-rouge">..</code>符号重载了，使其具备了 concat 的功能</p>
 
 
   </section>
