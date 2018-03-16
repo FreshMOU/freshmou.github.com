@@ -5,9 +5,124 @@
     <description>欢迎来到我的个人站~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 15 Mar 2018 12:49:16 +0800</pubDate>
-    <lastBuildDate>Thu, 15 Mar 2018 12:49:16 +0800</lastBuildDate>
+    <pubDate>Fri, 16 Mar 2018 10:32:01 +0800</pubDate>
+    <lastBuildDate>Fri, 16 Mar 2018 10:32:01 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>TextBoxes_plusplus在ubuntu14.04上的编译</title>
+        <description>&lt;h3 id=&quot;textboxes_plusplus&quot;&gt;TextBoxes_plusplus&lt;/h3&gt;
+
+&lt;p&gt;  TextBoxes_plusplus是基于TextBoxes改进的用于场景文字识别的项目，它用SSD来检测文字，然后对框出来的文字用CRNN进行识别。因为最近要用TextBoxes_plusplus，然后在编译它的过程中也遇到了一些问题，所以用这篇博客记录一下。&lt;/p&gt;
+
+&lt;p&gt;  首先还是要先执行&lt;code class=&quot;highlighter-rouge&quot;&gt;git clone https://github.com/MhLiao/TextBoxes_plusplus.git&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;编译textboxes&quot;&gt;编译TextBoxes&lt;/h2&gt;
+
+&lt;p&gt;  TextBoxes是在caffe上实现的，直接按照普通caffe编译即可。&lt;br /&gt;
+  在编译前需要安装caffe的各种依赖，依赖安装可以网上查询。&lt;br /&gt;
+  编译时，根据不同的系统环境，需要修改主目录下的Makefile.config&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Makefile&quot;&gt;USE_CUDNN := 1
+CUDA_DIR := /usr/local/cuda-8.0
+WITH_PYTHON_LAYER := 1
+INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/
+LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;  接下来执行&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;make -j4
+make py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  在make 的过程中我有遇到error: ‘xxx’ does not name a type，经过查询了解到是由于Makefile中的一句话&lt;/p&gt;
+
+&lt;p&gt;  &lt;code class=&quot;highlighter-rouge&quot;&gt;COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-isystem $(includedir))&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;  其中 -isystem 是 gcc 参数，表示引用路径，但是当 -isystem 里面如果与 -I 里面的头文件有冲突会忽略 -I，所以如果系统中其他地方有同名文件，此时就不会进行本地的头文件搜索。&lt;/p&gt;
+
+&lt;p&gt;  由于我的服务器中有安装另一个ssd的caffe环境，所以发生了错误。只要修改&lt;code class=&quot;highlighter-rouge&quot;&gt;-system&lt;/code&gt;为&lt;code class=&quot;highlighter-rouge&quot;&gt;-I&lt;/code&gt;即可。&lt;/p&gt;
+
+&lt;p&gt;  这样TextBoxes就编译完了&lt;/p&gt;
+
+&lt;h2 id=&quot;编译crnn&quot;&gt;编译crnn&lt;/h2&gt;
+
+&lt;p&gt;  接下来就是crnn的配置，crnn编译前也需要安装多个依赖。&lt;/p&gt;
+
+&lt;p&gt;  首先是torch7的安装，torch7安装比较简单，可以直接网上找教程。&lt;/p&gt;
+
+&lt;p&gt;  然后是LMDB，如果系统中没有LMDB，可以直接&lt;code class=&quot;highlighter-rouge&quot;&gt;apt-get install liblmdb-dev&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;  再是fblualib的编译，fblualib确实有点难编，因为对于 ubuntu14.04，fblualib都是编译的老版本的库。&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/facebookarchive/fblualib.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;fblualib
+./install_all.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  此时，系统就开始自动下载那些需要的库并自动编译，在编译fbthrift时会报&lt;code class=&quot;highlighter-rouge&quot;&gt;autoconf&lt;/code&gt;的错误，我查询半天无果，所以只能自己手动编译。找到install_all.sh脚本下载的 fbthrift 位置，将其删除，然后执行:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/facebook/fbthrift
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;build
+cmake ..
+make
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  此时又会有很多的错误，这是因为fbthrift这个库也有很多的依赖，所以要自己手动再将依赖装好，具体缺什么依赖可以看报的错误。然后依赖的地址可以去&lt;a href=&quot;https://github.com/facebook/fbthrift&quot;&gt;fbthrift&lt;/a&gt;看。&lt;/p&gt;
+
+&lt;p&gt;  接下来就可以继续编译thpp了，将install_all.sh中编译thpp的代码手动输入，但还是发生了问题，gtest-1.7.0文件不存在，这是由于google将gtest-1.7.0换了个位置存。此时找到thpp的目录，手动编译&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dir&lt;/span&gt;/thpp/thpp				（&lt;span class=&quot;nv&quot;&gt;$dir&lt;/span&gt;是thpp在当前系统中的位置，需要自己去找）
+curl -JLOk https://github.com/google/googletest/archive/release-1.7.0.zip
+unzip googletest-release-1.7.0.zip
+mv googletest-release-1.7.0 gtest-1.7.0
+mkdir –p build
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;build
+cmake ..
+make
+ctest
+sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  这样thpp就编译好了，接下来再编译fblualib&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ../../fblualib/fblualib
+./build.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  这样整个 fblualib 就编译完了。&lt;br /&gt;
+  此时就可以返回 TextBoxes_plusplus 目录去编译 crnn 了&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/TextBoxes_plusplus/crnn/src
+sh build_cpp.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  最后要测试一下，官方提供了两个模型。&lt;/p&gt;
+
+&lt;p&gt;  一个是TextBoxes的caffe模型 &lt;a href=&quot;https://pan.baidu.com/s/1bqekTun&quot;&gt;BaiduYun&lt;/a&gt;，下载来之后放到&lt;code class=&quot;highlighter-rouge&quot;&gt;./models&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;  一个是crnn的torch模型 &lt;a href=&quot;https://pan.baidu.com/s/1jJwmneI&quot;&gt;BaiduYun&lt;/a&gt;，下载来之后放到&lt;code class=&quot;highlighter-rouge&quot;&gt;./crnn/model/&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;  现在可以在主目录执行 &lt;code class=&quot;highlighter-rouge&quot;&gt;python examples/text/demo.py&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;  最终结果将被保存在&lt;code class=&quot;highlighter-rouge&quot;&gt;./demo_images&lt;/code&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 16 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/TextBoxes_plusplus/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/TextBoxes_plusplus/</guid>
+        
+        <category>深度学习</category>
+        
+        
+      </item>
     
       <item>
         <title>lua学习入门</title>
