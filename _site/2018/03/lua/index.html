@@ -177,7 +177,7 @@
 <h3 id="lua-一些常用名词">lua 一些常用名词</h3>
 <p>  在看torch的代码中，我经常可以看到 require, ..等单词或符号，直接看教程有很多语法都是不太用得到的，所以下面我自己整理一下一些常见的语法。</p>
 
-<h2 id="require">require</h2>
+<h4 id="require">require</h4>
 
 <p>  <code class="highlighter-rouge">require</code>与 C 和 C++ 中的<code class="highlighter-rouge">#include</code>类似，还有 python 中的<code class="highlighter-rouge">import</code>也是相同的功能，加载模块，加载了模块就可以使用模块的全局函数和全局数据。</p>
 
@@ -230,7 +230,7 @@ it'</span><span class="n">s</span> <span class="n">ok</span>
 </code></pre>
 </div>
 
-<h2>..</h2>
+<h4>..</h4>
 
 <p>  作为动态语言，lua 同 python 类似，可以直接将字符串连接起来，在 python 中是用<code class="highlighter-rouge">+</code>，而 lua 中则用<code class="highlighter-rouge">..</code>，对于 C++ 来说，lua 就是将<code class="highlighter-rouge">..</code>符号重载了，使其具备了 concat 的功能。</p>
 
@@ -241,7 +241,7 @@ it'</span><span class="n">s</span> <span class="n">ok</span>
 </code></pre>
 </div>
 
-<h2 id="local">local</h2>
+<h4 id="local">local</h4>
 
 <p>  前面不加前缀的变量都是全局变量，local 声明变量为局部变量，但是如果该变量在全局环境中在使用上几乎等价于全局变量。不过一般都推荐使用局部变量，因为 lua 自身的特性，局部变量在加载使用时要比全局变量快很多，详情可以点击<a href="http://lua-users.org/wiki/OptimisingUsingLocalVariables">这里</a></p>
 
@@ -271,11 +271,11 @@ it'</span><span class="n">s</span> <span class="n">ok</span>
 
 <p>  那些与C、C++、Python语法类似的 lua 语法就不再论述了，下面只给自己备忘一些与众不同的语法。</p>
 
-<h2 id="注释语法">注释语法</h2>
+<h4 id="注释语法">注释语法</h4>
 
 <p>  在 lua 中注释是用<code class="highlighter-rouge">--</code>，就类似于C语言中的<code class="highlighter-rouge">//</code>，而块注释的话就将块包括在<code class="highlighter-rouge">--[[ --]]</code></p>
 
-<h2 id="函数类语法">函数类语法</h2>
+<h4 id="函数类语法">函数类语法</h4>
 
 <p>  在 lua 中也提供了类似C结构体，C++类的模式，一个变量可以拥有它自己的函数。而且 lua 有两种给变量定义函数的方法</p>
 
@@ -291,7 +291,7 @@ it'</span><span class="n">s</span> <span class="n">ok</span>
 </code></pre>
 </div>
 
-<h2 id="冒号-和点">冒号: 和点.</h2>
+<h4 id="冒号-和点">冒号: 和点.</h4>
 
 <p>  <code class="highlighter-rouge">:</code> 和 <code class="highlighter-rouge">.</code> 其实没有本质的区别，冒号相比于点只是起了一个省略 <code class="highlighter-rouge">self</code> 的功能。</p>
 

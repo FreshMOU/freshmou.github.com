@@ -11,7 +11,7 @@ tags: 深度学习
 
 &#8195;&#8195;首先还是要先执行`git clone https://github.com/MhLiao/TextBoxes_plusplus.git`
 
-## 编译TextBoxes
+#### 编译TextBoxes
 
 &#8195;&#8195;TextBoxes是在caffe上实现的，直接按照普通caffe编译即可。  
 &#8195;&#8195;在编译前需要安装caffe的各种依赖，依赖安装可以网上查询。  
@@ -42,7 +42,7 @@ make py
 
 &#8195;&#8195;这样TextBoxes就编译完了
 
-## 编译crnn
+#### 编译crnn
 
 &#8195;&#8195;接下来就是crnn的配置，crnn编译前也需要安装多个依赖。
 
