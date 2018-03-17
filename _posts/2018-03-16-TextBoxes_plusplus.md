@@ -17,7 +17,7 @@ tags: 深度学习
 &#8195;&#8195;在编译前需要安装caffe的各种依赖，依赖安装可以网上查询。  
 &#8195;&#8195;编译时，根据不同的系统环境，需要修改主目录下的Makefile.config
 
-```Makefile
+```
 USE_CUDNN := 1
 CUDA_DIR := /usr/local/cuda-8.0
 WITH_PYTHON_LAYER := 1
@@ -52,7 +52,7 @@ make py
 
 &#8195;&#8195;再是fblualib的编译，fblualib确实有点难编，因为对于 ubuntu14.04，fblualib都是编译的老版本的库。
 
-```shell
+```
 git clone https://github.com/facebookarchive/fblualib.git
 cd fblualib
 ./install_all.sh
@@ -60,7 +60,7 @@ cd fblualib
 
 &#8195;&#8195;此时，系统就开始自动下载那些需要的库并自动编译，在编译fbthrift时会报`autoconf`的错误，我查询半天无果，所以只能自己手动编译。找到install_all.sh脚本下载的 fbthrift 位置，将其删除，然后执行:
 
-```shell
+```
 git clone https://github.com/facebook/fbthrift
 cd build
 cmake ..
@@ -71,7 +71,7 @@ make
 
 &#8195;&#8195;接下来就可以继续编译thpp了，将install_all.sh中编译thpp的代码手动输入，但还是发生了问题，gtest-1.7.0文件不存在，这是由于google将gtest-1.7.0换了个位置存。此时找到thpp的目录，手动编译
 
-```shell
+```
 cd $dir/thpp/thpp				（$dir是thpp在当前系统中的位置，需要自己去找）
 curl -JLOk https://github.com/google/googletest/archive/release-1.7.0.zip
 unzip googletest-release-1.7.0.zip
@@ -86,7 +86,7 @@ sudo make install
 
 &#8195;&#8195;这样thpp就编译好了，接下来再编译fblualib
 
-```shell
+```
 cd ../../fblualib/fblualib
 ./build.sh
 ```
@@ -94,7 +94,7 @@ cd ../../fblualib/fblualib
 &#8195;&#8195;这样整个 fblualib 就编译完了。  
 &#8195;&#8195;此时就可以返回 TextBoxes_plusplus 目录去编译 crnn 了
 
-```shell
+```
 cd ~/TextBoxes_plusplus/crnn/src
 sh build_cpp.sh
 ```

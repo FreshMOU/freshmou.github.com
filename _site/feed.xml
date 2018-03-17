@@ -5,8 +5,8 @@
     <description>欢迎来到我的个人站~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 17 Mar 2018 21:26:51 +0800</pubDate>
-    <lastBuildDate>Sat, 17 Mar 2018 21:26:51 +0800</lastBuildDate>
+    <pubDate>Sat, 17 Mar 2018 21:52:39 +0800</pubDate>
+    <lastBuildDate>Sat, 17 Mar 2018 21:52:39 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -23,12 +23,13 @@
   在编译前需要安装caffe的各种依赖，依赖安装可以网上查询。&lt;br /&gt;
   编译时，根据不同的系统环境，需要修改主目录下的Makefile.config&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-Makefile&quot;&gt;USE_CUDNN := 1
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;USE_CUDNN := 1
 CUDA_DIR := /usr/local/cuda-8.0
 WITH_PYTHON_LAYER := 1
 INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/
 LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;p&gt;  接下来执行&lt;/p&gt;
 
@@ -57,16 +58,16 @@ make py
 
 &lt;p&gt;  再是fblualib的编译，fblualib确实有点难编，因为对于 ubuntu14.04，fblualib都是编译的老版本的库。&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/facebookarchive/fblualib.git
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;fblualib
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/facebookarchive/fblualib.git
+cd fblualib
 ./install_all.sh
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;  此时，系统就开始自动下载那些需要的库并自动编译，在编译fbthrift时会报&lt;code class=&quot;highlighter-rouge&quot;&gt;autoconf&lt;/code&gt;的错误，我查询半天无果，所以只能自己手动编译。找到install_all.sh脚本下载的 fbthrift 位置，将其删除，然后执行:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/facebook/fbthrift
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;build
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/facebook/fbthrift
+cd build
 cmake ..
 make
 &lt;/code&gt;&lt;/pre&gt;
@@ -76,12 +77,12 @@ make
 
 &lt;p&gt;  接下来就可以继续编译thpp了，将install_all.sh中编译thpp的代码手动输入，但还是发生了问题，gtest-1.7.0文件不存在，这是由于google将gtest-1.7.0换了个位置存。此时找到thpp的目录，手动编译&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dir&lt;/span&gt;/thpp/thpp				（&lt;span class=&quot;nv&quot;&gt;$dir&lt;/span&gt;是thpp在当前系统中的位置，需要自己去找）
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd $dir/thpp/thpp				（$dir是thpp在当前系统中的位置，需要自己去找）
 curl -JLOk https://github.com/google/googletest/archive/release-1.7.0.zip
 unzip googletest-release-1.7.0.zip
 mv googletest-release-1.7.0 gtest-1.7.0
 mkdir –p build
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;build
+cd build
 cmake ..
 make
 ctest
@@ -91,7 +92,7 @@ sudo make install
 
 &lt;p&gt;  这样thpp就编译好了，接下来再编译fblualib&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ../../fblualib/fblualib
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ../../fblualib/fblualib
 ./build.sh
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -99,7 +100,7 @@ sudo make install
 &lt;p&gt;  这样整个 fblualib 就编译完了。&lt;br /&gt;
   此时就可以返回 TextBoxes_plusplus 目录去编译 crnn 了&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/TextBoxes_plusplus/crnn/src
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ~/TextBoxes_plusplus/crnn/src
 sh build_cpp.sh
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
