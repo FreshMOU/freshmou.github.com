@@ -17,10 +17,10 @@ tags: 深度学习
 
 #### 数据格式转化
 
-&#8195;&#8195;ICDAR2015提供的数据是由txt格式（[gt_img_1.txt](scripts-for-myself/formatConversion/examples/gt_img_1.txt)）保存的，其中的格式为[x1,y1,x2,y2,x3,y3,x4,y4,text]，而TextBoxes需要的是xml文件（[example.xml](scripts-for-myself/formatConversion/examples/example.xml)），所以我们先要把数据转过来。
+&#8195;&#8195;ICDAR2015提供的数据是由txt格式([gt_img_1.txt](https://github.com/FreshMOU/scripts-for-myself/formatConversion/examples/gt_img_1.txt))保存的，其中的格式为[x1,y1,x2,y2,x3,y3,x4,y4,text]，而TextBoxes需要的是xml文件([example.xml](https://github.com/FreshMOU/scripts-for-myself/formatConversion/examples/example.xml))，所以我们先要把数据转过来。
 
 &#8195;&#8195;TextBoxes是基于caffe实现的，caffe训练用的数据类型为lmdb格式的，要得到自己的lmdb文件需要有一个txt文件，其中的保存格式为：  
 &#8195;&#8195;your_path_to_img.jpg your_path_to_xml.xml  
 &#8195;&#8195;训练需要两个lmdb，一个train_lmdb，一个test_lmdb，所以需要两个txt文件。
 
-&#8195;&#8195;为了快速得到最后的train.txt和test.txt，我用python写了一个[脚本](scripts-for-myself/formatConversion/icdrtxt2xml.py)来对数据格式进行转换。
+&#8195;&#8195;为了快速得到最后的train.txt和test.txt，我用python写了一个[脚本](https://github.com/FreshMOU/scripts-for-myself/formatConversion/icdrtxt2xml.py)来对数据格式进行转换。
