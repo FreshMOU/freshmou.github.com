@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>SHL</title>
-  <meta name="description" content="欢迎来到我的个人站~">
+  <title>TextBoxes_plusplus的Textboxes部分基于ncnn实现</title>
+  <meta name="description" content="TextBoxes_plusplus的实现">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SHL">
-  <meta name="twitter:description" content="欢迎来到我的个人站~">
+  <meta name="twitter:title" content="TextBoxes_plusplus的Textboxes部分基于ncnn实现">
+  <meta name="twitter:description" content="TextBoxes_plusplus的实现">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="SHL">
-  <meta property="og:description" content="欢迎来到我的个人站~">
+  <meta property="og:title" content="TextBoxes_plusplus的Textboxes部分基于ncnn实现">
+  <meta property="og:description" content="TextBoxes_plusplus的实现">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/tags/">
+  <link rel="canonical" href="http://localhost:4000/2018/03/TextBoxes_in_ncnn/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -156,134 +156,94 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">TextBoxes_plusplus的Textboxes部分基于ncnn实现</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-03-25 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-03-25</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title"></h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="textboxes_plusplus的实现">TextBoxes_plusplus的实现</h3>
 
-<ul class="tag_box inline">
-    
-  
+<p>  TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的<code class="highlighter-rouge">denser_prior_boxes</code>和detection_output层的<code class="highlighter-rouge">use_polygon</code>，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。</p>
 
+<h3 id="textboxes-caffe模型转ncnn模型">TextBoxes caffe模型转ncnn模型</h3>
 
-  
-     
-    	<li><a href="#介绍-ref">介绍 <span>1</span></a></li>
-     
-    	<li><a href="#lua-ref">lua <span>1</span></a></li>
-     
-    	<li><a href="#深度学习-ref">深度学习 <span>4</span></a></li>
-    
-  
+<p>  Ncnn提供了caffe转ncnn的tools  <code class="highlighter-rouge">./tools/caffe/caffe2ncnn.cpp</code>，但是由于<code class="highlighter-rouge">denser_prior_boxes</code>和<code class="highlighter-rouge">use_polygon</code>是Textboxes_plusplus自己集成的参数，所以ncnn并不支持，这里就要自己去添加了。</p>
 
-
-
-</ul>
-
-<div class = "card">
- 
-
-  <h3 id="介绍-ref">介绍</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/Target/">第一篇博客</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="lua-ref">lua</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/lua/">lua学习入门</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="深度学习-ref">深度学习</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus的Textboxes部分基于ncnn实现</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/torch/">torch学习</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_plusplus/">TextBoxes_plusplus在ubuntu14.04上的编译</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
-
+<div class="highlighter-rouge"><pre class="highlight"><code>找到 else if (layer.type() == "PriorBox")
+在if的末尾添加  fprintf(pp, " 14=%d", prior_box_param.denser_prior_boxes());
+找到 else if (layer.type() == "DetectionOutput")，在if末尾添加  
+fprintf(pp, " 5=%d", detection_output_param.use_polygon());
+</code></pre>
 </div>
+
+<p>  然后编译ncnn</p>
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>mkdir build
+<span class="nb">cd </span>build
+cmake ..
+make -j4
+./tools/caffe/caffe2ncnn your_path_deploy.prototxt your_path_model.caffemodel xxx.param xxx.bin
+</code></pre>
+</div>
+
+<p>  这样caffe模型就顺利的转成ncnn模型(<code class="highlighter-rouge">xxx.param</code>和<code class="highlighter-rouge">xxx.bin</code>)了，接下来就是如何使用ncnn模型的问题了。</p>
+
+<h3 id="为ncnn添加textboxes算法实现部分">为ncnn添加TextBoxes算法实现部分</h3>
+
+<p>  先找到priorbox层的<code class="highlighter-rouge">load_param</code>，添加<code class="highlighter-rouge">denser_prior_boxes = pd.get(14, 0);</code>（别忘了在的.h文件中初始化），再找到detectionoutput层的<code class="highlighter-rouge">load_param</code>，添加<code class="highlighter-rouge">use_polygon = pd.get(5, 0);</code> 接下来就可以开始将Textboxes_plusplus的算法移植到ncnn上了。Priorbox层比较好修改，就不写了。</p>
+
+<p>  Detectionoutput层需要修改的地方如下：</p>
+<ol>
+  <li>添加Polygon的decode。</li>
+  <li>对bbox添加一个序号以便追踪，这样可以在最后输出时输出对应的polygon，因为polygon不进行nms和sort。</li>
+</ol>
+
+<p>  看着简单，实现起来确实也简单，polygon的decode是算法的核心，具体caffe的实现集成在TextBoxes_plusplus中的detection_output层里的<code class="highlighter-rouge">DecodeAllBoxes</code>函数中，一层层点进去就可以看到这部分的算法代码了，一部部将它从caffe翻译过来就可以了。</p>
+
+<p>  然后是第二步，因为caffe在<code class="highlighter-rouge">keep_nms_k</code>和<code class="highlighter-rouge">keep_top_k</code>中是提取每个bbox的index保存下来，然后最后根据index来输出bbox和polygon，而ncnn不是，ncnn是直接舍弃掉了不需要的bbox，没有使用index，所以就无法直接输出与要输出的bbox相匹配的polygon，所以需要对bbox添加一个序号，类似于caffe的index(indices)。</p>
+
+<p>  这样ncnn基本可以运行 Textboxes_plusplus 的TextBoxes部分了，但是可能还是会有一个问题，这个问题我也是调了好久才发现。本来以为是ncnn的长方形卷积有问题，一步步看下来发现原来是 caffe2ncnn.cpp 中没有把网络的 pad_h 和 pad_w 转进来，所以如果你也有这个问题，不妨去看看 caffe2ncnn.cpp 的 convolution 转参数部分。</p>
+
+<h3 id="end">END</h3>
+
+<p>  模型转完了，也可以使用了，似乎一切都结束了，但是其实下面还有一个难点，就是你要怎么给不规则四边形施加nms。已知2个四边形共8个点坐标，如何计算它俩的iou？具体可以看我<a href="./2018-3-31-compute_iou_of_quad.md">下一篇博客</a>。</p>
+
+<p>  如果有需要，可以参考我的代码，<a href="https://github.com/FreshMOU/ncnn">点击这里</a></p>
+
 
   </section>
 </article>
+
+<section class="post-comments">
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2018/03/TextBoxes_in_ncnn/";
+        this.page.identifier = "/2018/03/TextBoxes_in_ncnn/";
+    };
+    var disqus_shortname = 'jer';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+
+</section>
+
 
             <section class="footer">
     <footer>

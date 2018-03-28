@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>SHL</title>
-  <meta name="description" content="欢迎来到我的个人站~">
+  <title>用ICDAR2015数据训练TextBoxes</title>
+  <meta name="description" content="ICDAR2015">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SHL">
-  <meta name="twitter:description" content="欢迎来到我的个人站~">
+  <meta name="twitter:title" content="用ICDAR2015数据训练TextBoxes">
+  <meta name="twitter:description" content="ICDAR2015">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="SHL">
-  <meta property="og:description" content="欢迎来到我的个人站~">
+  <meta property="og:title" content="用ICDAR2015数据训练TextBoxes">
+  <meta property="og:description" content="ICDAR2015">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/tags/">
+  <link rel="canonical" href="http://localhost:4000/2018/03/TextBoxes_train/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -156,134 +156,72 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">用ICDAR2015数据训练TextBoxes</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-03-21 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-03-21</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title"></h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="icdar2015">ICDAR2015</h3>
 
-<ul class="tag_box inline">
-    
-  
+<p>  国际文档分析与识别大会（ICDAR）是全球文档分析以及模式识别领域最重要的国际学术会议之一，由国际模式识别协会(International Association of Pattern Recognition, IAPR)主办。该会议每两年举办1次，同时会举办ICDAR竞赛。ICDAR竞赛主要是考验模型对文字的定位和识别的准确度。</p>
 
+<p>  在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。</p>
 
-  
-     
-    	<li><a href="#介绍-ref">介绍 <span>1</span></a></li>
-     
-    	<li><a href="#lua-ref">lua <span>1</span></a></li>
-     
-    	<li><a href="#深度学习-ref">深度学习 <span>4</span></a></li>
-    
-  
+<h3 id="textboxes训练">TextBoxes训练</h3>
 
+<p>  之前提到TextBoxes_plusplus是由TextBoes和crnn合并得到的，其是由两个模型来分别进行位置检测和文字识别的。今天先把TextBoxes的训练先搞定了。</p>
 
+<p>  ICDAR2015提供的数据是由txt格式(<a href="https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/examples/gt_img_1.txt">gt_img_1.txt</a>)保存的，其中的格式为<code class="highlighter-rouge">[x1,y1,x2,y2,x3,y3,x4,y4,text]</code>，而TextBoxes需要的是xml文件(<a href="https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/examples/example.xml">example.xml</a>)，所以我们先要把数据转过来。</p>
 
-</ul>
-
-<div class = "card">
- 
-
-  <h3 id="介绍-ref">介绍</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/Target/">第一篇博客</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="lua-ref">lua</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/lua/">lua学习入门</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="深度学习-ref">深度学习</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus的Textboxes部分基于ncnn实现</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/torch/">torch学习</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_plusplus/">TextBoxes_plusplus在ubuntu14.04上的编译</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
-
+<p>  TextBoxes是基于caffe实现的，caffe训练用的数据类型为lmdb格式的，要得到自己的lmdb文件需要有一个txt文件，其中的保存格式为：</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>    path_to_example1.jpg path_to_example1.xml
+    path_to_example2.jpg path_to_example2.xml
+</code></pre>
 </div>
+
+<p>  训练需要两个lmdb，一个train_lmdb，一个test_lmdb，所以需要两个txt文件。</p>
+
+<p>  为了快速得到最后的train.txt和test.txt，我用python写了一个<a href="https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/icdrtxt2xml.py">脚本</a>来对数据格式进行转换。将该脚本放在TextBoxes_plusplus主目录的<code class="highlighter-rouge">./data/icdar2015</code>目录下运行，运行结束后即可得到在<code class="highlighter-rouge">./data/text</code>目录下的train.txt和test.txt（注意icdar2015的图片数据解压在<code class="highlighter-rouge">./data/icdar2015/image</code>目录下，ground truth数据解压在<code class="highlighter-rouge">./data/icdar2015/local_gt</code>下）。</p>
+
+<p>  接下来直接执行<code class="highlighter-rouge">./data/text/creat_data.sh</code>即可生成lmdb文件（在生成lmdb文件的时候一路报问题no such node(annotation.size.height)和bounding box irregular，猜测应该是由于xml文件写的框为不规则四边形的缘故，最后还报了一个链接错误不过没有什么影响，可以忽略），注意要修改<code class="highlighter-rouge">./examples/modelConfig.py</code>文件中lmdb的路径。</p>
+
+<p>  下载预训练模型放到<code class="highlighter-rouge">./models</code>下就可以开始训练了。执行<code class="highlighter-rouge">python examples/text/train.py</code>。</p>
+
 
   </section>
 </article>
+
+<section class="post-comments">
+
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2018/03/TextBoxes_train/";
+        this.page.identifier = "/2018/03/TextBoxes_train/";
+    };
+    var disqus_shortname = 'jer';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+
+</section>
+
 
             <section class="footer">
     <footer>

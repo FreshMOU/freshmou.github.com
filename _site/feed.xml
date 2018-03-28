@@ -5,9 +5,166 @@
     <description>欢迎来到我的个人站~</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 17 Mar 2018 21:52:39 +0800</pubDate>
-    <lastBuildDate>Sat, 17 Mar 2018 21:52:39 +0800</lastBuildDate>
+    <pubDate>Wed, 28 Mar 2018 19:20:58 +0800</pubDate>
+    <lastBuildDate>Wed, 28 Mar 2018 19:20:58 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>TextBoxes_plusplus的Textboxes部分基于ncnn实现</title>
+        <description>&lt;h3 id=&quot;textboxes_plusplus的实现&quot;&gt;TextBoxes_plusplus的实现&lt;/h3&gt;
+
+&lt;p&gt;  TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的&lt;code class=&quot;highlighter-rouge&quot;&gt;denser_prior_boxes&lt;/code&gt;和detection_output层的&lt;code class=&quot;highlighter-rouge&quot;&gt;use_polygon&lt;/code&gt;，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。&lt;/p&gt;
+
+&lt;h3 id=&quot;textboxes-caffe模型转ncnn模型&quot;&gt;TextBoxes caffe模型转ncnn模型&lt;/h3&gt;
+
+&lt;p&gt;  Ncnn提供了caffe转ncnn的tools  &lt;code class=&quot;highlighter-rouge&quot;&gt;./tools/caffe/caffe2ncnn.cpp&lt;/code&gt;，但是由于&lt;code class=&quot;highlighter-rouge&quot;&gt;denser_prior_boxes&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;use_polygon&lt;/code&gt;是Textboxes_plusplus自己集成的参数，所以ncnn并不支持，这里就要自己去添加了。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;找到 else if (layer.type() == &quot;PriorBox&quot;)
+在if的末尾添加  fprintf(pp, &quot; 14=%d&quot;, prior_box_param.denser_prior_boxes());
+找到 else if (layer.type() == &quot;DetectionOutput&quot;)，在if末尾添加  
+fprintf(pp, &quot; 5=%d&quot;, detection_output_param.use_polygon());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  然后编译ncnn&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir build
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;build
+cmake ..
+make -j4
+./tools/caffe/caffe2ncnn your_path_deploy.prototxt your_path_model.caffemodel xxx.param xxx.bin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  这样caffe模型就顺利的转成ncnn模型(&lt;code class=&quot;highlighter-rouge&quot;&gt;xxx.param&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;xxx.bin&lt;/code&gt;)了，接下来就是如何使用ncnn模型的问题了。&lt;/p&gt;
+
+&lt;h3 id=&quot;为ncnn添加textboxes算法实现部分&quot;&gt;为ncnn添加TextBoxes算法实现部分&lt;/h3&gt;
+
+&lt;p&gt;  先找到priorbox层的&lt;code class=&quot;highlighter-rouge&quot;&gt;load_param&lt;/code&gt;，添加&lt;code class=&quot;highlighter-rouge&quot;&gt;denser_prior_boxes = pd.get(14, 0);&lt;/code&gt;（别忘了在的.h文件中初始化），再找到detectionoutput层的&lt;code class=&quot;highlighter-rouge&quot;&gt;load_param&lt;/code&gt;，添加&lt;code class=&quot;highlighter-rouge&quot;&gt;use_polygon = pd.get(5, 0);&lt;/code&gt; 接下来就可以开始将Textboxes_plusplus的算法移植到ncnn上了。Priorbox层比较好修改，就不写了。&lt;/p&gt;
+
+&lt;p&gt;  Detectionoutput层需要修改的地方如下：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;添加Polygon的decode。&lt;/li&gt;
+  &lt;li&gt;对bbox添加一个序号以便追踪，这样可以在最后输出时输出对应的polygon，因为polygon不进行nms和sort。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;  看着简单，实现起来确实也简单，polygon的decode是算法的核心，具体caffe的实现集成在TextBoxes_plusplus中的detection_output层里的&lt;code class=&quot;highlighter-rouge&quot;&gt;DecodeAllBoxes&lt;/code&gt;函数中，一层层点进去就可以看到这部分的算法代码了，一部部将它从caffe翻译过来就可以了。&lt;/p&gt;
+
+&lt;p&gt;  然后是第二步，因为caffe在&lt;code class=&quot;highlighter-rouge&quot;&gt;keep_nms_k&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;keep_top_k&lt;/code&gt;中是提取每个bbox的index保存下来，然后最后根据index来输出bbox和polygon，而ncnn不是，ncnn是直接舍弃掉了不需要的bbox，没有使用index，所以就无法直接输出与要输出的bbox相匹配的polygon，所以需要对bbox添加一个序号，类似于caffe的index(indices)。&lt;/p&gt;
+
+&lt;p&gt;  这样ncnn基本可以运行 Textboxes_plusplus 的TextBoxes部分了，但是可能还是会有一个问题，这个问题我也是调了好久才发现。本来以为是ncnn的长方形卷积有问题，一步步看下来发现原来是 caffe2ncnn.cpp 中没有把网络的 pad_h 和 pad_w 转进来，所以如果你也有这个问题，不妨去看看 caffe2ncnn.cpp 的 convolution 转参数部分。&lt;/p&gt;
+
+&lt;h3 id=&quot;end&quot;&gt;END&lt;/h3&gt;
+
+&lt;p&gt;  模型转完了，也可以使用了，似乎一切都结束了，但是其实下面还有一个难点，就是你要怎么给不规则四边形施加nms。已知2个四边形共8个点坐标，如何计算它俩的iou？具体可以看我&lt;a href=&quot;./2018-3-31-compute_iou_of_quad.md&quot;&gt;下一篇博客&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;  如果有需要，可以参考我的代码，&lt;a href=&quot;https://github.com/FreshMOU/ncnn&quot;&gt;点击这里&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sun, 25 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/TextBoxes_in_ncnn/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/TextBoxes_in_ncnn/</guid>
+        
+        <category>深度学习</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Ncnn_1</title>
+        <description>
+</description>
+        <pubDate>Wed, 21 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/ncnn_1/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/ncnn_1/</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>用ICDAR2015数据训练TextBoxes</title>
+        <description>&lt;h3 id=&quot;icdar2015&quot;&gt;ICDAR2015&lt;/h3&gt;
+
+&lt;p&gt;  国际文档分析与识别大会（ICDAR）是全球文档分析以及模式识别领域最重要的国际学术会议之一，由国际模式识别协会(International Association of Pattern Recognition, IAPR)主办。该会议每两年举办1次，同时会举办ICDAR竞赛。ICDAR竞赛主要是考验模型对文字的定位和识别的准确度。&lt;/p&gt;
+
+&lt;p&gt;  在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。&lt;/p&gt;
+
+&lt;h3 id=&quot;textboxes训练&quot;&gt;TextBoxes训练&lt;/h3&gt;
+
+&lt;p&gt;  之前提到TextBoxes_plusplus是由TextBoes和crnn合并得到的，其是由两个模型来分别进行位置检测和文字识别的。今天先把TextBoxes的训练先搞定了。&lt;/p&gt;
+
+&lt;p&gt;  ICDAR2015提供的数据是由txt格式(&lt;a href=&quot;https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/examples/gt_img_1.txt&quot;&gt;gt_img_1.txt&lt;/a&gt;)保存的，其中的格式为&lt;code class=&quot;highlighter-rouge&quot;&gt;[x1,y1,x2,y2,x3,y3,x4,y4,text]&lt;/code&gt;，而TextBoxes需要的是xml文件(&lt;a href=&quot;https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/examples/example.xml&quot;&gt;example.xml&lt;/a&gt;)，所以我们先要把数据转过来。&lt;/p&gt;
+
+&lt;p&gt;  TextBoxes是基于caffe实现的，caffe训练用的数据类型为lmdb格式的，要得到自己的lmdb文件需要有一个txt文件，其中的保存格式为：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    path_to_example1.jpg path_to_example1.xml
+    path_to_example2.jpg path_to_example2.xml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;  训练需要两个lmdb，一个train_lmdb，一个test_lmdb，所以需要两个txt文件。&lt;/p&gt;
+
+&lt;p&gt;  为了快速得到最后的train.txt和test.txt，我用python写了一个&lt;a href=&quot;https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/icdrtxt2xml.py&quot;&gt;脚本&lt;/a&gt;来对数据格式进行转换。将该脚本放在TextBoxes_plusplus主目录的&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/icdar2015&lt;/code&gt;目录下运行，运行结束后即可得到在&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/text&lt;/code&gt;目录下的train.txt和test.txt（注意icdar2015的图片数据解压在&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/icdar2015/image&lt;/code&gt;目录下，ground truth数据解压在&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/icdar2015/local_gt&lt;/code&gt;下）。&lt;/p&gt;
+
+&lt;p&gt;  接下来直接执行&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/text/creat_data.sh&lt;/code&gt;即可生成lmdb文件（在生成lmdb文件的时候一路报问题no such node(annotation.size.height)和bounding box irregular，猜测应该是由于xml文件写的框为不规则四边形的缘故，最后还报了一个链接错误不过没有什么影响，可以忽略），注意要修改&lt;code class=&quot;highlighter-rouge&quot;&gt;./examples/modelConfig.py&lt;/code&gt;文件中lmdb的路径。&lt;/p&gt;
+
+&lt;p&gt;  下载预训练模型放到&lt;code class=&quot;highlighter-rouge&quot;&gt;./models&lt;/code&gt;下就可以开始训练了。执行&lt;code class=&quot;highlighter-rouge&quot;&gt;python examples/text/train.py&lt;/code&gt;。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 21 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/TextBoxes_train/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/TextBoxes_train/</guid>
+        
+        <category>深度学习</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>torch学习</title>
+        <description>&lt;h3 id=&quot;torch介绍&quot;&gt;torch介绍&lt;/h3&gt;
+
+&lt;p&gt;  &lt;a href=&quot;http://torch.ch/&quot;&gt;torch&lt;/a&gt;是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了&lt;a href=&quot;pytorch.org/&quot;&gt;pytorch&lt;/a&gt;提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/posts/2018-03-19-torch/1.PNG&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;torch项目克隆快速使用入门&quot;&gt;torch项目克隆快速使用入门&lt;/h3&gt;
+
+&lt;p&gt;  因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建的函数就先不详细了解了，先了解一下torch对现有模型的前向预测如何使用。之后也可能会涉及torch模型转出的问题。&lt;/p&gt;
+
+&lt;p&gt;  在编译好 torch 环境后，在终端输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;th&lt;/code&gt; 就进入了 torch 的 shell 环境，在其中可以进行常规的 lua 命令和使用 torch 的包。&lt;/p&gt;
+
+&lt;h4 id=&quot;cmdline&quot;&gt;CmdLine&lt;/h4&gt;
+
+&lt;p&gt;  该类主要为了提供一种方便解析参数的框架，对于每个实验尤其是神经网络中要调参数上。同时还可以把输出重定向到log文件中。&lt;/p&gt;
+
+&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CmdLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;‘&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Training&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simple&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;network&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;’&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Options'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'-seed'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;123&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'initial random seed'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'-booloption'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'boolean option'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'-stroption'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'mystring'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'string option'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rundir&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'experiment'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;paths&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mkdir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rundir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rundir&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/log'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;等以后再填坑&quot;&gt;等以后再填坑&lt;/h3&gt;
+</description>
+        <pubDate>Mon, 19 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/torch/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/torch/</guid>
+        
+        <category>深度学习</category>
+        
+        
+      </item>
     
       <item>
         <title>TextBoxes_plusplus在ubuntu14.04上的编译</title>
