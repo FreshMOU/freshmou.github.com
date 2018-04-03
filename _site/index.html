@@ -159,6 +159,48 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/04/VGG2Mobile/" title="访问 TextBoxe++的VGGnet用Mobilenet替换">TextBoxe++的VGGnet用Mobilenet替换</a></h2>
+      <p class="excerpt">  现在一般的检测网络都会用VggNet来作骨架，而Vgg网络的体量有点大，不太适合嵌入式实现。Mobilenet是google提出的一个轻量网络，可以在保持较高精度的同时极大地降低网络运算量，因此Mobilenet就成了在嵌入式设备上实现深度学习的首选。  由于TextBoxes使用的是pycaffe来生成网络，所以我也基于pycaffe来生成Mobilenet的网络，对照./python/caffe/model_libs下的VGGNetBody来写我自己的MobileNet。因为原始的...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-04-03 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-04-03</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">深度学习</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/04/VGG2Mobile/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/03/compute_iou_of_quad/" title="访问 对不规则四边形使用nms">对不规则四边形使用nms</a></h2>
+      <p class="excerpt">nms非极大抑制  非极大值抑制顾名思义就是抑制不是极大值的元素，搜索局部的极大值。这个局部代表的是一个邻域，邻域有两个参数可变，一是邻域的维数，二是邻域的大小。这里不讨论通用的NMS算法，而是用于在目标检测中用于提取分数最高的窗口的。例如在行人检测中，滑动窗口经提取特征，经分类器分类识别后，每个窗口都会得到一个分数。但是滑动窗口会导致很多窗口与其他窗口存在包含或者大部分交叉的情况。这时就需要用到NMS来选取那些邻域里分数最高（是行人的概率最大），并且抑制那些分数低的窗口。IOU  nms...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-03-31 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-03-31</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">深度学习</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/03/compute_iou_of_quad/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/TextBoxes_in_ncnn/" title="访问 TextBoxes_plusplus的Textboxes部分基于ncnn实现">TextBoxes_plusplus的Textboxes部分基于ncnn实现</a></h2>
       <p class="excerpt">TextBoxes_plusplus的实现  TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的denser_prior_boxes和detection_output层的use_polygon，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。TextBoxes...&hellip;</p>
       <div class="post-list__meta">        
