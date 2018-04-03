@@ -197,6 +197,21 @@
 
 <section class="post-comments">
 
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css" />
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '529f21a8dc06d3895fcd',
+            client_secret: '027b1c1f8291f9a956517ed479790fe8b494425a',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
   
     <div id="disqus_thread"></div>
     <script>
