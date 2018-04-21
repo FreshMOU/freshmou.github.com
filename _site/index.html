@@ -159,6 +159,27 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/04/SynthText/" title="访问 TextBoxes++使用SynthText数据集">TextBoxes++使用SynthText数据集</a></h2>
+      <p class="excerpt">SynthText数据集  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText，这个数据集包含了80万张图像，其中融入了800万个文本。数据格式转成适用于TextBoxes++的xml格式  有许多语言可以读取并处理mat格式文件，我在这里选用python来...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-04-06 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-04-06</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">深度学习</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/04/SynthText/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/04/VGG2Mobile/" title="访问 TextBoxe++的VGGnet用Mobilenet替换">TextBoxe++的VGGnet用Mobilenet替换</a></h2>
       <p class="excerpt">  现在一般的检测网络都会用VggNet来作骨架，而Vgg网络的体量有点大，不太适合嵌入式实现。Mobilenet是google提出的一个轻量网络，可以在保持较高精度的同时极大地降低网络运算量，因此Mobilenet就成了在嵌入式设备上实现深度学习的首选。  由于TextBoxes使用的是pycaffe来生成网络，所以我也基于pycaffe来生成Mobilenet的网络，对照./python/caffe/model_libs下的VGGNetBody来写我自己的MobileNet。因为原始的...&hellip;</p>
       <div class="post-list__meta">        
@@ -265,7 +286,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/TextBoxes_plusplus/" title="访问 TextBoxes_plusplus在ubuntu14.04上的编译">TextBoxes_plusplus在ubuntu14.04上的编译</a></h2>
-      <p class="excerpt">TextBoxes_plusplus  TextBoxes_plusplus是基于TextBoxes改进的用于场景文字识别的项目，它用SSD来检测文字，然后对框出来的文字用CRNN进行识别。因为最近要用TextBoxes_plusplus，然后在编译它的过程中也遇到了一些问题，所以用这篇博客记录一下。  首先还是要先执行git clone https://github.com/MhLiao/TextBoxes_plusplus.git编译TextBoxes  TextBoxes是在caff...&hellip;</p>
+      <p class="excerpt">TextBoxes_plusplus  TextBoxes_plusplus是基于TextBoxes改进的用于场景文字识别的项目，它用SSD来检测文字，然后对框出来的文字用CRNN进行识别。因为最近要用TextBoxes_plusplus，然后在编译它的过程中也遇到了一些问题，所以用这篇博客记录一下。  首先还是要先执行git clone https://github.com/MhLiao/TextBoxes_plusplus.git编译TextBoxes++  TextBoxes是在ca...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-16 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 

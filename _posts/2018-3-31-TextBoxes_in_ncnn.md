@@ -9,7 +9,7 @@ tags: 深度学习
 
 &#8195;&#8195;TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的`denser_prior_boxes`和detection_output层的`use_polygon`，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。
 
-### TextBoxes caffe模型转ncnn模型
+### TextBoxes++ caffe模型转ncnn模型
 
 &#8195;&#8195;Ncnn提供了caffe转ncnn的tools  `./tools/caffe/caffe2ncnn.cpp`，但是由于`denser_prior_boxes`和`use_polygon`是Textboxes_plusplus自己集成的参数，所以ncnn并不支持，这里就要自己去添加了。
 
@@ -104,6 +104,14 @@ for (int j = 0; j < num_prior; j++)
 ```
 
 &#8195;&#8195;这样ncnn基本可以运行 Textboxes_plusplus 的TextBoxes部分了，但是可能还是会有一个问题，这个问题我也是调了好久才发现。本来以为是ncnn的长方形卷积有问题，一步步看下来发现原来是 caffe2ncnn.cpp 中没有把网络的 pad_h 和 pad_w 转进来，所以如果你也有这个问题，不妨去看看 caffe2ncnn.cpp 的 convolution 转参数部分。
+
+&#8195;&#8195;大功告成
+
+<br/>
+
+![](/images/posts/2018-03-31-TextBoxes_ncnn/test.jpg)
+
+<br/>
 
 ### END
 

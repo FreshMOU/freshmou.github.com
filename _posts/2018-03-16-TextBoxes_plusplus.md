@@ -11,7 +11,7 @@ tags: 深度学习
 
 &#8195;&#8195;首先还是要先执行`git clone https://github.com/MhLiao/TextBoxes_plusplus.git`
 
-#### 编译TextBoxes
+#### 编译TextBoxes++
 
 &#8195;&#8195;TextBoxes是在caffe上实现的，直接按照普通caffe编译即可。  
 &#8195;&#8195;在编译前需要安装caffe的各种依赖，依赖安装可以网上查询。  
@@ -101,7 +101,7 @@ sh build_cpp.sh
 
 &#8195;&#8195;最后要测试一下，官方提供了两个模型。
 
-&#8195;&#8195;一个是TextBoxes的caffe模型 [BaiduYun](https://pan.baidu.com/s/1bqekTun)，下载来之后放到`./models`
+&#8195;&#8195;一个是TextBoxes++的caffe模型 [BaiduYun](https://pan.baidu.com/s/1bqekTun)，下载来之后放到`./models`
 
 &#8195;&#8195;一个是crnn的torch模型 [BaiduYun](https://pan.baidu.com/s/1jJwmneI)，下载来之后放到`./crnn/model/`
 
