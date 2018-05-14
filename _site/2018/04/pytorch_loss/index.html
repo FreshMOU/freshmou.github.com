@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>torch学习</title>
-  <meta name="description" content="torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caff...">
+  <title>Pytorch自定义Loss函数</title>
+  <meta name="description" content="  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="torch学习">
-  <meta name="twitter:description" content="torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caff...">
+  <meta name="twitter:title" content="Pytorch自定义Loss函数">
+  <meta name="twitter:description" content="  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="torch学习">
-  <meta property="og:description" content="torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caff...">
+  <meta property="og:title" content="Pytorch自定义Loss函数">
+  <meta property="og:description" content="  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/2018/03/torch/">
+  <link rel="canonical" href="http://localhost:4000/2018/04/pytorch_loss/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -156,10 +156,10 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">torch学习</h1>
+    <h1 class="post-title">Pytorch自定义Loss函数</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
-      <time datetime="2018-03-19 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-03-19</time>  
+      <time datetime="2018-04-21 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-04-21</time>  
          
       <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
     </p>
@@ -167,44 +167,53 @@
   </header>
 
   <section class="post">
-    <h3 id="torch介绍">torch介绍</h3>
+    <p>  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。</p>
 
-<p>  <a href="http://torch.ch/">torch</a>是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了<a href="pytorch.org/">pytorch</a>提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。</p>
+<h3 id="只定义loss函数的前向计算公式">只定义loss函数的前向计算公式</h3>
 
-<p><br /></p>
+<p>  在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。</p>
 
-<p><img src="/images/posts/2018-03-19-torch/1.PNG" alt="" height="50%" width="50%" /></p>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="n">Class</span> <span class="n">YourLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">():</span>
+        <span class="k">pass</span>
 
-<p><br /></p>
-
-<h3 id="torch项目克隆快速使用入门">torch项目克隆快速使用入门</h3>
-
-<p>  因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建的函数就先不详细了解了，先了解一下torch对现有模型的前向预测如何使用。之后也可能会涉及torch模型转出的问题。</p>
-
-<p>  在编译好 torch 环境后，在终端输入 <code class="highlighter-rouge">th</code> 就进入了 torch 的 shell 环境，在其中可以进行常规的 lua 命令和使用 torch 的包。</p>
-
-<h4 id="cmdline">CmdLine</h4>
-
-<p>  该类主要为了提供一种方便解析参数的框架，对于每个实验尤其是神经网络中要调参数上。同时还可以把输出重定向到log文件中。</p>
-
-<div class="language-lua highlighter-rouge"><pre class="highlight"><code><span class="n">cmd</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">CmdLine</span><span class="p">()</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">()</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">()</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">(</span><span class="err">‘</span><span class="n">Training</span> <span class="n">a</span> <span class="n">simple</span> <span class="n">network</span><span class="err">’</span><span class="p">)</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">()</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">(</span><span class="s1">'Options'</span><span class="p">)</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">option</span><span class="p">(</span><span class="s1">'-seed'</span><span class="p">,</span><span class="mi">123</span><span class="p">,</span><span class="s1">'initial random seed'</span><span class="p">)</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">option</span><span class="p">(</span><span class="s1">'-booloption'</span><span class="p">,</span><span class="kc">false</span><span class="p">,</span><span class="s1">'boolean option'</span><span class="p">)</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">option</span><span class="p">(</span><span class="s1">'-stroption'</span><span class="p">,</span><span class="s1">'mystring'</span><span class="p">,</span><span class="s1">'string option'</span><span class="p">)</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">()</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">:</span><span class="n">parse</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="n">params</span><span class="p">.</span><span class="n">rundir</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">:</span><span class="n">string</span><span class="p">(</span><span class="s1">'experiment'</span><span class="p">,</span><span class="n">params</span><span class="p">,{</span><span class="n">dir</span><span class="o">=</span><span class="kc">true</span><span class="p">})</span>
-<span class="n">paths</span><span class="p">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="n">rundir</span><span class="p">)</span>
-<span class="n">cmd</span><span class="p">:</span><span class="n">log</span><span class="p">(</span><span class="n">params</span><span class="p">.</span><span class="n">rundir</span> <span class="o">..</span> <span class="s1">'/log'</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">():</span>
+        <span class="k">pass</span>
 </code></pre>
 </div>
 
-<h3 id="等以后再填坑">等以后再填坑</h3>
+<h3 id="自定义loss函数的forward和backward">自定义loss函数的forward和backward</h3>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="kn">import</span> <span class="n">rfft2</span><span class="p">,</span> <span class="n">irfft2</span>
+
+<span class="k">class</span> <span class="nc">BadFFTFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">numpy_input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rfft2</span><span class="p">(</span><span class="n">numpy_input</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">input</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="n">numpy_go</span> <span class="o">=</span> <span class="n">grad_output</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">irfft2</span><span class="p">(</span><span class="n">numpy_go</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">grad_output</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="自己写一个pytorch的c扩展">自己写一个pytorch的C扩展</h3>
+
+<p>  这个了解不多，所以也不太会</p>
+
+<h3 id="简单定义">简单定义</h3>
+
+<p>  看网上有说直接定义一个简单函数就可以了，可以尝试一下，与只定义forward类似。</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="o">......</span> <span class="c">#模型操作</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+</code></pre>
+</div>
 
 
   </section>
@@ -215,15 +224,10 @@
     <ul class="pager">
         
         <li class="previous">
-            <a href="/2018/03/TextBoxes_plusplus/" data-toggle="tooltip" data-placement="top" title="TextBoxes_plusplus在ubuntu14.04上的编译">上一篇：  <span>TextBoxes_plusplus在ubuntu14.04上的编译</span>
+            <a href="/2018/04/SynthText/" data-toggle="tooltip" data-placement="top" title="TextBoxes++使用SynthText数据集">上一篇：  <span>TextBoxes++使用SynthText数据集</span>
             </a>
         </li>
         
-        
-        <li class="next">
-            <a href="/2018/03/TextBoxes_train/" data-toggle="tooltip" data-placement="top" title="用ICDAR2015数据训练TextBoxes">下一篇：  <span>用ICDAR2015数据训练TextBoxes</span>
-            </a>
-        </li>
         
     </ul>
 </section>

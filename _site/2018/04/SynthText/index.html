@@ -86,7 +86,7 @@
       </div>
     </span>
     
-    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/hawaii.jpg')">
   <div class="panel-main">
 
     <div class="panel-main__inner panel-inverted">
@@ -114,10 +114,10 @@
         <!-- 头像效果-end -->
         <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for SHL" class="blog-button">SHL</a></h1>
         
-        <span class="panel-cover__subtitle panel-subtitle">个人站</span>
+        <span class="panel-cover__subtitle panel-subtitle">freshmou</span>
         
         <hr class="panel-cover__divider" />
-        <p class="panel-cover__description">欢迎来到我的个人站~</p>
+        <span class="panel-cover__description">得陇复望蜀</span>
         <hr class="panel-cover__divider panel-cover__divider--secondary" />
         
         
@@ -140,7 +140,7 @@
           </div>          
         </div>
 
-
+        <div>© 2018. All rights reserved.</div>
         </div>
       </div>
     </div>
@@ -181,8 +181,93 @@
 </code></pre>
 </div>
 
-<p>  </p>
+<p>  之前我直接用string来规范文本数据，但是并不如xml包来的好管理。</p>
 
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scipy.io</span> <span class="kn">as</span> <span class="nn">sio</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xml.dom.minidom</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">MatRead</span><span class="p">(</span><span class="n">matfile</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">matfile</span><span class="p">)</span>
+
+    <span class="n">train_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'train.txt'</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span>
+    <span class="n">test_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'test.txt'</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'txt'</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s">'txt'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">" "</span><span class="p">)]</span>
+            <span class="n">contents</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"No.{} data"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">rec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'wordBB'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">dom</span><span class="o">.</span><span class="n">minidom</span><span class="o">.</span><span class="n">Document</span><span class="p">()</span> 
+        <span class="n">root</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">'annotation'</span><span class="p">)</span> 
+        <span class="n">doc</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> 
+        <span class="k">print</span><span class="p">(</span><span class="s">"start to process {} object"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)))</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)):</span>
+            <span class="n">nodeobject</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">'object'</span><span class="p">)</span>
+            <span class="n">nodecontent</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">'content'</span><span class="p">)</span>
+            <span class="n">nodecontent</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">createTextNode</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">contents</span><span class="p">[</span><span class="n">j</span><span class="p">])))</span>
+
+            <span class="n">nodename</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">'name'</span><span class="p">)</span>
+            <span class="n">nodename</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">createTextNode</span><span class="p">(</span><span class="s">'text'</span><span class="p">))</span>
+
+            <span class="n">bndbox</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'x1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'y1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'x2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'y2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'x3'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'y3'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'x4'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'y4'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'xmin'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bndbox</span><span class="p">[</span><span class="s">'x1'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'x2'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'x3'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'x4'</span><span class="p">])</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'xmax'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bndbox</span><span class="p">[</span><span class="s">'x1'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'x2'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'x3'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'x4'</span><span class="p">])</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'ymin'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bndbox</span><span class="p">[</span><span class="s">'y1'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'y2'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'y3'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'y4'</span><span class="p">])</span>
+            <span class="n">bndbox</span><span class="p">[</span><span class="s">'ymax'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bndbox</span><span class="p">[</span><span class="s">'y1'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'y2'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'y3'</span><span class="p">],</span> <span class="n">bndbox</span><span class="p">[</span><span class="s">'y4'</span><span class="p">])</span>
+
+            <span class="n">nodebndbox</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">'bndbox'</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">bndbox</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">nodecoord</span> <span class="o">=</span>  <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">nodecoord</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">createTextNode</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">bndbox</span><span class="p">[</span><span class="n">k</span><span class="p">])))</span>
+                <span class="n">nodebndbox</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">nodecoord</span><span class="p">)</span>
+
+            <span class="n">nodeobject</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">nodecontent</span><span class="p">)</span>
+            <span class="n">nodeobject</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">nodename</span><span class="p">)</span>
+            <span class="n">nodeobject</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">nodebndbox</span><span class="p">)</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">nodeobject</span><span class="p">)</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'imnames'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'.jpg'</span><span class="p">,</span> <span class="s">'.xml'</span><span class="p">)</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">writexml</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">,</span> <span class="n">addindent</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">,</span> <span class="n">newl</span><span class="o">=</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">"utf-8"</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">pwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pwd</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s">'imnames'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">xml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pwd</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">file_line</span> <span class="o">=</span> <span class="n">img_path</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="n">xml_path</span> <span class="o">+</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span>
+        <span class="k">if</span> <span class="n">rad</span> <span class="o">&gt;</span> <span class="mi">18</span><span class="p">:</span>
+            <span class="n">train_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">test_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_line</span><span class="p">)</span>    
+
+    <span class="n">train_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">test_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h3 id="生成lmdb数据">生成lmdb数据</h3>
+
+<p>  将<code class="highlighter-rouge">train.txt</code>和<code class="highlighter-rouge">test.txt</code>移到<code class="highlighter-rouge">TextBoxes_plusplus/data/text</code>目录下，再执行<code class="highlighter-rouge">./create_data.sh</code>即可得到lmdb文件。</p>
 
 
   </section>
@@ -197,6 +282,11 @@
             </a>
         </li>
         
+        
+        <li class="next">
+            <a href="/2018/04/pytorch_loss/" data-toggle="tooltip" data-placement="top" title="Pytorch自定义Loss函数">下一篇：  <span>Pytorch自定义Loss函数</span>
+            </a>
+        </li>
         
     </ul>
 </section>

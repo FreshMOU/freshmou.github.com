@@ -86,7 +86,7 @@
       </div>
     </span>
     
-    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/hawaii.jpg')">
   <div class="panel-main">
 
     <div class="panel-main__inner panel-inverted">
@@ -114,10 +114,10 @@
         <!-- 头像效果-end -->
         <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for SHL" class="blog-button">SHL</a></h1>
         
-        <span class="panel-cover__subtitle panel-subtitle">个人站</span>
+        <span class="panel-cover__subtitle panel-subtitle">freshmou</span>
         
         <hr class="panel-cover__divider" />
-        <p class="panel-cover__description">欢迎来到我的个人站~</p>
+        <span class="panel-cover__description">得陇复望蜀</span>
         <hr class="panel-cover__divider panel-cover__divider--secondary" />
         
         
@@ -140,7 +140,7 @@
           </div>          
         </div>
 
-
+        <div>© 2018. All rights reserved.</div>
         </div>
       </div>
     </div>
@@ -266,6 +266,14 @@ for (int j = 0; j &lt; num_prior; j++)
 </code></pre>
 
 <p>  这样ncnn基本可以运行 Textboxes_plusplus 的TextBoxes部分了，但是可能还是会有一个问题，这个问题我也是调了好久才发现。本来以为是ncnn的长方形卷积有问题，一步步看下来发现原来是 caffe2ncnn.cpp 中没有把网络的 pad_h 和 pad_w 转进来，所以如果你也有这个问题，不妨去看看 caffe2ncnn.cpp 的 convolution 转参数部分。</p>
+
+<p>  大功告成</p>
+
+<p><br /></p>
+
+<p><img src="/images/posts/2018-03-31-TextBoxes_ncnn/test.jpg" alt="" /></p>
+
+<p><br /></p>
 
 <h3 id="end">END</h3>
 
