@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>SHL</title>
-  <meta name="description" content="得陇复望蜀">
+  <title>Winograd</title>
+  <meta name="description" content="前言">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SHL">
-  <meta name="twitter:description" content="得陇复望蜀">
+  <meta name="twitter:title" content="Winograd">
+  <meta name="twitter:description" content="前言">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="SHL">
-  <meta property="og:description" content="得陇复望蜀">
+  <meta property="og:title" content="Winograd">
+  <meta property="og:description" content="前言">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/tags/">
+  <link rel="canonical" href="http://localhost:4000/2018/05/winograd/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -156,191 +156,75 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">Winograd</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-05-31 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-05-31</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title"></h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="前言">前言</h3>
 
-<ul class="tag_box inline">
-    
-  
+<p>  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在过滤器和批量小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并显示批处理大小从1到64的时时吞吐量。</p>
 
+<blockquote>
+  <p>Cong和Xiao使用Strassen算法进行快速矩阵乘法，以减少卷积网络层中的调度次数，从而降低其总算术复杂度。 作者还提出，来自算术复杂性理论的更多技术可能适用于衔接。[1]</p>
+</blockquote>
 
-  
-     
-    	<li><a href="#介绍-ref">介绍 <span>1</span></a></li>
-     
-    	<li><a href="#lua-ref">lua <span>1</span></a></li>
-     
-    	<li><a href="#深度学习-ref">深度学习 <span>8</span></a></li>
-     
-    	<li><a href="#pytorch-ref">pytorch <span>1</span></a></li>
-    
-  
+<h3 id="卷积公式">卷积公式</h3>
 
+<p>  假设卷积公式如下，</p>
 
+<p><img src="http://www.forkosh.com/mathtex.cgi? Y_{ i }_{ , }_{ k }_{ , }_{ x }_{ , }_{ y }=\sum _{ c=1 }^{ C }{ \sum _{ v=1 }^{ R }{ \sum _{ u=1 }^{ S }{ D_{ i }_{ , }_{ c }_{ , }_{ x }_{ + }_{ u }_{ , }_{ y }_{ + }_{ v }G_{ k }_{ , }_{ c }_{ , }_{ x }_{ , }_{ y } }  }  } " /></p>
 
-</ul>
+<p>参考文献</p>
 
-<div class = "card">
- 
+<h5 id="1-cong-j-xiao-b-2014-minimizing-computation-in-convolutional-neural-networks-in-wermter-s-et-al-eds-artificial-neural-networks-and-machine-learning--icann-2014-icann-2014-lecture-notes-in-computer-science-vol-8681-springer-cham">1. Cong J., Xiao B. (2014) <a href="https://link.springer.com/chapter/10.1007/978-3-319-11179-7_36">Minimizing Computation in Convolutional Neural Networks.</a> In: Wermter S. et al. (eds) Artificial Neural Networks and Machine Learning – ICANN 2014. ICANN 2014. Lecture Notes in Computer Science, vol 8681. Springer, Cham</h5>
 
-  <h3 id="介绍-ref">介绍</h3>
-  <ul>
-      
-    
+<h5 id="2-lavin-a-gray-s-fast-algorithms-for-convolutional-neural-networkscproceedings-of-the-ieee-conference-on-computer-vision-and-pattern-recognition-2016-4013-4021">2. Lavin A, Gray S. <a href="https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Lavin_Fast_Algorithms_for_CVPR_2016_paper.pdf">Fast algorithms for convolutional neural networks[C]</a>//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016: 4013-4021.</h5>
 
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/Target/">第一篇博客</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="lua-ref">lua</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/lua/">lua学习入门</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="深度学习-ref">深度学习</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/05/winograd/">Winograd</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/04/SynthText/">TextBoxes++使用SynthText数据集</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/04/VGG2Mobile/">TextBoxe++的VGGnet用Mobilenet替换</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/compute_iou_of_quad/">对不规则四边形使用nms</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus的Textboxes部分基于ncnn实现</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/torch/">torch学习</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_plusplus/">TextBoxes_plusplus在ubuntu14.04上的编译</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="pytorch-ref">pytorch</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/04/pytorch_loss/">Pytorch自定义Loss函数</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
-
-</div>
 
   </section>
 </article>
+
+<section>
+
+    <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/04/pytorch_loss/" data-toggle="tooltip" data-placement="top" title="Pytorch自定义Loss函数">上一篇：  <span>Pytorch自定义Loss函数</span>
+            </a>
+        </li>
+        
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '91743f9a28fe42c95eb6',
+            client_secret: '6cd3dcf61b359e04362b3d1ff09d4236e4e42bb3',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
+  
+
+</section>
+
 
             <section class="footer">
     <footer>

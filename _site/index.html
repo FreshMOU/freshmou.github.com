@@ -159,6 +159,27 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/05/winograd/" title="访问 Winograd">Winograd</a></h2>
+      <p class="excerpt">前言  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在过滤器和批量小的情况下更快。论文使用VGG网络对算...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-05-31 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-05-31</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">深度学习</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/05/winograd/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/04/pytorch_loss/" title="访问 Pytorch自定义Loss函数">Pytorch自定义Loss函数</a></h2>
       <p class="excerpt">  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。只定义loss函数的前向计算公式  在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。import torch.nn as nnClass YourLoss(nn.Module):    def __init__():        pass    def forward():        pass自定义loss函数的forward和backwardfrom numpy.fft import r...&hellip;</p>
       <div class="post-list__meta">        
