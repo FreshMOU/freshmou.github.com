@@ -210,10 +210,10 @@ ul {
 code {
   color: #000000;
   padding: .2em .2em;
-  background: #fcfeff;
+  background: #ade4ff1c;
   /* border: 1px solid #c9e1f6; */
   border-radius: 3px;
-  font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  font-family: Monaco,Courier New,Bitstream Vera Sans Mono,Menlo,Consolas,   Lucida Console, Liberation Mono, DejaVu Sans Mono,   monospace, serif;
   font-size: 1.3em;
   vertical-align: bottom;
   word-wrap: break-word; }
@@ -421,7 +421,7 @@ img::-moz-selection {
 
   .content-wrapper__inner {
     /*margin: 0 10%;*/
-    margin-right: 60px;
+    margin-right: 8%;
     padding: 50px 0; 
     /*margin: 0 auto; */
     /*width: 700px;*/
@@ -1167,8 +1167,8 @@ input[type="tel"]:-ms-input-placeholder {
     margin: 0 auto; 
   }
   .content-wrapper__inner {
-    margin-right: 0;
-    margin-left: 10px; 
+    margin-right: 10px;
+    margin-left: 40%; 
   }
 }
 
