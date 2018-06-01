@@ -196,13 +196,8 @@
 
 <p>  假设用长度为r的FIR滤波器来得到输出m的式子为<script type="math/tex">F(m, r)</script>，传统的winograd算法需要<script type="math/tex">µ(F(m,r)) = m + r - 1</script>次乘法。我们可以通过堆叠一维算法来得到二维的最小算法——假设<script type="math/tex">F(m\times n, r\times s)</script>指代用<script type="math/tex">r\times s</script>的滤波器来计算得到<script type="math/tex">m\times n</script>的输出，则它需要
 <img src="/images/posts/2018-05-31-Winograd/tex3.png" alt="" height="50%" width="50%" />
-次乘法。以此为例，我们可以继续堆叠一维算法来得到多维的最小算法。</p>
-
-<p>  可以看出不管是一维、二维还是多维的计算，算法所需要的乘法数与输入数都是一样的。（这里需要了解信号卷积的相关知识[3]）</p>
-
-<p><img src="/images/posts/2018-05-31-Winograd/1.jpg" alt="" height="50%" width="50%" /></p>
-
-<p>  如图，以长度为<script type="math/tex">r</script>的FIR要得到<script type="math/tex">m</script>的输出，输入必为<script type="math/tex">m+r-1</script>。</p>
+次乘法。以此为例，我们可以继续堆叠一维算法来得到多维的最小算法。<br />
+  <strong><font color="red">但是需要注意不管是一维、二维还是多维的最快计算法，它要求输入的数量与所需乘法数一样。</font></strong></p>
 
 <h2 id="f2times-23times-3"><script type="math/tex">F(2\times 2,3\times 3)</script></h2>
 
@@ -216,7 +211,7 @@
 
 <p>  我们可以将矩阵公式写成
 <img src="/images/posts/2018-05-31-Winograd/tex6.png" alt="" height="30%" width="30%" />
-  其中，<script type="math/tex">\odot</script>指逐元素的乘法。对于<script type="math/tex">F(2,3)</script>而言，上述公式各元素表示的意义如下</p>
+  其中，<script type="math/tex">\odot</script>指逐元素的乘法（就是点乘，卷积用的）。对于<script type="math/tex">F(2,3)</script>而言，上述公式各元素表示的意义如下</p>
 
 <p><img src="/images/posts/2018-05-31-Winograd/tex7.png" alt="" height="50%" width="50%" /></p>
 
@@ -224,13 +219,13 @@
 <img src="/images/posts/2018-05-31-Winograd/tex8.png" alt="" height="30%" width="30%" />
   其中，<script type="math/tex">g</script>是一个<script type="math/tex">r\times r</script>的滤波器，<script type="math/tex">d</script>是一个<script type="math/tex">(m+r-1)\times(m+r-1)</script>的输入图像块。</p>
 
-<p>  F(2x2, 3x3)用winograd只需要4x4=16次乘法，而原始矩阵运算则需要2x2x3x3=36次乘法运算。尽管winograd法还需要用32次加法来进行数据转换，用28个浮点运算指令来进行滤波器转换，用24次加法来进行反转变换，但是相比原始矩阵运算法还是提升很大。</p>
+<p>  <script type="math/tex">F(2\times 2, 3\times 3)</script>用winograd只需要<script type="math/tex">4\times 4=16</script>次乘法，而原始矩阵运算则需要<script type="math/tex">2\times 2\times 3\times 3=36</script>次乘法运算。尽管winograd法还需要用32次加法来进行数据转换，用28个浮点运算指令来进行滤波器转换，用24次加法来进行反转变换，但是相比原始矩阵运算法还是提升很大。</p>
 
 <p>  假设<script type="math/tex">U=G_gG^T</script>和<script type="math/tex">V=B^{T}dB</script>，则
 <script type="math/tex">Y=A^{T}[U\odot V]A</script></p>
 
 <p>  以<script type="math/tex">(\widetilde {x},\widetilde {y})</script>为坐标，<script type="math/tex">i</script>指单张图片，<script type="math/tex">k</script>为滤波器，则可以将上述卷积公式改写成，
-<img src="/images/posts/2018-05-31-Winograd/tex11.png" alt="" height="50%" width="50%" /></p>
+<img src="/images/posts/2018-05-31-Winograd/tex11.png" alt="" height="40%" width="40%" /></p>
 
 <p>  以下是具体实现的伪代码</p>
 
