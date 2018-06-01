@@ -47,23 +47,35 @@ tags: 深度学习
 
 ![](/images/posts/2018-05-31-Winograd/tex7.png){:height="50%" width="50%"}
 
-&#8195;&#8195;堆叠一维算法可以得到二维算法$$F(m\times m, r\times r)$$如下
+&#8195;&#8195;堆叠一维算法可以得到二维算法$$F(m\times m, r\times r)$$如下（这一步论文没有具体的分析，不是很懂为什么，估计是各种线性变换(￣▽￣) ）
 ![](/images/posts/2018-05-31-Winograd/tex8.png){:height="30%" width="30%"}
 &#8195;&#8195;其中，$$g$$是一个$$r\times r$$的滤波器，$$d$$是一个$$(m+r-1)\times(m+r-1)$$的输入图像块。
 
 &#8195;&#8195;$$F(2\times 2, 3\times 3)$$用winograd只需要$$4\times 4=16$$次乘法，而原始矩阵运算则需要$$2\times 2\times 3\times 3=36$$次乘法运算。尽管winograd法还需要用32次加法来进行数据转换，用28个浮点运算指令来进行滤波器转换，用24次加法来进行反转变换，但是相比原始矩阵运算法还是提升很大。
+
+&#8195;&#8195;$$F(2\times 2,3\times 3)$$可以被用来计算卷积核为$$r\times r$$的卷积操作。其中，输入图像的每个通道需要被切割成$$(m+r-1)\times(m+r-1)$$大小的块（每个块与相邻块间有$$r-1$$的重叠区域），则每个通道可以有$$P=\left\lceil H/m\right\rceil\times\left\lceil W/m\right\rceil$$个块。然后$$F(2\times 2,3\times 3)$$可以分别计算所有块然后累加得到最终结果。
 
 &#8195;&#8195;假设$$U=G_gG^T$$和$$V=B^{T}dB$$，则
 $$
 Y=A^{T}[U\odot V]A
 $$
 
-&#8195;&#8195;以$$(\widetilde {x},\widetilde {y})$$为坐标，$$i$$指单张图片，$$k$$为滤波器，则可以将上述卷积公式改写成，
+&#8195;&#8195;以$$(\widetilde {x},\widetilde {y})$$为各个块坐标，$$i$$指单张图片，$$k$$为滤波器，则可以将上述卷积公式改写成，
 ![](/images/posts/2018-05-31-Winograd/tex11.png){:height="40%" width="40%"}
 
 &#8195;&#8195;以下是具体实现的伪代码
 
 ![](/images/posts/2018-05-31-Winograd/tex12.png){:height="70%" width="70%"}
+
+### 私货和具体理解
+
+&#8195;&#8195;其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像$$3\times 3$$的卷积核对$$7\times 7$$的矩阵进行卷积，因为在计算时要将输入图像切割成$$(m+r-1)\times(m+r-1)$$大小的块，并且每个块与相邻块间有$$r-1$$的重叠区域，也就是说每个块与相邻块重叠区域大小为$$2$$，所以$$m+r-1=5\Longrightarrow m=3$$，所以这个计算要拆成$$4$$个$$F(3\times 3,3\times 3)$$的累加。
+
+&#8195;&#8195;因此我们只要了解到这个公式就可以了，
+
+![](/images/posts/2018-05-31-Winograd/tex8.png){:height="30%" width="30%"}
+
+$$A,G,B$$根据不同的卷积核有不同的值，而且是提前计算好的，可以用<https://github.com/andravin/wincnn>的脚本计算。不过，$$A,G,B$$也不是可以通过脚本直接得到的，还需要自己确定$$m+r-2$$个插值点，wincnn的作者推荐了<https://openreview.net/forum?id=H1ZaRZVKg&noteId=H1ZaRZVKg>可以帮助确定插值点。（感觉好难啊（−＿−；））
 
 
 <br/>
@@ -74,4 +86,6 @@ $$
 
 ##### 2. Cong J., Xiao B. (2014) [Minimizing Computation in Convolutional Neural Networks.](https://link.springer.com/chapter/10.1007/978-3-319-11179-7_36) In: Wermter S. et al. (eds) Artificial Neural Networks and Machine Learning – ICANN 2014. ICANN 2014. Lecture Notes in Computer Science, vol 8681. Springer, Cham
 
-##### 3. [知乎，如何通俗易懂地解释卷积？](https://www.zhihu.com/question/22298352)
+##### 3. [Winograd 方法快速计算卷积](http://shuokay.com/2018/02/21/winograd/)
+
+##### 4. [知乎，如何通俗易懂地解释卷积？](https://www.zhihu.com/question/22298352)

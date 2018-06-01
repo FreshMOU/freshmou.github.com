@@ -5,8 +5,8 @@
     <description>在学习DL性能优化的学生</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Jun 2018 15:52:37 +0800</pubDate>
-    <lastBuildDate>Fri, 01 Jun 2018 15:52:37 +0800</lastBuildDate>
+    <pubDate>Fri, 01 Jun 2018 19:52:56 +0800</pubDate>
+    <lastBuildDate>Fri, 01 Jun 2018 19:52:56 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -55,21 +55,33 @@
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex7.png&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;  堆叠一维算法可以得到二维算法&lt;script type=&quot;math/tex&quot;&gt;F(m\times m, r\times r)&lt;/script&gt;如下
+&lt;p&gt;  堆叠一维算法可以得到二维算法&lt;script type=&quot;math/tex&quot;&gt;F(m\times m, r\times r)&lt;/script&gt;如下（这一步论文没有具体的分析，不是很懂为什么，估计是各种线性变换(￣▽￣) ）
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex8.png&quot; alt=&quot;&quot; height=&quot;30%&quot; width=&quot;30%&quot; /&gt;
   其中，&lt;script type=&quot;math/tex&quot;&gt;g&lt;/script&gt;是一个&lt;script type=&quot;math/tex&quot;&gt;r\times r&lt;/script&gt;的滤波器，&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;是一个&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;的输入图像块。&lt;/p&gt;
 
 &lt;p&gt;  &lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;用winograd只需要&lt;script type=&quot;math/tex&quot;&gt;4\times 4=16&lt;/script&gt;次乘法，而原始矩阵运算则需要&lt;script type=&quot;math/tex&quot;&gt;2\times 2\times 3\times 3=36&lt;/script&gt;次乘法运算。尽管winograd法还需要用32次加法来进行数据转换，用28个浮点运算指令来进行滤波器转换，用24次加法来进行反转变换，但是相比原始矩阵运算法还是提升很大。&lt;/p&gt;
 
+&lt;p&gt;  &lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;可以被用来计算卷积核为&lt;script type=&quot;math/tex&quot;&gt;r\times r&lt;/script&gt;的卷积操作。其中，输入图像的每个通道需要被切割成&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;大小的块（每个块与相邻块间有&lt;script type=&quot;math/tex&quot;&gt;r-1&lt;/script&gt;的重叠区域），则每个通道可以有&lt;script type=&quot;math/tex&quot;&gt;P=\left\lceil H/m\right\rceil\times\left\lceil W/m\right\rceil&lt;/script&gt;个块。然后&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;可以分别计算所有块然后累加得到最终结果。&lt;/p&gt;
+
 &lt;p&gt;  假设&lt;script type=&quot;math/tex&quot;&gt;U=G_gG^T&lt;/script&gt;和&lt;script type=&quot;math/tex&quot;&gt;V=B^{T}dB&lt;/script&gt;，则
 &lt;script type=&quot;math/tex&quot;&gt;Y=A^{T}[U\odot V]A&lt;/script&gt;&lt;/p&gt;
 
-&lt;p&gt;  以&lt;script type=&quot;math/tex&quot;&gt;(\widetilde {x},\widetilde {y})&lt;/script&gt;为坐标，&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;指单张图片，&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;为滤波器，则可以将上述卷积公式改写成，
+&lt;p&gt;  以&lt;script type=&quot;math/tex&quot;&gt;(\widetilde {x},\widetilde {y})&lt;/script&gt;为各个块坐标，&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;指单张图片，&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;为滤波器，则可以将上述卷积公式改写成，
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex11.png&quot; alt=&quot;&quot; height=&quot;40%&quot; width=&quot;40%&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;  以下是具体实现的伪代码&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex12.png&quot; alt=&quot;&quot; height=&quot;70%&quot; width=&quot;70%&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;私货和具体理解&quot;&gt;私货和具体理解&lt;/h3&gt;
+
+&lt;p&gt;  其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的卷积核对&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的矩阵进行卷积，因为在计算时要将输入图像切割成&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;大小的块，并且每个块与相邻块间有&lt;script type=&quot;math/tex&quot;&gt;r-1&lt;/script&gt;的重叠区域，也就是说每个块与相邻块重叠区域大小为&lt;script type=&quot;math/tex&quot;&gt;2&lt;/script&gt;，所以&lt;script type=&quot;math/tex&quot;&gt;m+r-1=5\Longrightarrow m=3&lt;/script&gt;，所以这个计算要拆成&lt;script type=&quot;math/tex&quot;&gt;4&lt;/script&gt;个&lt;script type=&quot;math/tex&quot;&gt;F(3\times 3,3\times 3)&lt;/script&gt;的累加。&lt;/p&gt;
+
+&lt;p&gt;  因此我们只要了解到这个公式就可以了，&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex8.png&quot; alt=&quot;&quot; height=&quot;30%&quot; width=&quot;30%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;根据不同的卷积核有不同的值，而且是提前计算好的，可以用&lt;a href=&quot;https://github.com/andravin/wincnn&quot;&gt;https://github.com/andravin/wincnn&lt;/a&gt;的脚本计算。不过，&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;也不是可以通过脚本直接得到的，还需要自己确定&lt;script type=&quot;math/tex&quot;&gt;m+r-2&lt;/script&gt;个插值点，wincnn的作者推荐了&lt;a href=&quot;https://openreview.net/forum?id=H1ZaRZVKg&amp;amp;noteId=H1ZaRZVKg&quot;&gt;https://openreview.net/forum?id=H1ZaRZVKg&amp;amp;noteId=H1ZaRZVKg&lt;/a&gt;可以帮助确定插值点。（感觉好难啊（−＿−；））&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
@@ -79,7 +91,9 @@
 
 &lt;h5 id=&quot;2-cong-j-xiao-b-2014-minimizing-computation-in-convolutional-neural-networks-in-wermter-s-et-al-eds-artificial-neural-networks-and-machine-learning--icann-2014-icann-2014-lecture-notes-in-computer-science-vol-8681-springer-cham&quot;&gt;2. Cong J., Xiao B. (2014) &lt;a href=&quot;https://link.springer.com/chapter/10.1007/978-3-319-11179-7_36&quot;&gt;Minimizing Computation in Convolutional Neural Networks.&lt;/a&gt; In: Wermter S. et al. (eds) Artificial Neural Networks and Machine Learning – ICANN 2014. ICANN 2014. Lecture Notes in Computer Science, vol 8681. Springer, Cham&lt;/h5&gt;
 
-&lt;h5 id=&quot;3-知乎如何通俗易懂地解释卷积&quot;&gt;3. &lt;a href=&quot;https://www.zhihu.com/question/22298352&quot;&gt;知乎，如何通俗易懂地解释卷积？&lt;/a&gt;&lt;/h5&gt;
+&lt;h5 id=&quot;3-winograd-方法快速计算卷积&quot;&gt;3. &lt;a href=&quot;http://shuokay.com/2018/02/21/winograd/&quot;&gt;Winograd 方法快速计算卷积&lt;/a&gt;&lt;/h5&gt;
+
+&lt;h5 id=&quot;4-知乎如何通俗易懂地解释卷积&quot;&gt;4. &lt;a href=&quot;https://www.zhihu.com/question/22298352&quot;&gt;知乎，如何通俗易懂地解释卷积？&lt;/a&gt;&lt;/h5&gt;
 </description>
         <pubDate>Thu, 31 May 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2018/05/winograd/</link>
