@@ -233,7 +233,9 @@
 
 <p><img src="/images/posts/2018-05-31-Winograd/tex12.png" alt="" height="70%" width="70%" /></p>
 
-<h3 id="私货和具体理解">私货和具体理解</h3>
+<p>  论文接下来的算法介绍主要提供了<script type="math/tex">F(3\times 3,2\times 2)</script>和<script type="math/tex">F(4\times 4,3\times 3)</script>的<script type="math/tex">A,G,B</script>矩阵。</p>
+
+<h3 id="理解">理解</h3>
 
 <p>  其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像<script type="math/tex">3\times 3</script>的卷积核对<script type="math/tex">7\times 7</script>的矩阵进行卷积，因为在计算时要将输入图像切割成<script type="math/tex">(m+r-1)\times(m+r-1)</script>大小的块，并且每个块与相邻块间有<script type="math/tex">r-1</script>的重叠区域，也就是说每个块与相邻块重叠区域大小为<script type="math/tex">2</script>，所以<script type="math/tex">m+r-1=5\Longrightarrow m=3</script>，所以这个计算要拆成<script type="math/tex">4</script>个<script type="math/tex">F(3\times 3,3\times 3)</script>的累加。</p>
 

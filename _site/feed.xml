@@ -5,8 +5,8 @@
     <description>在学习DL性能优化的学生</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Jun 2018 19:52:56 +0800</pubDate>
-    <lastBuildDate>Fri, 01 Jun 2018 19:52:56 +0800</lastBuildDate>
+    <pubDate>Fri, 01 Jun 2018 19:55:44 +0800</pubDate>
+    <lastBuildDate>Fri, 01 Jun 2018 19:55:44 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -73,7 +73,9 @@
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex12.png&quot; alt=&quot;&quot; height=&quot;70%&quot; width=&quot;70%&quot; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;私货和具体理解&quot;&gt;私货和具体理解&lt;/h3&gt;
+&lt;p&gt;  论文接下来的算法介绍主要提供了&lt;script type=&quot;math/tex&quot;&gt;F(3\times 3,2\times 2)&lt;/script&gt;和&lt;script type=&quot;math/tex&quot;&gt;F(4\times 4,3\times 3)&lt;/script&gt;的&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;矩阵。&lt;/p&gt;
+
+&lt;h3 id=&quot;理解&quot;&gt;理解&lt;/h3&gt;
 
 &lt;p&gt;  其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的卷积核对&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的矩阵进行卷积，因为在计算时要将输入图像切割成&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;大小的块，并且每个块与相邻块间有&lt;script type=&quot;math/tex&quot;&gt;r-1&lt;/script&gt;的重叠区域，也就是说每个块与相邻块重叠区域大小为&lt;script type=&quot;math/tex&quot;&gt;2&lt;/script&gt;，所以&lt;script type=&quot;math/tex&quot;&gt;m+r-1=5\Longrightarrow m=3&lt;/script&gt;，所以这个计算要拆成&lt;script type=&quot;math/tex&quot;&gt;4&lt;/script&gt;个&lt;script type=&quot;math/tex&quot;&gt;F(3\times 3,3\times 3)&lt;/script&gt;的累加。&lt;/p&gt;
 
