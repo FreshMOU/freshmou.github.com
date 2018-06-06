@@ -6,16 +6,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>Winograd for CNN</title>
+  <title>Winograd for CNN（一）</title>
   <meta name="description" content="前言">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Winograd for CNN">
+  <meta name="twitter:title" content="Winograd for CNN（一）">
   <meta name="twitter:description" content="前言">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Winograd for CNN">
+  <meta property="og:title" content="Winograd for CNN（一）">
   <meta property="og:description" content="前言">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
@@ -160,7 +160,7 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">Winograd for CNN</h1>
+    <h1 class="post-title">Winograd for CNN（一）</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
       <time datetime="2018-05-31 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-05-31</time>  
@@ -237,13 +237,17 @@
 
 <h3 id="理解">理解</h3>
 
-<p>  其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像<script type="math/tex">3\times 3</script>的卷积核对<script type="math/tex">7\times 7</script>的矩阵进行卷积，因为在计算时要将输入图像切割成<script type="math/tex">(m+r-1)\times(m+r-1)</script>大小的块，并且每个块与相邻块间有<script type="math/tex">r-1</script>的重叠区域，也就是说每个块与相邻块重叠区域大小为<script type="math/tex">2</script>，所以<script type="math/tex">m+r-1=5\Longrightarrow m=3</script>，所以这个计算要拆成<script type="math/tex">4</script>个<script type="math/tex">F(3\times 3,3\times 3)</script>的累加。</p>
-
-<p>  因此我们只要了解到这个公式就可以了，</p>
+<p>  下面这个公式是最重要的一块。</p>
 
 <p><img src="/images/posts/2018-05-31-Winograd/tex8.png" alt="" height="30%" width="30%" /></p>
 
 <p><script type="math/tex">A,G,B</script>根据不同的卷积核有不同的值，而且是提前计算好的，可以用<a href="https://github.com/andravin/wincnn">https://github.com/andravin/wincnn</a>的脚本计算。不过，<script type="math/tex">A,G,B</script>也不是可以通过脚本直接得到的，还需要自己确定<script type="math/tex">m+r-2</script>个插值点，wincnn的作者推荐了<a href="https://openreview.net/forum?id=H1ZaRZVKg&amp;noteId=H1ZaRZVKg">https://openreview.net/forum?id=H1ZaRZVKg&amp;noteId=H1ZaRZVKg</a>可以帮助确定插值点。（感觉好难啊（−＿−；））</p>
+
+<p>  自己推了好久，发现根本就没办法算，之后只能找代码看（<a href="https://github.com/NervanaSystems/neon/blob/master/neon/backends/winograd.py">winograd.py</a>），原来winograd是一定要加padding补全的，加多少padding视情况而定。所以其实这个算法就是针对卷积套公式，不过卷积计算选择不同算法，速度会不太一样。（现在有许多版本的winograd）</p>
+
+<p>  对于不同的输入用不同的padding补全，最后会选择性地舍弃部分数据。如<script type="math/tex">7\times 7</script>的输入，在用<script type="math/tex">F(2\times 2, 3\times 3)</script>计算时，会在左边补一个padding，在右边补两个padding，最后winograd卷积得到一个<script type="math/tex">8\times 8</script>的输出，这时就要舍弃最右边的一列。</p>
+
+<p>  我尝试写了一下自己版本的winograd算法，以便后面学习优化，具体可以看下一篇。</p>
 
 <p><br /></p>
 
@@ -270,6 +274,11 @@
             </a>
         </li>
         
+        
+        <li class="next">
+            <a href="/2018/06/winograd2/" data-toggle="tooltip" data-placement="top" title="Winograd for CNN（二）">下一篇：  <span>Winograd for CNN（二）</span>
+            </a>
+        </li>
         
     </ul>
 </section>

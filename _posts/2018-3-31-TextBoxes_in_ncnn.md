@@ -1,6 +1,6 @@
 ---
 layout: post
-title: TextBoxes_plusplus的Textboxes部分基于ncnn实现
+title: TextBoxes_plusplus基于ncnn实现
 date: 2018-03-25
 tags: 深度学习
 ---

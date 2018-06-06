@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Winograd for CNN
+title: Winograd for CNN（一）
 date: 2018-05-31
-tags: 深度学习
+tags: 深度学习 性能优化
 ---
 
 ### 前言
@@ -71,14 +71,17 @@ $$
 
 ### 理解
 
-&#8195;&#8195;其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像$$3\times 3$$的卷积核对$$7\times 7$$的矩阵进行卷积，因为在计算时要将输入图像切割成$$(m+r-1)\times(m+r-1)$$大小的块，并且每个块与相邻块间有$$r-1$$的重叠区域，也就是说每个块与相邻块重叠区域大小为$$2$$，所以$$m+r-1=5\Longrightarrow m=3$$，所以这个计算要拆成$$4$$个$$F(3\times 3,3\times 3)$$的累加。
-
-&#8195;&#8195;因此我们只要了解到这个公式就可以了，
+&#8195;&#8195;下面这个公式是最重要的一块。
 
 ![](/images/posts/2018-05-31-Winograd/tex8.png){:height="30%" width="30%"}
 
 $$A,G,B$$根据不同的卷积核有不同的值，而且是提前计算好的，可以用<https://github.com/andravin/wincnn>的脚本计算。不过，$$A,G,B$$也不是可以通过脚本直接得到的，还需要自己确定$$m+r-2$$个插值点，wincnn的作者推荐了<https://openreview.net/forum?id=H1ZaRZVKg&noteId=H1ZaRZVKg>可以帮助确定插值点。（感觉好难啊（−＿−；））
 
+&#8195;&#8195;自己推了好久，发现根本就没办法算，之后只能找代码看（[winograd.py](https://github.com/NervanaSystems/neon/blob/master/neon/backends/winograd.py)），原来winograd是一定要加padding补全的，加多少padding视情况而定。所以其实这个算法就是针对卷积套公式，不过卷积计算选择不同算法，速度会不太一样。（现在有许多版本的winograd）
+
+&#8195;&#8195;对于不同的输入用不同的padding补全，最后会选择性地舍弃部分数据。如$$7\times 7$$的输入，在用$$F(2\times 2, 3\times 3)$$计算时，会在左边补一个padding，在右边补两个padding，最后winograd卷积得到一个$$8\times 8$$的输出，这时就要舍弃最右边的一列。
+
+&#8195;&#8195;我尝试写了一下自己版本的winograd算法，以便后面学习优化，具体可以看下一篇。
 
 <br/>
 

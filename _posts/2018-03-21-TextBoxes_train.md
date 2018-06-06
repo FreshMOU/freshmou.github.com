@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 用ICDAR2015数据训练TextBoxes
+title: 用ICDAR2015数据训练TextBoxes++
 date: 2018-03-21
 tags: 深度学习
 ---
@@ -11,7 +11,7 @@ tags: 深度学习
 
 &#8195;&#8195;在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。
 
-### TextBoxes训练
+### TextBoxes++训练
 
 &#8195;&#8195;之前提到TextBoxes_plusplus是由TextBoes和crnn合并得到的，其是由两个模型来分别进行位置检测和文字识别的。今天先把TextBoxes的训练先搞定了。
 

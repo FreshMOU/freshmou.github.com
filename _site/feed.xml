@@ -5,12 +5,279 @@
     <description>在学习DL性能优化的学生</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Jun 2018 19:55:44 +0800</pubDate>
-    <lastBuildDate>Fri, 01 Jun 2018 19:55:44 +0800</lastBuildDate>
+    <pubDate>Wed, 06 Jun 2018 15:11:44 +0800</pubDate>
+    <lastBuildDate>Wed, 06 Jun 2018 15:11:44 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
-        <title>Winograd for CNN</title>
+        <title>Winograd for CNN（二）</title>
+        <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+
+&lt;p&gt;  winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于&lt;code class=&quot;highlighter-rouge&quot;&gt;Fast Algorithms for Convolutional Neural Networks&lt;/code&gt;的&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;实现。&lt;/p&gt;
+
+&lt;p&gt;  我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。&lt;/p&gt;
+
+&lt;h3 id=&quot;代码示例&quot;&gt;代码示例&lt;/h3&gt;
+
+&lt;p&gt;  这里我设置&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+G=\begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0.5 &amp; 0.5 &amp; 0.5 \\ 0.5&amp;-0.5&amp;0.5\\0&amp;0&amp;1\end{bmatrix} %]]&gt;&lt;/script&gt;,&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+B^T=\begin{bmatrix} 1 &amp; 0 &amp; -1&amp;0 \\ 0 &amp;1 &amp; 1&amp;0 \\ 0&amp;-1&amp;1&amp;0\\0&amp;1&amp;0&amp;-1\end{bmatrix} %]]&gt;&lt;/script&gt;,&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+A^T=\begin{bmatrix} 1&amp; \quad1 &amp;\quad1&amp;\quad0\\0&amp;\quad1&amp;-1&amp;-1\end{bmatrix} %]]&gt;&lt;/script&gt;。以&lt;script type=&quot;math/tex&quot;&gt;4\times 4&lt;/script&gt;的输入，&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的卷积核为例。（注意输入是要加padding的）&lt;/p&gt;
+
+&lt;h2 id=&quot;gggt&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;GgG^T&lt;/script&gt;&lt;/h2&gt;
+
+&lt;p&gt;  这一步对于同一个卷积核的值来说是固定，因此是可以提前计算好的，是offline的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float **U_2x2_3x3(float *kernel)
+{
+    float G[4][3] = { { 1,    0,    0},
+                      {0.5,  0.5,  0.5},
+                      {0.5, -0.5,  0.5},
+                      { 0,    0,    1} };
+    float GT[3][4] = { { 1,  0.5,  0.5,  0},
+                       { 0,  0.5, -0.5,  0},
+                       { 0,  0.5,  0.5,  1} };
+    
+    float G_g[4][3] = {0};
+    for (int i = 0; i &amp;lt; 4; ++i) {
+        for (int j = 0; j &amp;lt; 3; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; 3; ++k) {
+                temp += G[i][k] * kernel[k * 3 + j];
+            }
+            G_g[i][j] = temp;
+        }
+    }
+
+    float **G_g_GT;
+    G_g_GT = (float**)malloc(4 * sizeof(float*));
+    //float G_g_GT[4][4] = {0};
+    for (int i = 0; i &amp;lt; 4; ++i) {
+        G_g_GT[i] = (float*)malloc(4 * sizeof(float));
+        memset(G_g_GT[i], 0, 4 * sizeof(float));
+        for (int j = 0; j &amp;lt; 4; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; 3; ++k) {
+                temp += G_g[i][k] * GT[k][j];
+            }
+            G_g_GT[i][j] = temp;
+        }
+    }
+
+    return G_g_GT;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;btdb&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;B^TdB&lt;/script&gt;&lt;/h2&gt;
+
+&lt;p&gt;  因为我预设的输入是用一维数组来表示二维的矩阵，所以需要一个矩阵起始位置来推断分割的矩阵。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float **V_2x2_3x3(float *input, int start)
+{
+    int BT[4][4] = { {1,  0, -1,  0},
+                     {0,  1,  1,  0},
+                     {0, -1,  1,  0},
+                     {0,  1,  0, -1}};
+    int B[4][4] =  { { 1,  0,  0,  0},
+                     { 0,  1, -1,  1},
+                     {-1,  1,  1,  0},
+                     { 0,  0,  0, -1}};
+
+    float BT_d[4][4] = {0};
+    for (int i = 0; i &amp;lt; 4; ++i) {
+        for (int j = 0; j &amp;lt; 4; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; 4; ++k) {
+                temp += BT[i][k] * input[k * 6 + j + start];
+            }
+            BT_d[i][j] = temp;
+        }
+    }
+
+    float **BT_d_B;
+    BT_d_B = (float**)malloc(4 * sizeof(float*));
+    //float BT_d_B[4][4] = {0};
+    for (int i = 0; i &amp;lt; 4; ++i) {
+        BT_d_B[i] = (float*)malloc(4 * sizeof(float));
+        memset(BT_d_B[i], 0, 4 * sizeof(float));
+        for (int j = 0; j &amp;lt; 4; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; 4; ++k) {
+                temp += BT_d[i][k] * B[k][j];
+            }
+            BT_d_B[i][j] = temp;
+        }
+    }
+
+    return BT_d_B;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;atuodot-va&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;A^T[U\odot V]A&lt;/script&gt;&lt;/h2&gt;
+
+&lt;p&gt;  这里输出的就是局部的最终结果。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float **M_2x2_3x3(float **U, float **V)
+{
+    int AT[2][4] = { {1, 1,  1,  0},
+                     {0, 1, -1, -1} };
+
+    int A[4][2] = { {1,  0},
+                    {1,  1},
+                    {1, -1},
+                    {0, -1} };
+
+    float M[4][4] = {0};
+    for (int i = 0; i &amp;lt; 4; ++i) {
+        for (int j = 0; j &amp;lt; 4; ++j) {
+            M[i][j] = U[i][j] * V[i][j];
+        }
+    }
+
+    for (int l = 0; l &amp;lt; 4; ++l) {
+        free(V[l]);
+    }
+    free(V);
+
+    float AT_M[2][4] = {0};
+    for (int i = 0; i &amp;lt; 2; ++i) {
+        for (int j = 0; j &amp;lt; 4; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; 4; ++k) {
+                temp += AT[i][k] * M[k][j];
+            }
+            AT_M[i][j] = temp;
+        }
+    }
+
+    float **AT_M_A;
+    AT_M_A = (float**)malloc(2 * sizeof(float*));
+    for (int i = 0; i &amp;lt; 2; ++i) {
+        AT_M_A[i] = (float*)malloc(2 * sizeof(float));
+        memset(AT_M_A[i], 0, 2 * sizeof(float));
+        for (int j = 0; j &amp;lt; 2; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; 4; ++k) {
+                temp += AT_M[i][k] * A[k][j];
+            }
+            AT_M_A[i][j] = temp;
+        }
+    }
+
+    return AT_M_A;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;winograd&quot;&gt;Winograd&lt;/h2&gt;
+
+&lt;p&gt;  因为我这里举的输入是&lt;script type=&quot;math/tex&quot;&gt;4\times 4&lt;/script&gt;，卷积为&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的例子，所以局部结果可以刚好拼成最终结果，而且padding也只要上下左右各加1就可以了。但如果是&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的输入，那么padding在下面和右边都要加2才行，而且在局部结果拼最终结果时要舍去1行和1列。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void winograd(float* input, float* kernel, float* output, int input_size)
+{
+    float **U;
+    U = U_2x2_3x3(kernel);
+    for (int l = 0; l &amp;lt; 2; ++l) {      //  H/m向上取整
+        for (int n = 0; n &amp;lt; 2; ++n) {
+            float **V, **Y;
+            V = V_2x2_3x3(input, l * input_size * 2 + n * 2);
+            Y = M_2x2_3x3(U, V);
+            int row_col = l * 8 + n * 2;
+            memcpy(output + row_col, Y[0], 2 * sizeof(float));
+            memcpy(output + row_col + 4, Y[1], 2 * sizeof(float));
+
+        }
+    }
+    for (int i = 0; i &amp;lt; 4; ++i) {
+        free(U[i]);
+    }
+    free(U);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;剩余代码&quot;&gt;剩余代码&lt;/h2&gt;
+
+&lt;p&gt;  全部代码都在这里了。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void mm(float* input, float* kernel, float* output, int input_size, int kernel_size)
+{
+    int output_size = input_size - kernel_size + 1;
+    for (int i = 0; i &amp;lt; output_size; ++i) {
+        for (int j = 0; j &amp;lt; output_size; ++j) {
+            float temp = 0;
+            for (int k = 0; k &amp;lt; kernel_size; ++k) {
+                for (int l = 0; l &amp;lt; kernel_size; ++l) {
+                    temp += kernel[k*kernel_size+l] * input[i*input_size+j+k*input_size+l];
+                }
+            }
+            output[i*output_size + j] = temp;
+        }
+    }
+}
+
+int main() {
+    int input_size, kernel_size;
+    input_size = 4;
+    kernel_size = 3;
+    float *input, *kernel, *output, *winograd_out;
+    input = (float*)malloc(input_size * input_size * sizeof(float));
+    for (int i = 0; i &amp;lt; input_size*input_size; ++i) {
+        input[i] = i;
+    }
+
+    input = add_padding(input,input_size);
+    input_size += 2;
+
+    kernel = (float*)malloc(kernel_size * kernel_size * sizeof(float));
+    for (int i = 0; i &amp;lt; kernel_size*kernel_size; ++i) {
+        kernel[i] = 1;
+    }
+
+    int output_size = input_size;
+    output = (float*)malloc(output_size * output_size * sizeof(float));
+    memset(output, 0, output_size * output_size * sizeof(float));
+    winograd_out = (float*)malloc(output_size * output_size * sizeof(float));
+    memset(winograd_out, 0, output_size * output_size * sizeof(float));
+    clock_t start, end1, end2;
+
+    start = clock();
+    mm(input, kernel, output, input_size, kernel_size);
+
+    end1 = clock();
+    winograd(input, kernel, winograd_out, input_size);
+    end2 = clock();
+
+    printf(&quot;mm cost %f , winograd cost %f&quot;, double(end1-start)/CLOCKS_PER_SEC, double(end2-end1)/CLOCKS_PER_SEC);
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;最后&quot;&gt;最后&lt;/h3&gt;
+
+&lt;p&gt;  虽然结果是一样的，但是我实现的winograd比寻常卷积要慢好多╮(￣▽￣””)╭。具体原因应该还要我接下来摸索，应该可以考虑内存池优化、汇编优化、代码消冗余等。&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 05 Jun 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/06/winograd2/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/06/winograd2/</guid>
+        
+        <category>深度学习</category>
+        
+        <category>性能优化</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Winograd for CNN（一）</title>
         <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
 &lt;p&gt;  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在过滤器和批量小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并显示批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
@@ -77,13 +344,17 @@
 
 &lt;h3 id=&quot;理解&quot;&gt;理解&lt;/h3&gt;
 
-&lt;p&gt;  其实winograd就是针对不同的卷积情况套公式就可以了，不同的卷积情况需要的算法形式都不太一样，像&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的卷积核对&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的矩阵进行卷积，因为在计算时要将输入图像切割成&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;大小的块，并且每个块与相邻块间有&lt;script type=&quot;math/tex&quot;&gt;r-1&lt;/script&gt;的重叠区域，也就是说每个块与相邻块重叠区域大小为&lt;script type=&quot;math/tex&quot;&gt;2&lt;/script&gt;，所以&lt;script type=&quot;math/tex&quot;&gt;m+r-1=5\Longrightarrow m=3&lt;/script&gt;，所以这个计算要拆成&lt;script type=&quot;math/tex&quot;&gt;4&lt;/script&gt;个&lt;script type=&quot;math/tex&quot;&gt;F(3\times 3,3\times 3)&lt;/script&gt;的累加。&lt;/p&gt;
-
-&lt;p&gt;  因此我们只要了解到这个公式就可以了，&lt;/p&gt;
+&lt;p&gt;  下面这个公式是最重要的一块。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex8.png&quot; alt=&quot;&quot; height=&quot;30%&quot; width=&quot;30%&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;根据不同的卷积核有不同的值，而且是提前计算好的，可以用&lt;a href=&quot;https://github.com/andravin/wincnn&quot;&gt;https://github.com/andravin/wincnn&lt;/a&gt;的脚本计算。不过，&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;也不是可以通过脚本直接得到的，还需要自己确定&lt;script type=&quot;math/tex&quot;&gt;m+r-2&lt;/script&gt;个插值点，wincnn的作者推荐了&lt;a href=&quot;https://openreview.net/forum?id=H1ZaRZVKg&amp;amp;noteId=H1ZaRZVKg&quot;&gt;https://openreview.net/forum?id=H1ZaRZVKg&amp;amp;noteId=H1ZaRZVKg&lt;/a&gt;可以帮助确定插值点。（感觉好难啊（−＿−；））&lt;/p&gt;
+
+&lt;p&gt;  自己推了好久，发现根本就没办法算，之后只能找代码看（&lt;a href=&quot;https://github.com/NervanaSystems/neon/blob/master/neon/backends/winograd.py&quot;&gt;winograd.py&lt;/a&gt;），原来winograd是一定要加padding补全的，加多少padding视情况而定。所以其实这个算法就是针对卷积套公式，不过卷积计算选择不同算法，速度会不太一样。（现在有许多版本的winograd）&lt;/p&gt;
+
+&lt;p&gt;  对于不同的输入用不同的padding补全，最后会选择性地舍弃部分数据。如&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的输入，在用&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;计算时，会在左边补一个padding，在右边补两个padding，最后winograd卷积得到一个&lt;script type=&quot;math/tex&quot;&gt;8\times 8&lt;/script&gt;的输出，这时就要舍弃最右边的一列。&lt;/p&gt;
+
+&lt;p&gt;  我尝试写了一下自己版本的winograd算法，以便后面学习优化，具体可以看下一篇。&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
@@ -102,6 +373,8 @@
         <guid isPermaLink="true">http://localhost:4000/2018/05/winograd/</guid>
         
         <category>深度学习</category>
+        
+        <category>性能优化</category>
         
         
       </item>
@@ -497,7 +770,7 @@ static int nms(std::vector&amp;lt;bbox&amp;gt;&amp;amp; polygons, float overlap)
       </item>
     
       <item>
-        <title>TextBoxes_plusplus的Textboxes部分基于ncnn实现</title>
+        <title>TextBoxes_plusplus基于ncnn实现</title>
         <description>&lt;h3 id=&quot;textboxes_plusplus的实现&quot;&gt;TextBoxes_plusplus的实现&lt;/h3&gt;
 
 &lt;p&gt;  TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的&lt;code class=&quot;highlighter-rouge&quot;&gt;denser_prior_boxes&lt;/code&gt;和detection_output层的&lt;code class=&quot;highlighter-rouge&quot;&gt;use_polygon&lt;/code&gt;，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。&lt;/p&gt;
@@ -622,14 +895,14 @@ for (int j = 0; j &amp;lt; num_prior; j++)
       </item>
     
       <item>
-        <title>用ICDAR2015数据训练TextBoxes</title>
+        <title>用ICDAR2015数据训练TextBoxes++</title>
         <description>&lt;h3 id=&quot;icdar2015&quot;&gt;ICDAR2015&lt;/h3&gt;
 
 &lt;p&gt;  国际文档分析与识别大会（ICDAR）是全球文档分析以及模式识别领域最重要的国际学术会议之一，由国际模式识别协会(International Association of Pattern Recognition, IAPR)主办。该会议每两年举办1次，同时会举办ICDAR竞赛。ICDAR竞赛主要是考验模型对文字的定位和识别的准确度。&lt;/p&gt;
 
 &lt;p&gt;  在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。&lt;/p&gt;
 
-&lt;h3 id=&quot;textboxes训练&quot;&gt;TextBoxes训练&lt;/h3&gt;
+&lt;h3 id=&quot;textboxes训练&quot;&gt;TextBoxes++训练&lt;/h3&gt;
 
 &lt;p&gt;  之前提到TextBoxes_plusplus是由TextBoes和crnn合并得到的，其是由两个模型来分别进行位置检测和文字识别的。今天先把TextBoxes的训练先搞定了。&lt;/p&gt;
 
@@ -820,165 +1093,6 @@ sh build_cpp.sh
         <guid isPermaLink="true">http://localhost:4000/2018/03/TextBoxes_plusplus/</guid>
         
         <category>深度学习</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>lua学习入门</title>
-        <description>&lt;h3 id=&quot;mac下安装-lua&quot;&gt;Mac下安装 lua&lt;/h3&gt;
-
-&lt;p&gt;  brew作为Mac下非常好用的包管理工具，可以直接 install lua。直接在Mac终端输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;brew install lua&lt;/code&gt; ，lua就安装好了。成功后可以测试一下，执行命令 &lt;code class=&quot;highlighter-rouge&quot;&gt;lua&lt;/code&gt; 进入 lua 脚本环境&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt; print('hello world')&lt;/code&gt;&lt;br /&gt;
-&lt;code class=&quot;highlighter-rouge&quot;&gt;hello world&lt;/code&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;lua-一些常用名词&quot;&gt;lua 一些常用名词&lt;/h3&gt;
-&lt;p&gt;  在看torch的代码中，我经常可以看到 require, ..等单词或符号，直接看教程有很多语法都是不太用得到的，所以下面我自己整理一下一些常见的语法。&lt;/p&gt;
-
-&lt;h4 id=&quot;require&quot;&gt;require&lt;/h4&gt;
-
-&lt;p&gt;  &lt;code class=&quot;highlighter-rouge&quot;&gt;require&lt;/code&gt;与 C 和 C++ 中的&lt;code class=&quot;highlighter-rouge&quot;&gt;#include&lt;/code&gt;类似，还有 python 中的&lt;code class=&quot;highlighter-rouge&quot;&gt;import&lt;/code&gt;也是相同的功能，加载模块，加载了模块就可以使用模块的全局函数和全局数据。&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;require&lt;/code&gt;搜索的路径是存在一个全局table package的path和cpath字段里的。&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;package.path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;share&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
-  &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;share&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
-  &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
-  &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
-  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;  
-  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;  
-
-  &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;package.cpath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;so&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;usr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadall&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;so&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;so&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;可以看到默认的路径的格式为: ?.lua , 所以我们require “xxx”，而不是require “xxx.lua”，lua编译器会自动替换“？”&lt;/p&gt;
-
-&lt;p&gt;当我们想要加载当前脚本的上级目录时，我们自己可以添加相对路径。&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;package.path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;package.path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;';..\\?.lua'&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;  require “xxx” 某个模块后&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;如果该模块自身有返回值，且模块加载成功，那么require 的返回值就是该模块的返回值&lt;/li&gt;
-  &lt;li&gt;如果模块没有返回值，如果require加载模块成功，就返回ture&lt;/li&gt;
-  &lt;li&gt;require 内部将返回值储存在：package.loaded表中。 
-（即：package.loaded[xxx]中）&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lua&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'it\'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;')
-end
-
-return temp
-
-2. ok.lua
-local a = require('&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;')
-a.show()
-
-&amp;gt; lua ok.lua
-it'&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ok&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4&gt;..&lt;/h4&gt;
-
-&lt;p&gt;  作为动态语言，lua 同 python 类似，可以直接将字符串连接起来，在 python 中是用&lt;code class=&quot;highlighter-rouge&quot;&gt;+&lt;/code&gt;，而 lua 中则用&lt;code class=&quot;highlighter-rouge&quot;&gt;..&lt;/code&gt;，对于 C++ 来说，lua 就是将&lt;code class=&quot;highlighter-rouge&quot;&gt;..&lt;/code&gt;符号重载了，使其具备了 concat 的功能。&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'a'&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'b'&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ab&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;local&quot;&gt;local&lt;/h4&gt;
-
-&lt;p&gt;  前面不加前缀的变量都是全局变量，local 声明变量为局部变量，但是如果该变量在全局环境中在使用上几乎等价于全局变量。不过一般都推荐使用局部变量，因为 lua 自身的特性，局部变量在加载使用时要比全局变量快很多，详情可以点击&lt;a href=&quot;http://lua-users.org/wiki/OptimisingUsingLocalVariables&quot;&gt;这里&lt;/a&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;                 &lt;span class=&quot;c1&quot;&gt;-- 全局变量&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;           
-
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;       &lt;span class=&quot;c1&quot;&gt;-- 局部变量&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;             &lt;span class=&quot;c1&quot;&gt;-- 全局变量&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;-- 5&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;-- 5, nil, 5&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;       &lt;span class=&quot;c1&quot;&gt;-- 局部变量&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;             &lt;span class=&quot;c1&quot;&gt;-- 全局变量&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;           &lt;span class=&quot;c1&quot;&gt;-- 4，6&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;一些-lua-的语法&quot;&gt;一些 lua 的语法&lt;/h3&gt;
-
-&lt;p&gt;  那些与C、C++、Python语法类似的 lua 语法就不再论述了，下面只给自己备忘一些与众不同的语法。&lt;/p&gt;
-
-&lt;h4 id=&quot;注释语法&quot;&gt;注释语法&lt;/h4&gt;
-
-&lt;p&gt;  在 lua 中注释是用&lt;code class=&quot;highlighter-rouge&quot;&gt;--&lt;/code&gt;，就类似于C语言中的&lt;code class=&quot;highlighter-rouge&quot;&gt;//&lt;/code&gt;，而块注释的话就将块包括在&lt;code class=&quot;highlighter-rouge&quot;&gt;--[[ --]]&lt;/code&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;函数类语法&quot;&gt;函数类语法&lt;/h4&gt;
-
-&lt;p&gt;  在 lua 中也提供了类似C结构体，C++类的模式，一个变量可以拥有它自己的函数。而且 lua 有两种给变量定义函数的方法&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'hello world'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'hello world'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;冒号-和点&quot;&gt;冒号: 和点.&lt;/h4&gt;
-
-&lt;p&gt;  &lt;code class=&quot;highlighter-rouge&quot;&gt;:&lt;/code&gt; 和 &lt;code class=&quot;highlighter-rouge&quot;&gt;.&lt;/code&gt; 其实没有本质的区别，冒号相比于点只是起了一个省略 &lt;code class=&quot;highlighter-rouge&quot;&gt;self&lt;/code&gt; 的功能。&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;number&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SetNumber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;SetNumber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;err&quot;&gt;用冒号调用时，会隐式地传入&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;，所以其实冒号调用上面用点定义的函数其实也是可以的。&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setNumber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;            &lt;span class=&quot;c1&quot;&gt;--100&lt;/span&gt;
-
-&lt;span class=&quot;err&quot;&gt;当然，不一定就要用&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;，也可以用其他单词来表示，只是一个别名，下面的方法等价于上面这种方法。&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;SetNumber&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;girl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;girl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;number&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/03/lua/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/lua/</guid>
-        
-        <category>lua</category>
         
         
       </item>
