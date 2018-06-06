@@ -1,6 +1,6 @@
 ---
 layout: post
-title: TextBoxes_plusplus在ubuntu14.04上的编译
+title: TextBoxes++在ubuntu14.04上的编译
 date: 2018-03-16
 tags: 深度学习
 ---
