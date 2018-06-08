@@ -1,6 +1,6 @@
 ---
 layout: post
-title: optimization
+title: optimization（一）
 date: 2018-06-09
 tags: 性能优化
 ---
@@ -31,4 +31,6 @@ tags: 性能优化
 - 是否有多核可以利用
 - ……
 
-### 
+### im2col+gemm
+
+

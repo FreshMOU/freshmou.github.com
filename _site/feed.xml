@@ -5,8 +5,8 @@
     <description>在学习DL性能优化的学生</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 06 Jun 2018 15:38:56 +0800</pubDate>
-    <lastBuildDate>Wed, 06 Jun 2018 15:38:56 +0800</lastBuildDate>
+    <pubDate>Fri, 08 Jun 2018 14:03:16 +0800</pubDate>
+    <lastBuildDate>Fri, 08 Jun 2018 14:03:16 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -280,10 +280,10 @@ int main() {
         <title>Winograd for CNN（一）</title>
         <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
-&lt;p&gt;  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在过滤器和批量小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并显示批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
+&lt;p&gt;  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在滤波器和batch小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并展示了批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;Cong和Xiao使用Strassen算法进行快速矩阵乘法，以减少卷积网络层中的调度次数，从而降低其总算术复杂度。 作者还提出，来自算术复杂性理论的更多技术可能适用于衔接。[2]&lt;/p&gt;
+  &lt;p&gt;Cong和Xiao使用Strassen算法进行快速矩阵乘法，以减少卷积网络层中的调度次数，从而降低其总算术复杂度。 作者还提出，来自算术复杂性理论的更多技术可能适用于衔接。&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;  原始的Winograd算法，前置了很多数论方面的知识，为了效率我就没有深入的去阅读了。本文主要针对阅读了&lt;code class=&quot;highlighter-rouge&quot;&gt;Fast Algorithms for Convolutional Neural Networks&lt;/code&gt;。&lt;/p&gt;
@@ -362,11 +362,9 @@ int main() {
 
 &lt;h5 id=&quot;1-lavin-a-gray-s-fast-algorithms-for-convolutional-neural-networkscproceedings-of-the-ieee-conference-on-computer-vision-and-pattern-recognition-2016-4013-4021&quot;&gt;1. Lavin A, Gray S. &lt;a href=&quot;https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Lavin_Fast_Algorithms_for_CVPR_2016_paper.pdf&quot;&gt;Fast algorithms for convolutional neural networks[C]&lt;/a&gt;//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016: 4013-4021.&lt;/h5&gt;
 
-&lt;h5 id=&quot;2-cong-j-xiao-b-2014-minimizing-computation-in-convolutional-neural-networks-in-wermter-s-et-al-eds-artificial-neural-networks-and-machine-learning--icann-2014-icann-2014-lecture-notes-in-computer-science-vol-8681-springer-cham&quot;&gt;2. Cong J., Xiao B. (2014) &lt;a href=&quot;https://link.springer.com/chapter/10.1007/978-3-319-11179-7_36&quot;&gt;Minimizing Computation in Convolutional Neural Networks.&lt;/a&gt; In: Wermter S. et al. (eds) Artificial Neural Networks and Machine Learning – ICANN 2014. ICANN 2014. Lecture Notes in Computer Science, vol 8681. Springer, Cham&lt;/h5&gt;
+&lt;h5 id=&quot;2-winograd-方法快速计算卷积&quot;&gt;2. &lt;a href=&quot;http://shuokay.com/2018/02/21/winograd/&quot;&gt;Winograd 方法快速计算卷积&lt;/a&gt;&lt;/h5&gt;
 
-&lt;h5 id=&quot;3-winograd-方法快速计算卷积&quot;&gt;3. &lt;a href=&quot;http://shuokay.com/2018/02/21/winograd/&quot;&gt;Winograd 方法快速计算卷积&lt;/a&gt;&lt;/h5&gt;
-
-&lt;h5 id=&quot;4-知乎如何通俗易懂地解释卷积&quot;&gt;4. &lt;a href=&quot;https://www.zhihu.com/question/22298352&quot;&gt;知乎，如何通俗易懂地解释卷积？&lt;/a&gt;&lt;/h5&gt;
+&lt;h5 id=&quot;3-知乎如何通俗易懂地解释卷积&quot;&gt;3. &lt;a href=&quot;https://www.zhihu.com/question/22298352&quot;&gt;知乎，如何通俗易懂地解释卷积？&lt;/a&gt;&lt;/h5&gt;
 </description>
         <pubDate>Thu, 31 May 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2018/05/winograd/</link>
