@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>文章</title>
-  <meta name="description" content="在学习DL性能优化的学生">
+  <title>optimization（一）</title>
+  <meta name="description" content="前言  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。  一般CNN性能优化的方向有下面几种。  ...">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="文章">
-  <meta name="twitter:description" content="在学习DL性能优化的学生">
+  <meta name="twitter:title" content="optimization（一）">
+  <meta name="twitter:description" content="前言  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。  一般CNN性能优化的方向有下面几种。  ...">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="文章">
-  <meta property="og:description" content="在学习DL性能优化的学生">
+  <meta property="og:title" content="optimization（一）">
+  <meta property="og:description" content="前言  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。  一般CNN性能优化的方向有下面几种。  ...">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/archive/">
+  <link rel="canonical" href="http://localhost:4000/2018/06/optimization/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,296 +160,96 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">optimization（一）</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-06-09 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-06-09</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title">文章</h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="前言">前言</h3>
+
+<p>  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如<a href="https://github.com/Tencent/ncnn">ncnn</a>，<a href="https://github.com/ARM-software/ComputeLibrary">ARM Compute Library</a>等。</p>
+
+<p>  一般CNN性能优化的方向有下面几种。</p>
+<ul>
+  <li>算法层面的优化
+    <ul>
+      <li>模型优化</li>
+      <li>卷积计算优化</li>
+    </ul>
+  </li>
+  <li>系统层面的优化
+    <ul>
+      <li>代码冗余优化</li>
+      <li>内存优化</li>
+      <li>并行计算</li>
+    </ul>
+  </li>
+</ul>
+
+<p>  算法层面的优化需要太多的数学基础，对做工程的我们来说太难了，只能等业界大佬的论文。模型的优化现在很多大佬都在做，现在主要用mobilenet，shufflenet等轻量模型做主干特征提取网络，还有用剪枝的操作来减少模型参数。<br />
+  卷积计算的优化主要有两种方法，</p>
+<ul>
+  <li>im2col: 目前几乎所有的主流计算框架包括Caffe, MXNet等都实现了该方法。该方法把卷积变成矩阵和矩阵的乘法，然后通过各种BLAS库来计算，因为BLAS库优化的非常好，所以这个方法速度是比较快的。</li>
+  <li>winograd: 由于乘法和加法在硬件实现上的时间复杂度一般是不一样的，乘法运算所需的时间通常远大于加法所需的时间。因此，用廉价运算代替昂贵运算也是加速运算。winograd就是通过变换来用加法来替换部分乘法以达到优化增速的目的。</li>
+</ul>
+
+<p>  对于工程师而言，主要是针对系统级的优化，需要考虑</p>
+<ul>
+  <li>代码是否有冗余</li>
+  <li>代码是否缓存友好</li>
+  <li>内存重要还是速度重要</li>
+  <li>是否有多核可以利用</li>
+  <li>……</li>
+</ul>
+
+<h3 id="im2colgemm">im2col+gemm</h3>
+
+<p>  我这里就先</p>
 
 
-<div class="page card">
-
-
-
-  
-    
-    
-    
-    
-  
-    
-    
-    
-      <div class="hat_title">
-        <h3>2018</h3>
-      </div>
-      <div class="post_list">
-      <ul>
-      
-    
-  
-    <li>
-      <span>
-        2018-06- 9
-      </span>
-       &raquo; 
-      <a href="/2018/06/optimization/">optimization（一）</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-06- 5
-      </span>
-       &raquo; 
-      <a href="/2018/06/winograd2/">Winograd for CNN（二）</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-05-31
-      </span>
-       &raquo; 
-      <a href="/2018/05/winograd/">Winograd for CNN（一）</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-04-21
-      </span>
-       &raquo; 
-      <a href="/2018/04/pytorch_loss/">Pytorch自定义Loss函数</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-04- 6
-      </span>
-       &raquo; 
-      <a href="/2018/04/SynthText/">TextBoxes++使用SynthText数据集</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-04- 3
-      </span>
-       &raquo; 
-      <a href="/2018/04/VGG2Mobile/">TextBoxe++的VGGnet用Mobilenet替换</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-31
-      </span>
-       &raquo; 
-      <a href="/2018/03/compute_iou_of_quad/">对不规则四边形使用nms</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-25
-      </span>
-       &raquo; 
-      <a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus基于ncnn实现</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-21
-      </span>
-       &raquo; 
-      <a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes++</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-19
-      </span>
-       &raquo; 
-      <a href="/2018/03/torch/">torch学习</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-16
-      </span>
-       &raquo; 
-      <a href="/2018/03/TextBoxes_plusplus/">TextBoxes++在ubuntu14.04上的编译</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-15
-      </span>
-       &raquo; 
-      <a href="/2018/03/lua/">lua学习入门</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-13
-      </span>
-       &raquo; 
-      <a href="/2018/03/Target/">第一篇博客</a>
-    </li>
- 
-    
-      </ul>
-      
-    
-  
-
-</div>
-</div>
   </section>
 </article>
+
+<section>
+
+    <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/06/winograd2/" data-toggle="tooltip" data-placement="top" title="Winograd for CNN（二）">上一篇：  <span>Winograd for CNN（二）</span>
+            </a>
+        </li>
+        
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '91743f9a28fe42c95eb6',
+            client_secret: '6cd3dcf61b359e04362b3d1ff09d4236e4e42bb3',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
+  
+
+</section>
+
 
             <section class="footer">
     <footer>

@@ -163,6 +163,27 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/06/optimization/" title="访问 optimization（一）">optimization（一）</a></h2>
+      <p class="excerpt">前言  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。  一般CNN性能优化的方向有下面几种。  算法层面的优化          模型优化      卷积计算优化        系统层面的优化          代码冗余优化      内存优化      并行计算      ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-06-09 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-06-09</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">性能优化</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/06/optimization/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/06/winograd2/" title="访问 Winograd for CNN（二）">Winograd for CNN（二）</a></h2>
       <p class="excerpt">前言  winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于Fast Algorithms for Convolutional Neural Networks的实现。  我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。代码示例  这里我设置,,。以的输入，的卷积核为例。（注意输入是要加padding...&hellip;</p>
       <div class="post-list__meta">        
