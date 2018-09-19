@@ -1096,7 +1096,7 @@ input[type="tel"]:-ms-input-placeholder {
   margin-left: 0px;
   text-align: center;
 }
-@media all and (max-width: 1300px) {
+@media (max-width: 1300px) {
   .panel-cover__logo {
     width: 70px; }
 
@@ -1111,7 +1111,7 @@ input[type="tel"]:-ms-input-placeholder {
     margin: 0 10px;
     font-size: .9em; }
 }
-@media all and (max-width: 1100px) {
+@media (max-width: 720px) {
   .btn-mobile-menu {
     display: block; 
   }
@@ -1182,23 +1182,24 @@ input[type="tel"]:-ms-input-placeholder {
     display: block; 
   }
   .content-wrapper {
-    width: 60%;
+    width: 80%;
     max-width: none;
     margin: 0 auto; 
   }
   .content-wrapper__inner {
     margin-right: 10px;
-    margin-left: 40%; 
+    margin-left: 10%; 
   }
 }
 
-@media all and (max-width: 420px) {
+/* @media all and (max-width: 720px) {
   .panel-main__inner {
     padding: 0 5%; 
   }
   .content-wrapper {
-    width: 100%;
+    width: 60%;
     max-width: none;
+    margin-left: 40%; 
     margin: 0 auto; 
   }
   h1 {
@@ -1214,7 +1215,7 @@ input[type="tel"]:-ms-input-placeholder {
   .panel-subtitle {
     font-size: .6em; 
   }
- }
+ } */
 
 
 /*头像效果-start*/
