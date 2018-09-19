@@ -1192,7 +1192,7 @@ input[type="tel"]:-ms-input-placeholder {
   }
 }
 
-@media all and (max-width: 420px) {
+@media all and (max-width: 1000px) {
   .panel-main__inner {
     padding: 0 5%; 
   }
