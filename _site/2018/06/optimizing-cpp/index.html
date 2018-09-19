@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>SHL</title>
-  <meta name="description" content="在学习DL性能优化的学生">
+  <title>C++代码优化</title>
+  <meta name="description" content="前言">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SHL">
-  <meta name="twitter:description" content="在学习DL性能优化的学生">
+  <meta name="twitter:title" content="C++代码优化">
+  <meta name="twitter:description" content="前言">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="SHL">
-  <meta property="og:description" content="在学习DL性能优化的学生">
+  <meta property="og:title" content="C++代码优化">
+  <meta property="og:description" content="前言">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/tags/">
+  <link rel="canonical" href="http://localhost:4000/2018/06/optimizing-cpp/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,256 +160,74 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">C++代码优化</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-06-19 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-06-19</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title"></h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="前言">前言</h3>
 
-<ul class="tag_box inline">
-    
-  
+<p>  相对于其他简单的高级语言来说，C++可以更好地发挥硬件性能，但就算是相同的算法，代码写的不好，C++也不一定比其他语言就快很多。一般来说，没有一种简单的方法可以完美优化所有情况，所以优化只是尽可能接近最完美的情况。</p>
 
+<p>  一般优化过程中有两个标准：<br />
+-Principle of diminishing returns.  先从耗时耗力少且优化效果好的部分开始着手优化。<br />
+-Principle of diminishing portability.  先从跨平台通用的代码开始优化。</p>
 
-  
-     
-    	<li><a href="#介绍-ref">介绍 <span>1</span></a></li>
-     
-    	<li><a href="#lua-ref">lua <span>1</span></a></li>
-     
-    	<li><a href="#深度学习-ref">深度学习 <span>10</span></a></li>
-     
-    	<li><a href="#pytorch-ref">pytorch <span>1</span></a></li>
-     
-    	<li><a href="#性能优化-ref">性能优化 <span>4</span></a></li>
-    
-  
+<p><br /></p>
 
+<p>参考文献</p>
 
+<h5 id="optimizing-c"><a href="https://en.wikibooks.org/wiki/Optimizing_C%2B%2B">optimizing C++</a></h5>
 
-</ul>
-
-<div class = "card">
- 
-
-  <h3 id="介绍-ref">介绍</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/Target/">第一篇博客</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="lua-ref">lua</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/lua/">lua学习入门</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="深度学习-ref">深度学习</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/09/docker/">Docker使用</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/06/winograd2/">Winograd for CNN（二）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/05/winograd/">Winograd for CNN（一）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/04/SynthText/">TextBoxes++使用SynthText数据集</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/04/VGG2Mobile/">TextBoxe++的VGGnet用Mobilenet替换</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/compute_iou_of_quad/">对不规则四边形使用nms</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus基于ncnn实现</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes++</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/torch/">torch学习</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_plusplus/">TextBoxes++在ubuntu14.04上的编译</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="pytorch-ref">pytorch</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/04/pytorch_loss/">Pytorch自定义Loss函数</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="性能优化-ref">性能优化</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/06/optimizing-cpp/">C++代码优化</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/06/optimization/">optimization（一）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/06/winograd2/">Winograd for CNN（二）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/05/winograd/">Winograd for CNN（一）</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
-
-</div>
 
   </section>
 </article>
+
+<section>
+
+    <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/06/optimization/" data-toggle="tooltip" data-placement="top" title="optimization（一）">上一篇：  <span>optimization（一）</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/09/docker/" data-toggle="tooltip" data-placement="top" title="Docker使用">下一篇：  <span>Docker使用</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '91743f9a28fe42c95eb6',
+            client_secret: '6cd3dcf61b359e04362b3d1ff09d4236e4e42bb3',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
+  
+
+</section>
+
 
             <section class="footer">
     <footer>

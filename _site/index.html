@@ -163,6 +163,48 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/09/docker/" title="访问 Docker使用">Docker使用</a></h2>
+      <p class="excerpt">前言最近了解到了docker，才发现原来世界上还有这么好用的东西。  Docker是一个开放源代码软件项目，让应用程序布署在软件容器下的工作可以自动化进行，借此在Linux操作系统上，提供一个额外的软件抽象层，以及操作系统层虚拟化的自动管理机制。Docker的方便之处从事linux嵌入式开发或者深度学习方向的研究人员往往都会遇到这样一个问题—-服务器的环境配置。linux嵌入式开发需要配置交叉编译所需要的工具，而深度学习研究有各种各样的框架，并且这些框架有概率是互不兼容的（比如说有些论文实...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-09-18 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-09-18</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">深度学习</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/09/docker/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/06/optimizing-cpp/" title="访问 C++代码优化">C++代码优化</a></h2>
+      <p class="excerpt">前言  相对于其他简单的高级语言来说，C++可以更好地发挥硬件性能，但就算是相同的算法，代码写的不好，C++也不一定比其他语言就快很多。一般来说，没有一种简单的方法可以完美优化所有情况，所以优化只是尽可能接近最完美的情况。  一般优化过程中有两个标准：-Principle of diminishing returns.  先从耗时耗力少且优化效果好的部分开始着手优化。-Principle of diminishing portability.  先从跨平台通用的代码开始优化。参考文献opt...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-06-19 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-06-19</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">性能优化</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/06/optimizing-cpp/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/06/optimization/" title="访问 optimization（一）">optimization（一）</a></h2>
       <p class="excerpt">前言  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。  一般CNN性能优化的方向有下面几种。  算法层面的优化          模型优化      卷积计算优化        系统层面的优化          代码冗余优化      内存优化      并行计算      ...&hellip;</p>
       <div class="post-list__meta">        
@@ -206,7 +248,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/05/winograd/" title="访问 Winograd for CNN（一）">Winograd for CNN（一）</a></h2>
-      <p class="excerpt">前言  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在滤波器和batch小的情况下更快。论文使用VG...&hellip;</p>
+      <p class="excerpt">前言  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法在小卷积上计算复杂度最小，这使得它在滤波器和batch小的情况下更快。论文使用VGG...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-05-31 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 

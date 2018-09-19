@@ -5,9 +5,171 @@
     <description>在学习DL性能优化的学生</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 12 Jun 2018 20:00:09 +0800</pubDate>
-    <lastBuildDate>Tue, 12 Jun 2018 20:00:09 +0800</lastBuildDate>
+    <pubDate>Wed, 19 Sep 2018 12:40:55 +0800</pubDate>
+    <lastBuildDate>Wed, 19 Sep 2018 12:40:55 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>Docker使用</title>
+        <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+
+&lt;p&gt;最近了解到了docker，才发现原来世界上还有这么好用的东西。&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Docker是一个开放源代码软件项目，让应用程序布署在软件容器下的工作可以自动化进行，借此在Linux操作系统上，提供一个额外的软件抽象层，以及操作系统层虚拟化的自动管理机制。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;docker的方便之处&quot;&gt;Docker的方便之处&lt;/h3&gt;
+
+&lt;p&gt;从事linux嵌入式开发或者深度学习方向的研究人员往往都会遇到这样一个问题—-服务器的环境配置。linux嵌入式开发需要配置交叉编译所需要的工具，而深度学习研究有各种各样的框架，并且这些框架有概率是互不兼容的（比如说有些论文实现依托于cudnn5.1，而有些则需要更高的版本），总不能为了搭一个环境而舍弃另一个环境吧。&lt;/p&gt;
+
+&lt;p&gt;当服务器环境越配越多，此时，Docker的优势就体现出来了，Docker的镜像提供了除内核外完整的运行时环境，确保了应用运行环境一致性，从而不会再出现 「这段代码在我机器上没问题啊」 这类问题。&lt;/p&gt;
+
+&lt;p&gt;并且，Docker在迁移时更加方便，它没有其他依赖，可以说自己就是一个微型系统。&lt;/p&gt;
+
+&lt;h3 id=&quot;docker使用介绍&quot;&gt;Docker使用介绍&lt;/h3&gt;
+
+&lt;p&gt;docker中有镜像(image)和容器(container)的概念，镜像就是指已经打包好的容器，可以被pull或push的，而容器则是你正在使用的，已经实例化的镜像。&lt;/p&gt;
+
+&lt;p&gt;一般将镜像视为模版，不存放任何代码，只配置环境，代码使用volume挂载放入容器。(&lt;code class=&quot;highlighter-rouge&quot;&gt;run&lt;/code&gt;时用&lt;code class=&quot;highlighter-rouge&quot;&gt;-v&lt;/code&gt;来挂载)&lt;/p&gt;
+
+&lt;h2 id=&quot;docker常用命令&quot;&gt;docker常用命令&lt;/h2&gt;
+
+&lt;h4 id=&quot;docker-images&quot;&gt;docker images&lt;/h4&gt;
+
+&lt;p&gt;显示已有镜像&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker images
+REPOSITORY     TAG         IMAGE ID        CREATED           SIZE
+ubuntu        16.04      52b10959e8aa    12 days ago         115MB
+ubuntu        14.04      8789038981bc    12 days ago         188MB
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;docker-rmi&quot;&gt;docker rmi&lt;/h4&gt;
+
+&lt;p&gt;删除镜像&lt;/p&gt;
+
+&lt;h4 id=&quot;docker-system-prune--a&quot;&gt;docker system prune -a&lt;/h4&gt;
+
+&lt;p&gt;释放空间&lt;/p&gt;
+
+&lt;h4 id=&quot;docker-ps--a&quot;&gt;docker ps -a&lt;/h4&gt;
+
+&lt;p&gt;显示所有容器&lt;/p&gt;
+
+&lt;h4 id=&quot;docker-start&quot;&gt;docker start&lt;/h4&gt;
+
+&lt;p&gt;在退出容器后需要先start才可以进入。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker start nnie
+nnie
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;docker-attach&quot;&gt;docker attach&lt;/h4&gt;
+
+&lt;p&gt;容器开启后使用该命令进入容器。&lt;/p&gt;
+
+&lt;h4 id=&quot;docker-run&quot;&gt;docker run&lt;/h4&gt;
+
+&lt;p&gt;语法&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;一般常用&lt;code class=&quot;highlighter-rouge&quot;&gt;docker run -t -i -v /YOUR/PATH:/root/ ImageName /bin/bash&lt;/code&gt;
+&lt;strong&gt;注意&lt;/strong&gt;，挂载时要使用绝对路径。&lt;/p&gt;
+
+&lt;p&gt;OPTIONS说明：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;-a stdin: 指定标准输入输出内容类型，可选 STDIN/STDOUT/STDERR 三项；
+
+-d: 后台运行容器，并返回容器ID；
+
+-i: 以交互模式运行容器，通常与 -t 同时使用；
+
+-p: 端口映射，格式为：主机(宿主)端口:容器端口
+
+-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用；
+
+--name=&quot;nginx-lb&quot;: 为容器指定一个名称；
+
+--dns 8.8.8.8: 指定容器使用的DNS服务器，默认和宿主一致；
+
+--dns-search example.com: 指定容器DNS搜索域名，默认和宿主一致；
+
+-h &quot;mars&quot;: 指定容器的hostname；
+
+-e username=&quot;ritchie&quot;: 设置环境变量；
+
+--env-file=[]: 从指定文件读入环境变量；
+
+--cpuset=&quot;0-2&quot; or --cpuset=&quot;0,1,2&quot;: 绑定容器到指定CPU运行；
+
+-m :设置容器使用内存最大值；
+
+--net=&quot;bridge&quot;: 指定容器的网络连接类型，支持 bridge/host/none/container: 四种类型；
+
+--link=[]: 添加链接到另一个容器；
+
+--expose=[]: 开放一个端口或一组端口；
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;docker常用构建方法&quot;&gt;Docker常用构建方法&lt;/h3&gt;
+
+&lt;p&gt;docker hub一般都有许多镜像提供给你直接拉取，如果刚好有你需要的，只要直接pull就可以了。
+比如说我需要一个caffe的环境，那么我直接在docker hub上找到&lt;a href=&quot;https://hub.docker.com/r/bvlc/caffe/&quot;&gt;caffe&lt;/a&gt;，然后根据所需要的tag直接拉取镜像就可以了。&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 这里我拉取的是caffe的cpu版本&lt;/span&gt;
+docker pull bvlc/caffe:cpu
+
+&lt;span class=&quot;c&quot;&gt;# 通过下面这行命令就可以通过拉取的镜像生成自己的容器，并进入到容器中了&lt;/span&gt;
+docker run -it bvlc/caffe:cpu /bin/bash
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;不过主流的可能还是使用DockerFile来构建镜像，DockerFile的优点如下，&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Dockerfile是Docker镜像的自动化脚本&lt;/li&gt;
+  &lt;li&gt;手动图像创build将变得复杂，当你想testing相同的设置不同的操作系统风格，那么你必须创build所有风格的图像，但通过在dockerfile中的小改变，你可以创build不同的风味的图像&lt;/li&gt;
+  &lt;li&gt;它具有简单的图像语法，并自动做许多更改，手动将需要更多的时间。&lt;/li&gt;
+  &lt;li&gt;Dockerfile有一个系统的步骤，可以让别人很容易理解，并且很容易知道在基本映像中改变了什么确切的configuration。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Tue, 18 Sep 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/09/docker/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/docker/</guid>
+        
+        <category>深度学习</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>C++代码优化</title>
+        <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+
+&lt;p&gt;  相对于其他简单的高级语言来说，C++可以更好地发挥硬件性能，但就算是相同的算法，代码写的不好，C++也不一定比其他语言就快很多。一般来说，没有一种简单的方法可以完美优化所有情况，所以优化只是尽可能接近最完美的情况。&lt;/p&gt;
+
+&lt;p&gt;  一般优化过程中有两个标准：&lt;br /&gt;
+-Principle of diminishing returns.  先从耗时耗力少且优化效果好的部分开始着手优化。&lt;br /&gt;
+-Principle of diminishing portability.  先从跨平台通用的代码开始优化。&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;参考文献&lt;/p&gt;
+
+&lt;h5 id=&quot;optimizing-c&quot;&gt;&lt;a href=&quot;https://en.wikibooks.org/wiki/Optimizing_C%2B%2B&quot;&gt;optimizing C++&lt;/a&gt;&lt;/h5&gt;
+</description>
+        <pubDate>Tue, 19 Jun 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/06/optimizing-cpp/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/06/optimizing-cpp/</guid>
+        
+        <category>性能优化</category>
+        
+        
+      </item>
     
       <item>
         <title>optimization（一）</title>
@@ -332,7 +494,7 @@ int main() {
         <title>Winograd for CNN（一）</title>
         <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
-&lt;p&gt;  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法计算出小卷积上的最小复杂度，这使得它在滤波器和batch小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并展示了批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
+&lt;p&gt;  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法在小卷积上计算复杂度最小，这使得它在滤波器和batch小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并展示了批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;Cong和Xiao使用Strassen算法进行快速矩阵乘法，以减少卷积网络层中的调度次数，从而降低其总算术复杂度。 作者还提出，来自算术复杂性理论的更多技术可能适用于衔接。&lt;/p&gt;
@@ -938,93 +1100,6 @@ for (int j = 0; j &amp;lt; num_prior; j++)
         <pubDate>Sun, 25 Mar 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2018/03/TextBoxes_in_ncnn/</link>
         <guid isPermaLink="true">http://localhost:4000/2018/03/TextBoxes_in_ncnn/</guid>
-        
-        <category>深度学习</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>用ICDAR2015数据训练TextBoxes++</title>
-        <description>&lt;h3 id=&quot;icdar2015&quot;&gt;ICDAR2015&lt;/h3&gt;
-
-&lt;p&gt;  国际文档分析与识别大会（ICDAR）是全球文档分析以及模式识别领域最重要的国际学术会议之一，由国际模式识别协会(International Association of Pattern Recognition, IAPR)主办。该会议每两年举办1次，同时会举办ICDAR竞赛。ICDAR竞赛主要是考验模型对文字的定位和识别的准确度。&lt;/p&gt;
-
-&lt;p&gt;  在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。&lt;/p&gt;
-
-&lt;h3 id=&quot;textboxes训练&quot;&gt;TextBoxes++训练&lt;/h3&gt;
-
-&lt;p&gt;  之前提到TextBoxes_plusplus是由TextBoes和crnn合并得到的，其是由两个模型来分别进行位置检测和文字识别的。今天先把TextBoxes的训练先搞定了。&lt;/p&gt;
-
-&lt;p&gt;  ICDAR2015提供的数据是由txt格式(&lt;a href=&quot;https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/examples/gt_img_1.txt&quot;&gt;gt_img_1.txt&lt;/a&gt;)保存的，其中的格式为&lt;code class=&quot;highlighter-rouge&quot;&gt;[x1,y1,x2,y2,x3,y3,x4,y4,text]&lt;/code&gt;，而TextBoxes需要的是xml文件(&lt;a href=&quot;https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/examples/example.xml&quot;&gt;example.xml&lt;/a&gt;)，所以我们先要把数据转过来。&lt;/p&gt;
-
-&lt;p&gt;  TextBoxes是基于caffe实现的，caffe训练用的数据类型为lmdb格式的，要得到自己的lmdb文件需要有一个txt文件，其中的保存格式为：&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    path_to_example1.jpg path_to_example1.xml
-    path_to_example2.jpg path_to_example2.xml
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;  训练需要两个lmdb，一个train_lmdb，一个test_lmdb，所以需要两个txt文件。&lt;/p&gt;
-
-&lt;p&gt;  为了快速得到最后的train.txt和test.txt，我用python写了一个&lt;a href=&quot;https://github.com/FreshMOU/scripts-for-myself/blob/master/formatConversion/icdrtxt2xml.py&quot;&gt;脚本&lt;/a&gt;来对数据格式进行转换。将该脚本放在TextBoxes_plusplus主目录的&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/icdar2015&lt;/code&gt;目录下运行，运行结束后即可得到在&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/text&lt;/code&gt;目录下的train.txt和test.txt（注意icdar2015的图片数据解压在&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/icdar2015/image&lt;/code&gt;目录下，ground truth数据解压在&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/icdar2015/local_gt&lt;/code&gt;下）。&lt;/p&gt;
-
-&lt;p&gt;  接下来直接执行&lt;code class=&quot;highlighter-rouge&quot;&gt;./data/text/creat_data.sh&lt;/code&gt;即可生成lmdb文件（在生成lmdb文件的时候一路报问题no such node(annotation.size.height)和bounding box irregular，猜测应该是由于xml文件写的框为不规则四边形的缘故，最后还报了一个链接错误不过没有什么影响，可以忽略），注意要修改&lt;code class=&quot;highlighter-rouge&quot;&gt;./examples/modelConfig.py&lt;/code&gt;文件中lmdb的路径。&lt;/p&gt;
-
-&lt;p&gt;  下载预训练模型放到&lt;code class=&quot;highlighter-rouge&quot;&gt;./models&lt;/code&gt;下就可以开始训练了。执行&lt;code class=&quot;highlighter-rouge&quot;&gt;python examples/text/train.py&lt;/code&gt;。&lt;/p&gt;
-</description>
-        <pubDate>Wed, 21 Mar 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/03/TextBoxes_train/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/TextBoxes_train/</guid>
-        
-        <category>深度学习</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>torch学习</title>
-        <description>&lt;h3 id=&quot;torch介绍&quot;&gt;torch介绍&lt;/h3&gt;
-
-&lt;p&gt;  &lt;a href=&quot;http://torch.ch/&quot;&gt;torch&lt;/a&gt;是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了&lt;a href=&quot;pytorch.org/&quot;&gt;pytorch&lt;/a&gt;提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/posts/2018-03-19-torch/1.PNG&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;torch项目克隆快速使用入门&quot;&gt;torch项目克隆快速使用入门&lt;/h3&gt;
-
-&lt;p&gt;  因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建的函数就先不详细了解了，先了解一下torch对现有模型的前向预测如何使用。之后也可能会涉及torch模型转出的问题。&lt;/p&gt;
-
-&lt;p&gt;  在编译好 torch 环境后，在终端输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;th&lt;/code&gt; 就进入了 torch 的 shell 环境，在其中可以进行常规的 lua 命令和使用 torch 的包。&lt;/p&gt;
-
-&lt;h4 id=&quot;cmdline&quot;&gt;CmdLine&lt;/h4&gt;
-
-&lt;p&gt;  该类主要为了提供一种方便解析参数的框架，对于每个实验尤其是神经网络中要调参数上。同时还可以把输出重定向到log文件中。&lt;/p&gt;
-
-&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CmdLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;‘&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Training&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simple&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;network&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;’&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Options'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'-seed'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;123&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'initial random seed'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'-booloption'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'boolean option'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'-stroption'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'mystring'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'string option'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rundir&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'experiment'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;paths&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mkdir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rundir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;cmd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rundir&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/log'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;等以后再填坑&quot;&gt;等以后再填坑&lt;/h3&gt;
-</description>
-        <pubDate>Mon, 19 Mar 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/03/torch/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/torch/</guid>
         
         <category>深度学习</category>
         

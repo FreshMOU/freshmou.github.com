@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>SHL</title>
-  <meta name="description" content="在学习DL性能优化的学生">
+  <title>Docker使用</title>
+  <meta name="description" content="前言">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SHL">
-  <meta name="twitter:description" content="在学习DL性能优化的学生">
+  <meta name="twitter:title" content="Docker使用">
+  <meta name="twitter:description" content="前言">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="SHL">
-  <meta property="og:description" content="在学习DL性能优化的学生">
+  <meta property="og:title" content="Docker使用">
+  <meta property="og:description" content="前言">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/tags/">
+  <link rel="canonical" href="http://localhost:4000/2018/09/docker/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,256 +160,181 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">Docker使用</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-09-18 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-09-18</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title"></h1>
   </header>
 
   <section class="post">
-    
+    <h3 id="前言">前言</h3>
 
-<ul class="tag_box inline">
-    
-  
+<p>最近了解到了docker，才发现原来世界上还有这么好用的东西。</p>
+<blockquote>
+  <p>Docker是一个开放源代码软件项目，让应用程序布署在软件容器下的工作可以自动化进行，借此在Linux操作系统上，提供一个额外的软件抽象层，以及操作系统层虚拟化的自动管理机制。</p>
+</blockquote>
 
+<h3 id="docker的方便之处">Docker的方便之处</h3>
 
-  
-     
-    	<li><a href="#介绍-ref">介绍 <span>1</span></a></li>
-     
-    	<li><a href="#lua-ref">lua <span>1</span></a></li>
-     
-    	<li><a href="#深度学习-ref">深度学习 <span>10</span></a></li>
-     
-    	<li><a href="#pytorch-ref">pytorch <span>1</span></a></li>
-     
-    	<li><a href="#性能优化-ref">性能优化 <span>4</span></a></li>
-    
-  
+<p>从事linux嵌入式开发或者深度学习方向的研究人员往往都会遇到这样一个问题—-服务器的环境配置。linux嵌入式开发需要配置交叉编译所需要的工具，而深度学习研究有各种各样的框架，并且这些框架有概率是互不兼容的（比如说有些论文实现依托于cudnn5.1，而有些则需要更高的版本），总不能为了搭一个环境而舍弃另一个环境吧。</p>
 
+<p>当服务器环境越配越多，此时，Docker的优势就体现出来了，Docker的镜像提供了除内核外完整的运行时环境，确保了应用运行环境一致性，从而不会再出现 「这段代码在我机器上没问题啊」 这类问题。</p>
 
+<p>并且，Docker在迁移时更加方便，它没有其他依赖，可以说自己就是一个微型系统。</p>
 
+<h3 id="docker使用介绍">Docker使用介绍</h3>
+
+<p>docker中有镜像(image)和容器(container)的概念，镜像就是指已经打包好的容器，可以被pull或push的，而容器则是你正在使用的，已经实例化的镜像。</p>
+
+<p>一般将镜像视为模版，不存放任何代码，只配置环境，代码使用volume挂载放入容器。(<code class="highlighter-rouge">run</code>时用<code class="highlighter-rouge">-v</code>来挂载)</p>
+
+<h2 id="docker常用命令">docker常用命令</h2>
+
+<h4 id="docker-images">docker images</h4>
+
+<p>显示已有镜像</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ docker images
+REPOSITORY     TAG         IMAGE ID        CREATED           SIZE
+ubuntu        16.04      52b10959e8aa    12 days ago         115MB
+ubuntu        14.04      8789038981bc    12 days ago         188MB
+</code></pre>
+</div>
+
+<h4 id="docker-rmi">docker rmi</h4>
+
+<p>删除镜像</p>
+
+<h4 id="docker-system-prune--a">docker system prune -a</h4>
+
+<p>释放空间</p>
+
+<h4 id="docker-ps--a">docker ps -a</h4>
+
+<p>显示所有容器</p>
+
+<h4 id="docker-start">docker start</h4>
+
+<p>在退出容器后需要先start才可以进入。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ docker start nnie
+nnie
+</code></pre>
+</div>
+
+<h4 id="docker-attach">docker attach</h4>
+
+<p>容器开启后使用该命令进入容器。</p>
+
+<h4 id="docker-run">docker run</h4>
+
+<p>语法</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+</code></pre>
+</div>
+
+<p>一般常用<code class="highlighter-rouge">docker run -t -i -v /YOUR/PATH:/root/ ImageName /bin/bash</code>
+<strong>注意</strong>，挂载时要使用绝对路径。</p>
+
+<p>OPTIONS说明：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>-a stdin: 指定标准输入输出内容类型，可选 STDIN/STDOUT/STDERR 三项；
+
+-d: 后台运行容器，并返回容器ID；
+
+-i: 以交互模式运行容器，通常与 -t 同时使用；
+
+-p: 端口映射，格式为：主机(宿主)端口:容器端口
+
+-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用；
+
+--name="nginx-lb": 为容器指定一个名称；
+
+--dns 8.8.8.8: 指定容器使用的DNS服务器，默认和宿主一致；
+
+--dns-search example.com: 指定容器DNS搜索域名，默认和宿主一致；
+
+-h "mars": 指定容器的hostname；
+
+-e username="ritchie": 设置环境变量；
+
+--env-file=[]: 从指定文件读入环境变量；
+
+--cpuset="0-2" or --cpuset="0,1,2": 绑定容器到指定CPU运行；
+
+-m :设置容器使用内存最大值；
+
+--net="bridge": 指定容器的网络连接类型，支持 bridge/host/none/container: 四种类型；
+
+--link=[]: 添加链接到另一个容器；
+
+--expose=[]: 开放一个端口或一组端口；
+</code></pre>
+</div>
+
+<h3 id="docker常用构建方法">Docker常用构建方法</h3>
+
+<p>docker hub一般都有许多镜像提供给你直接拉取，如果刚好有你需要的，只要直接pull就可以了。
+比如说我需要一个caffe的环境，那么我直接在docker hub上找到<a href="https://hub.docker.com/r/bvlc/caffe/">caffe</a>，然后根据所需要的tag直接拉取镜像就可以了。</p>
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 这里我拉取的是caffe的cpu版本</span>
+docker pull bvlc/caffe:cpu
+
+<span class="c"># 通过下面这行命令就可以通过拉取的镜像生成自己的容器，并进入到容器中了</span>
+docker run -it bvlc/caffe:cpu /bin/bash
+</code></pre>
+</div>
+
+<p>不过主流的可能还是使用DockerFile来构建镜像，DockerFile的优点如下，</p>
+<ul>
+  <li>Dockerfile是Docker镜像的自动化脚本</li>
+  <li>手动图像创build将变得复杂，当你想testing相同的设置不同的操作系统风格，那么你必须创build所有风格的图像，但通过在dockerfile中的小改变，你可以创build不同的风味的图像</li>
+  <li>它具有简单的图像语法，并自动做许多更改，手动将需要更多的时间。</li>
+  <li>Dockerfile有一个系统的步骤，可以让别人很容易理解，并且很容易知道在基本映像中改变了什么确切的configuration。</li>
 </ul>
 
-<div class = "card">
- 
-
-  <h3 id="介绍-ref">介绍</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/Target/">第一篇博客</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="lua-ref">lua</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/03/lua/">lua学习入门</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="深度学习-ref">深度学习</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/09/docker/">Docker使用</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/06/winograd2/">Winograd for CNN（二）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/05/winograd/">Winograd for CNN（一）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/04/SynthText/">TextBoxes++使用SynthText数据集</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/04/VGG2Mobile/">TextBoxe++的VGGnet用Mobilenet替换</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/compute_iou_of_quad/">对不规则四边形使用nms</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus基于ncnn实现</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes++</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/torch/">torch学习</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/03/TextBoxes_plusplus/">TextBoxes++在ubuntu14.04上的编译</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="pytorch-ref">pytorch</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/04/pytorch_loss/">Pytorch自定义Loss函数</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
- 
-
-  <h3 id="性能优化-ref">性能优化</h3>
-  <ul>
-      
-    
-
-
-  
-    
-      
-      	
-      	<li><a href="/2018/06/optimizing-cpp/">C++代码优化</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/06/optimization/">optimization（一）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/06/winograd2/">Winograd for CNN（二）</a></li>
-      	
-      
-    
-  
-    
-      
-      	
-      	<li><a href="/2018/05/winograd/">Winograd for CNN（一）</a></li>
-      	
-      
-    
-  
-
-
-
-  </ul>
-
-
-
-</div>
 
   </section>
 </article>
+
+<section>
+
+    <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/06/optimizing-cpp/" data-toggle="tooltip" data-placement="top" title="C++代码优化">上一篇：  <span>C++代码优化</span>
+            </a>
+        </li>
+        
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '91743f9a28fe42c95eb6',
+            client_secret: '6cd3dcf61b359e04362b3d1ff09d4236e4e42bb3',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
+  
+
+</section>
+
 
             <section class="footer">
     <footer>
