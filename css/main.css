@@ -1182,13 +1182,13 @@ input[type="tel"]:-ms-input-placeholder {
     display: block; 
   }
   .content-wrapper {
-    width: 100%;
+    width: 95%;
     max-width: none;
     margin: 0 auto; 
   }
   .content-wrapper__inner {
     margin-right: 10px;
-    margin-left: 0%; 
+    margin-left: 3%; 
   }
 }
 
