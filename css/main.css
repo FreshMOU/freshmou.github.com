@@ -1111,7 +1111,7 @@ input[type="tel"]:-ms-input-placeholder {
     margin: 0 10px;
     font-size: .9em; }
 }
-@media all and (min-width: 1080px) {
+@media all and (max-width: 1080px) {
   .btn-mobile-menu {
     display: block; 
   }
@@ -1192,7 +1192,7 @@ input[type="tel"]:-ms-input-placeholder {
   }
 }
 
-@media all and (max-width: 1080px) {
+@media all and (min-width: 1080px) {
   .panel-main__inner {
     padding: 0 5%; 
   }
