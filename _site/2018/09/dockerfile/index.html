@@ -6,16 +6,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>Docker使用</title>
+  <title>DockerFile</title>
   <meta name="description" content="前言">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Docker使用">
+  <meta name="twitter:title" content="DockerFile">
   <meta name="twitter:description" content="前言">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Docker使用">
+  <meta property="og:title" content="DockerFile">
   <meta property="og:description" content="前言">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/2018/09/docker/">
+  <link rel="canonical" href="http://localhost:4000/2018/09/dockerfile/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,10 +160,10 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-    <h1 class="post-title">Docker使用</h1>
+    <h1 class="post-title">DockerFile</h1>
     <div class="post-meta">
       <img src="/images/calendar.png" width="20px"/> 
-      <time datetime="2018-09-18 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-09-18</time>  
+      <time datetime="2018-09-22 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-09-22</time>  
          
       <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
     </p>
@@ -173,132 +173,114 @@
   <section class="post">
     <h3 id="前言">前言</h3>
 
-<p>最近了解到了docker，才发现原来世界上还有这么好用的东西。</p>
-<blockquote>
-  <p>Docker是一个开放源代码软件项目，让应用程序布署在软件容器下的工作可以自动化进行，借此在Linux操作系统上，提供一个额外的软件抽象层，以及操作系统层虚拟化的自动管理机制。</p>
-</blockquote>
+<p>前面已经介绍了DockerFile的几个优点了，其实主要的优点就是它有一个系统的步骤，可以让别人很容易理解，并且很容易知道在基本映像中改变了什么确切的配置。</p>
 
-<h3 id="docker的方便之处">Docker的方便之处</h3>
+<h3 id="dockerfile编写">DockerFile编写</h3>
 
-<p>从事linux嵌入式开发或者深度学习方向的研究人员往往都会遇到这样一个问题—-服务器的环境配置。linux嵌入式开发需要配置交叉编译所需要的工具，而深度学习研究有各种各样的框架，并且这些框架有概率是互不兼容的（比如说有些论文实现依托于cudnn5.1，而有些则需要更高的版本），总不能为了搭一个环境而舍弃另一个环境吧。</p>
+<p>DockerFile其实就是一种被docker解释的脚本，由多条指令组成，每条指令对应linux下的指令。</p>
 
-<p>当服务器环境越配越多，此时，Docker的优势就体现出来了，Docker的镜像提供了除内核外完整的运行时环境，确保了应用运行环境一致性，从而不会再出现 「这段代码在我机器上没问题啊」 这类问题。</p>
+<p>Dockerfile的指令是忽略大小写的，建议使用大写，使用#作为注释，每一行只支持一条指令，每条指令可以携带多个参数。</p>
 
-<p>并且，Docker在迁移时更加方便，它没有其他依赖，可以说自己就是一个微型系统。</p>
+<p>常用命令如下。</p>
 
-<h3 id="docker使用介绍">Docker使用介绍</h3>
+<h4 id="from指定初始镜像">FROM（指定初始镜像）</h4>
 
-<p>docker中有镜像(image)和容器(container)的概念，镜像就是指已经打包好的容器，可以被pull或push的，而容器则是你正在使用的，已经实例化的镜像。</p>
+<p>用法：<code class="highlighter-rouge">FROM &lt;image&gt;:&lt;tag&gt;</code></p>
 
-<p>一般将镜像视为模版，不存放任何代码，只配置环境，代码使用volume挂载放入容器。(<code class="highlighter-rouge">run</code>时用<code class="highlighter-rouge">-v</code>来挂载)</p>
+<p>一般从官方仓库直接拉取。</p>
 
-<h2 id="docker常用命令">docker常用命令</h2>
+<h4 id="maintainer制定镜像制作者信息">MAINTAINER（制定镜像制作者信息）</h4>
 
-<h4 id="docker-images">docker images</h4>
+<p>将镜像的制作者相关的信息写入到镜像中。</p>
 
-<p>显示已有镜像</p>
+<p>用法：<code class="highlighter-rouge">MAINTAINER &lt;name&gt;</code></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ docker images
-REPOSITORY     TAG         IMAGE ID        CREATED           SIZE
-ubuntu        16.04      52b10959e8aa    12 days ago         115MB
-ubuntu        14.04      8789038981bc    12 days ago         188MB
+<h4 id="run调用命令">RUN（调用命令）</h4>
+
+<p>RUN可以运行任何被基础镜像支持的命令。如基础镜像选择了ubuntu，那么软件管理能使用ubuntu的命令。</p>
+
+<p>用法：<code class="highlighter-rouge">RUN &lt;shell command&gt;</code></p>
+
+<h4 id="env设置环境变量">ENV（设置环境变量）</h4>
+
+<p>用法：<code class="highlighter-rouge">ENV &lt;key&gt; &lt;value&gt;</code></p>
+
+<h4 id="add添加文件">ADD（添加文件）</h4>
+
+<p>将主机的文件添加至镜像中，一般用来替换镜像源。</p>
+
+<p>用法：<code class="highlighter-rouge">ADD &lt;src&gt; &lt;dst&gt;</code></p>
+
+<h4 id="workdir切换目录">WORKDIR（切换目录）</h4>
+
+<p>用法：<code class="highlighter-rouge">WORKDIR &lt;dir&gt;</code></p>
+
+<h3 id="textboxes_plusplus的cpu版dockerfile">TextBoxes_plusplus的CPU版DockerFile</h3>
+
+<p>因为TextBoxes_plusplus没有提供CPU版本的DockerFile，而我的mac又不支持GPU，所以根据其提供的GPU版本略微修改了DockerFile。（修改了镜像源以加速配置）</p>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>FROM ubuntu:14.04
+MAINTAINER caffe-maint@googlegroups.com
+
+RUN mv /etc/apt/sources.list /etc/apt/sources-bak.list
+<span class="c"># sources.list在当前目录下，里面是修改的阿里云镜像源</span>
+ADD sources.list /etc/apt/sources.list
+
+RUN apt-get update <span class="o">&amp;&amp;</span> apt-get install -y --no-install-recommends <span class="se">\</span>
+        build-essential <span class="se">\</span>
+        cmake <span class="se">\</span>
+        git <span class="se">\</span>
+        wget <span class="se">\</span>
+        libatlas-base-dev <span class="se">\</span>
+        libboost-all-dev <span class="se">\</span>
+        libgflags-dev <span class="se">\</span>
+        libgoogle-glog-dev <span class="se">\</span>
+        libhdf5-serial-dev <span class="se">\</span>
+        libleveldb-dev <span class="se">\</span>
+        liblmdb-dev <span class="se">\</span>
+        libopencv-dev <span class="se">\</span>
+        libprotobuf-dev <span class="se">\</span>
+        libsnappy-dev <span class="se">\</span>
+	    libgeos-dev <span class="se">\</span>
+        protobuf-compiler <span class="se">\</span>
+        python-dev <span class="se">\</span>
+        python-numpy <span class="se">\</span>
+        python-pip <span class="se">\</span>
+        python-scipy <span class="se">\</span>
+	    python-opencv <span class="o">&amp;&amp;</span> <span class="se">\</span>
+    rm -rf /var/lib/apt/lists/<span class="k">*</span>
+
+<span class="c"># 同上配置阿里云源</span>
+ADD pip.conf /root/.pip/pip.conf
+
+ENV <span class="nv">CAFFE_ROOT</span><span class="o">=</span>/opt/caffe
+WORKDIR <span class="nv">$CAFFE_ROOT</span>
+
+<span class="c"># FIXME: clone a specific git tag and use ARG instead of ENV once DockerHub supports this.</span>
+ENV <span class="nv">CLONE_TAG</span><span class="o">=</span>master
+
+ARG CLONE_REPO
+
+RUN git clone -b <span class="k">${</span><span class="nv">CLONE_TAG</span><span class="k">}</span> --depth 1 <span class="nv">$CLONE_REPO</span> .
+
+RUN <span class="k">for </span>req <span class="k">in</span> <span class="k">$(</span>cat python/requirements.txt<span class="k">)</span> pydot; <span class="k">do </span>pip install <span class="nv">$req</span>; <span class="k">done</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+    mkdir build <span class="o">&amp;&amp;</span> <span class="nb">cd </span>build <span class="o">&amp;&amp;</span> <span class="se">\</span>
+    cmake -DCPU_ONLY<span class="o">=</span>1 .. <span class="o">&amp;&amp;</span> <span class="se">\</span>
+    make -j<span class="s2">"</span><span class="k">$(</span>nproc<span class="k">)</span><span class="s2">"</span>
+
+RUN ln -s /dev/null /dev/raw1394
+
+ENV PYCAFFE_ROOT <span class="nv">$CAFFE_ROOT</span>/python
+ENV PYTHONPATH <span class="nv">$PYCAFFE_ROOT</span>:<span class="nv">$PYTHONPATH</span>
+ENV PATH <span class="nv">$CAFFE_ROOT</span>/build/tools:<span class="nv">$PYCAFFE_ROOT</span>:<span class="nv">$PATH</span>
+RUN <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$CAFFE_ROOT</span><span class="s2">/build/lib"</span> &gt;&gt; /etc/ld.so.conf.d/caffe.conf <span class="o">&amp;&amp;</span> ldconfig
+
+WORKDIR /workspace
 </code></pre>
 </div>
 
-<h4 id="docker-rmi">docker rmi</h4>
-
-<p>删除镜像</p>
-
-<h4 id="docker-system-prune--a">docker system prune -a</h4>
-
-<p>释放空间</p>
-
-<h4 id="docker-ps--a">docker ps -a</h4>
-
-<p>显示所有容器</p>
-
-<h4 id="docker-start">docker start</h4>
-
-<p>在退出容器后需要先start才可以进入。</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>$ docker start nnie
-nnie
-</code></pre>
-</div>
-
-<h4 id="docker-attach">docker attach</h4>
-
-<p>容器开启后使用该命令进入容器。</p>
-
-<h4 id="docker-run">docker run</h4>
-
-<p>语法</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
-</code></pre>
-</div>
-
-<p>一般常用<code class="highlighter-rouge">docker run -t -i -v /YOUR/PATH:/root/ ImageName /bin/bash</code>
-<strong>注意</strong>，挂载时要使用绝对路径。</p>
-
-<p>OPTIONS说明：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>-a stdin: 指定标准输入输出内容类型，可选 STDIN/STDOUT/STDERR 三项；
-
--d: 后台运行容器，并返回容器ID；
-
--i: 以交互模式运行容器，通常与 -t 同时使用；
-
--p: 端口映射，格式为：主机(宿主)端口:容器端口
-
--t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用；
-
---name="nginx-lb": 为容器指定一个名称；
-
---dns 8.8.8.8: 指定容器使用的DNS服务器，默认和宿主一致；
-
---dns-search example.com: 指定容器DNS搜索域名，默认和宿主一致；
-
--h "mars": 指定容器的hostname；
-
--e username="ritchie": 设置环境变量；
-
---env-file=[]: 从指定文件读入环境变量；
-
---cpuset="0-2" or --cpuset="0,1,2": 绑定容器到指定CPU运行；
-
--m :设置容器使用内存最大值；
-
---net="bridge": 指定容器的网络连接类型，支持 bridge/host/none/container: 四种类型；
-
---link=[]: 添加链接到另一个容器；
-
---expose=[]: 开放一个端口或一组端口；
-</code></pre>
-</div>
-
-<h4 id="docker-build">docker build</h4>
-
-<p>build指令是通过DockerFile来构建镜像的，具体使用下一篇介绍。</p>
-
-<h3 id="docker常用构建方法">Docker常用构建方法</h3>
-
-<p>docker hub一般都有许多镜像提供给你直接拉取，如果刚好有你需要的，只要直接pull就可以了。
-比如说我需要一个caffe的环境，那么我直接在docker hub上找到<a href="https://hub.docker.com/r/bvlc/caffe/">caffe</a>，然后根据所需要的tag直接拉取镜像就可以了。</p>
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 这里我拉取的是caffe的cpu版本</span>
-docker pull bvlc/caffe:cpu
-
-<span class="c"># 通过下面这行命令就可以通过拉取的镜像生成自己的容器，并进入到容器中了</span>
-docker run -it bvlc/caffe:cpu /bin/bash
-</code></pre>
-</div>
-
-<p>不过主流的可能还是使用DockerFile来构建镜像，DockerFile的优点如下，</p>
-<ul>
-  <li>Dockerfile是Docker镜像的自动化脚本</li>
-  <li>它具有简单的图像语法，并自动做许多更改，手动将需要更多的时间。</li>
-  <li>Dockerfile有一个系统的步骤，可以让别人很容易理解，并且很容易知道在基本映像中改变了什么确切的配置。</li>
-</ul>
+<p>使用方法：
+<code class="highlighter-rouge">docker build -t tbpp:cpu --build-arg CLONE_REPO=$(git remote get-url --all origin) YOURPATH</code></p>
 
 
   </section>
@@ -309,15 +291,10 @@ docker run -it bvlc/caffe:cpu /bin/bash
     <ul class="pager">
         
         <li class="previous">
-            <a href="/2018/06/optimizing-cpp/" data-toggle="tooltip" data-placement="top" title="C++代码优化">上一篇：  <span>C++代码优化</span>
+            <a href="/2018/09/docker/" data-toggle="tooltip" data-placement="top" title="Docker使用">上一篇：  <span>Docker使用</span>
             </a>
         </li>
         
-        
-        <li class="next">
-            <a href="/2018/09/dockerfile/" data-toggle="tooltip" data-placement="top" title="DockerFile">下一篇：  <span>DockerFile</span>
-            </a>
-        </li>
         
     </ul>
 </section>
