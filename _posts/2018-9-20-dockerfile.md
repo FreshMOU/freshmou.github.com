@@ -51,6 +51,8 @@ RUN可以运行任何被基础镜像支持的命令。如基础镜像选择了ub
 
 ### TextBoxes_plusplus的CPU版DockerFile
 
+因为TextBoxes_plusplus没有提供CPU版本的DockerFile，而我的mac又不支持GPU，所以根据其提供的GPU版本略微修改了DockerFile。（修改了镜像源以加速配置）
+
 ```shell
 FROM ubuntu:14.04
 MAINTAINER caffe-maint@googlegroups.com
