@@ -7,11 +7,11 @@ tags: 深度学习
 
 ### SynthText数据集
 
-&#8195;&#8195;SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供[数据集SynthText](http://www.robots.ox.ac.uk/~vgg/data/scenetext/)，这个数据集包含了80万张图像，其中融入了800万个文本。
+SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供[数据集SynthText](http://www.robots.ox.ac.uk/~vgg/data/scenetext/)，这个数据集包含了80万张图像，其中融入了800万个文本。
 
 ### 数据格式转成适用于TextBoxes++的xml格式
 
-&#8195;&#8195;有许多语言可以读取并处理mat格式文件，我在这里选用python来处理。
+有许多语言可以读取并处理mat格式文件，我在这里选用python来处理。
 
 ```python
 # 读取gt.mat数据
@@ -19,7 +19,7 @@ import scipy.io as sio
 data = sio.loadmat('gt.mat')
 ```
 
-&#8195;&#8195;之前我直接用string来规范文本数据，但是并不如xml包来的好管理。
+之前我直接用string来规范文本数据，但是并不如xml包来的好管理。
 
 ```python
 import scipy.io as sio
@@ -105,4 +105,4 @@ def MatRead(matfile):
 
 ### 生成lmdb数据
 
-&#8195;&#8195;将`train.txt`和`test.txt`移到`TextBoxes_plusplus/data/text`目录下，再执行`./create_data.sh`即可得到lmdb文件。
+将`train.txt`和`test.txt`移到`TextBoxes_plusplus/data/text`目录下，再执行`./create_data.sh`即可得到lmdb文件。
