@@ -22,8 +22,7 @@ tags: HiSi
 
 然后input层也需要遵循格式要求
 ##### deploy.prototxt 输入层格式
-deploy.prototxt 输入层支持如下两种格式，n 维度的 dim 值建议写 1，mapper 会根据参
-考图片路径中的图片张数自动生成 n 值: 
+deploy.prototxt 输入层支持如下两种格式，n 维度的 dim 值建议写 1，mapper 会根据参考图片路径中的图片张数自动生成 n 值: 
 格式一:
  
 ```
@@ -127,7 +126,7 @@ NNIE mapper 量化时需要的图片是典型场景图片，建议从网络模�
 
 官方提供了ssd的sample代码，而TextBoxes_plusplus是基于ssd修改的，所以为了在NNIE上实现TextBoxes_plusplus，我基于官方的ssd代码进行了修改。
 
-基本可以参照之前TextBoxes_plusplus基于ncnn实现的文档。
+基本可以参照之前TextBoxes_plusplus基于ncnn实现的文档。<font color='red'>（注意内存的分配）</font>
 
 不过还是有些不同的地方，ncnn处只需要修改PriorBoxes和DetectionOutput层，而nnie处还有其他地方代码需要修改，具体如下。
 
@@ -176,4 +175,4 @@ pstSoftWareParam->af32PriorBoxAspectRatio[0][0] = 2;
 
 ### 输入的格式
 
-输入的格式文档中并没有说，我是根据后缀这些猜出来的，确实也是如此。直接依次排序保存像素值，大小需要自己记录下来。
+输入的格式文档中并没有说，我是根据后缀这些猜出来的，确实也是如此。直接依次排序保存像素值，图片大小需要自己记录下来。
