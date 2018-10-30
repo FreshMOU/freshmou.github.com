@@ -101,6 +101,7 @@ h2,
 h3,
 h4,
 h5,
+h6,
 h5 {
   margin-top: 1.0em;
   margin-bottom: .5em;
@@ -159,6 +160,14 @@ h5 {
   max-width: 80%;
   margin-left: 2em;
   line-height: 1.3em;
+}
+
+h6 {
+  font-size: 1.4em;
+  margin-left: 10px;
+  text-indent: 10px;
+  margin-bottom: 40px;
+  margin-top: 40px;
 }
 
 header {
@@ -258,6 +267,7 @@ pre {
   overflow: scroll; }
 pre code {
   padding: 0;
+  font-size: 1.3em;
   background: none;
   border: none;
   word-wrap: normal; }

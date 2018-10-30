@@ -21,7 +21,7 @@ tags: HiSi
 网络从前往后只保留到各个Permute层，Permute后面的层要全部删除。
 
 然后input层也需要遵循格式要求
-##### deploy.prototxt 输入层格式
+###### deploy.prototxt 输入层格式
 deploy.prototxt 输入层支持如下两种格式，n 维度的 dim 值建议写 1，mapper 会根据参考图片路径中的图片张数自动生成 n 值: 
 格式一:
  
@@ -53,7 +53,7 @@ input_param {
 }
 ```
 
-##### 中间上报层
+###### 中间上报层
 
 如果想要将某些中间层的结果抽取出来，可以使用`report`关键词
 
@@ -70,7 +70,7 @@ input_param {
 - inplace 激活，_report 应加在 conv 层上，原因是多个激活共享了 conv 的 blob，因此这些层只输出一个 blob，加在激活层上不会报错，也不会增加上报点;
 - conv 加激活，如果用户想在 conv 层上报，必须把两个节点拆开(激活写成 non- inplace 方式，即激活的 top、bottom 不同名);
 
-##### 指定任意层高精度
+###### 指定任意层高精度
 
 用户指定自定义计算精度(compile_mode = 2)时，在对应层的层名后加上高精度`_hp`(16 比特)标记，可实现指定任意层为高精度输入。格式如下所示
 
