@@ -101,8 +101,7 @@ h2,
 h3,
 h4,
 h5,
-h6,
-h5 {
+h6 {
   margin-top: 1.0em;
   margin-bottom: .5em;
   font-family: Menlo, "WenQuanYi Micro Hei", "ff-tisa-web-pro-2", "ff-tisa-web-pro-1", "Lucida Grande", "Hiragino Sans GB", "Hiragino Sans GB W3", "Microsoft YaHei", sans-serif;
@@ -163,7 +162,7 @@ h5 {
 }
 
 h6 {
-  font-size: 1.4em;
+  font-size: 1.6em;
   margin-left: 10px;
   text-indent: 10px;
   margin-bottom: 40px;
@@ -181,6 +180,7 @@ p {
   padding-left: 20px;
   font-size: 1.3em;
   max-width: 90%;
+  text-indent: 2em;
 }
 
 p code{
