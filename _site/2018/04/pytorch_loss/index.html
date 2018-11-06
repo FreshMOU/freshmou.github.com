@@ -7,16 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <title>Pytorch自定义Loss函数</title>
-  <meta name="description" content="  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
+  <meta name="description" content="Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Pytorch自定义Loss函数">
-  <meta name="twitter:description" content="  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
+  <meta name="twitter:description" content="Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
   
   <meta property="og:type" content="article">
   <meta property="og:title" content="Pytorch自定义Loss函数">
-  <meta property="og:description" content="  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
+  <meta property="og:description" content="Pytorch定义自己的loss函数十分方便，有很多方法可以选择。">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -171,11 +171,11 @@
   </header>
 
   <section class="post">
-    <p>  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。</p>
+    <p>Pytorch定义自己的loss函数十分方便，有很多方法可以选择。</p>
 
 <h3 id="只定义loss函数的前向计算公式">只定义loss函数的前向计算公式</h3>
 
-<p>  在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。</p>
+<p>在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。</p>
 
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
 <span class="n">Class</span> <span class="n">YourLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -207,11 +207,11 @@
 
 <h3 id="自己写一个pytorch的c扩展">自己写一个pytorch的C扩展</h3>
 
-<p>  这个了解不多，所以也不太会</p>
+<p>这个了解不多，所以也不太会</p>
 
 <h3 id="简单定义">简单定义</h3>
 
-<p>  看网上有说直接定义一个简单函数就可以了，可以尝试一下，与只定义forward类似。</p>
+<p>看网上有说直接定义一个简单函数就可以了，可以尝试一下，与只定义forward类似。</p>
 
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
 <span class="o">......</span> <span class="c">#模型操作</span>

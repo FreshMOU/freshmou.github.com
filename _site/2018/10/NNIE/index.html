@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>NNIE</title>
+  <meta name="description" content="NNIE 是 Neural Network Inference Engine 的简称，是海思媒体 SoC 中专门针对神经网 络特别是深度学习卷积神经网络进行加速处理的硬件单元，支持现有大部分的公开网 络，如 Alexnet、VGG16、Googlenet、Resnet18、Resnet50 等分类网络，Faste...">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="NNIE">
+  <meta name="twitter:description" content="NNIE 是 Neural Network Inference Engine 的简称，是海思媒体 SoC 中专门针对神经网 络特别是深度学习卷积神经网络进行加速处理的硬件单元，支持现有大部分的公开网 络，如 Alexnet、VGG16、Googlenet、Resnet18、Resnet50 等分类网络，Faste...">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="NNIE">
+  <meta property="og:description" content="NNIE 是 Neural Network Inference Engine 的简称，是海思媒体 SoC 中专门针对神经网 络特别是深度学习卷积神经网络进行加速处理的硬件单元，支持现有大部分的公开网 络，如 Alexnet、VGG16、Googlenet、Resnet18、Resnet50 等分类网络，Faste...">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2018/10/NNIE/">
+  <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/hawaii.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 SHL 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                freshmou
+                            
+                        </h2>
+                        <p>
+                           
+                                计算机视觉 / 嵌入式
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for SHL" class="blog-button">SHL</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">得陇复望蜀</span>
+        
+        <hr class="panel-cover__divider" />
+        <span class="panel-cover__description">在学习DL性能优化的学生</span>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+        <div>© 2018. All rights reserved.</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">NNIE</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-10-03 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-10-03</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <p>NNIE 是 Neural Network Inference Engine 的简称，是海思媒体 SoC 中专门针对神经网 络特别是深度学习卷积神经网络进行加速处理的硬件单元，支持现有大部分的公开网 络，如 Alexnet、VGG16、Googlenet、Resnet18、Resnet50 等分类网络，Faster R- CNN、YOLO、SSD、RFCN 等检测网络，以及 SegNet、FCN 等场景分割网络。目前 NNIE 配套软件及工具链仅支持以 Caffe 框架，使用其他框架的网络模型需要转化 为 Caffe 框架下的模型。</p>
+
+<h3 id="linux下模型转换工具nnie_mapper">linux下模型转换工具nnie_mapper</h3>
+
+<p>通过设置不同的模式，<code class="highlighter-rouge">mapper</code> 将 <code class="highlighter-rouge">*.caffemodel</code> 转化成在仿真器、仿真库或板端上可加载执行的数据指令文件。</p>
+
+<h3 id="量化方法">量化方法</h3>
+
+<p>猜测:<br />
+应该是根据所提供的图片数据来进行分析，用的是非线性量化，应该是针对典型场景图片所有的像素值，将密集出现的像素值划区域压缩在一个值上。
+应该跟输入的大小有关，用压缩过的图片来进行量化。</p>
+
+<h3 id="信息存储结构体">信息存储结构体</h3>
+
+<p>NNIE中定义了很多的结构体，并用这些结构体来存储信息，如果光看代码，很容易看着看着忘了上面的，所以记录下来。</p>
+
+<h4 id="sample_svp_nnie_param_s-pstnnieparam">SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam</h4>
+
+<p>这是NNIE中最重要的结构体，它保存了最关键的信息，包括网络参数，输入输出等。</p>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="cm">/*NNIE Execution parameters */</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">hiSAMPLE_SVP_NNIE_PARAM_S</span>
+<span class="p">{</span>
+    <span class="n">SVP_NNIE_MODEL_S</span><span class="o">*</span>    <span class="n">pstModel</span><span class="p">;</span>
+    <span class="n">HI_U32</span> <span class="n">u32TmpBufSize</span><span class="p">;</span>
+    <span class="n">HI_U32</span> <span class="n">au32TaskBufSize</span><span class="p">[</span><span class="n">SVP_NNIE_MAX_NET_SEG_NUM</span><span class="p">];</span>
+    <span class="n">SVP_MEM_INFO_S</span>      <span class="n">stTaskBuf</span><span class="p">;</span>
+	<span class="n">SVP_MEM_INFO_S</span>      <span class="n">stTmpBuf</span><span class="p">;</span>
+    <span class="n">SVP_MEM_INFO_S</span>      <span class="n">stStepBuf</span><span class="p">;</span><span class="c1">//store Lstm step info
+</span>    <span class="n">SAMPLE_SVP_NNIE_SEG_DATA_S</span> <span class="n">astSegData</span><span class="p">[</span><span class="n">SVP_NNIE_MAX_NET_SEG_NUM</span><span class="p">];</span><span class="c1">//each seg's input and output blob
+</span>    <span class="n">SVP_NNIE_FORWARD_CTRL_S</span> <span class="n">astForwardCtrl</span><span class="p">[</span><span class="n">SVP_NNIE_MAX_NET_SEG_NUM</span><span class="p">];</span>
+	<span class="n">SVP_NNIE_FORWARD_WITHBBOX_CTRL_S</span> <span class="n">astForwardWithBboxCtrl</span><span class="p">[</span><span class="n">SVP_NNIE_MAX_NET_SEG_NUM</span><span class="p">];</span>
+<span class="p">}</span><span class="n">SAMPLE_SVP_NNIE_PARAM_S</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">pstModel</code>是读取进来的模型<code class="highlighter-rouge">.wk</code>文件</p>
+
+<h6 id="sample_svp_nnie_seg_data_s-astsegdatasvp_nnie_max_net_seg_num">SAMPLE_SVP_NNIE_SEG_DATA_S astSegData[SVP_NNIE_MAX_NET_SEG_NUM]</h6>
+
+<p>该结构体嵌套上结构体内，用于保存输入输出的信息。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/*each seg input and output memory*/
+typedef struct hiSAMPLE_SVP_NNIE_SEG_DATA_S
+{
+	SVP_SRC_BLOB_S astSrc[SVP_NNIE_MAX_INPUT_NUM];
+	SVP_DST_BLOB_S astDst[SVP_NNIE_MAX_OUTPUT_NUM];
+}SAMPLE_SVP_NNIE_SEG_DATA_S;
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">astSrc</code>保存的是输入数据
+<code class="highlighter-rouge">astDst</code>保存的是输出数据</p>
+
+<h4 id="sample_svp_nnie_cfg_s-pstnniecfg">SAMPLE_SVP_NNIE_CFG_S *pstNnieCfg</h4>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="cm">/*NNIE configuration parameter*/</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">hiSAMPLE_SVP_NNIE_CFG_S</span>
+<span class="p">{</span>
+    <span class="n">HI_CHAR</span> <span class="o">*</span><span class="n">pszPic</span><span class="p">;</span>
+    <span class="n">HI_U32</span> <span class="n">u32MaxInputNum</span><span class="p">;</span>
+    <span class="n">HI_U32</span> <span class="n">u32MaxRoiNum</span><span class="p">;</span>
+    <span class="n">HI_U64</span> <span class="n">au64StepVirAddr</span><span class="p">[</span><span class="n">SAMPLE_SVP_NNIE_EACH_SEG_STEP_ADDR_NUM</span><span class="o">*</span><span class="n">SVP_NNIE_MAX_NET_SEG_NUM</span><span class="p">];</span><span class="c1">//virtual addr of LSTM's or RNN's step buffer
+</span>	<span class="n">SVP_NNIE_ID_E</span>	<span class="n">aenNnieCoreId</span><span class="p">[</span><span class="n">SVP_NNIE_MAX_NET_SEG_NUM</span><span class="p">];</span>
+<span class="p">}</span><span class="n">SAMPLE_SVP_NNIE_CFG_S</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p>对于ssd来说，这个结构体中只有<code class="highlighter-rouge">pszPic</code>和<code class="highlighter-rouge">aenNnieCoreId</code>是有用的。</p>
+
+<h4 id="sample_svp_nnie_ssd_software_param_s-pstsoftwareparam">SAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S* pstSoftwareParam</h4>
+
+<p>ssd所需参数保存的结构体。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/*SSD software parameter*/
+typedef struct hiSAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S
+{
+	/*----------------- Model Parameters ---------------*/
+	HI_U32 au32ConvHeight[12];
+	HI_U32 au32ConvWidth[12];
+	HI_U32 au32ConvChannel[12];
+	/*----------------- PriorBox Parameters ---------------*/
+	HI_U32 au32PriorBoxWidth[6];
+	HI_U32 au32PriorBoxHeight[6];
+	HI_FLOAT af32PriorBoxMinSize[6][1];
+	HI_FLOAT af32PriorBoxMaxSize[6][1];
+	HI_U32 u32MinSizeNum;
+	HI_U32 u32MaxSizeNum;
+	HI_U32 u32OriImHeight;
+	HI_U32 u32OriImWidth;
+	HI_U32 au32InputAspectRatioNum[6];
+	HI_FLOAT af32PriorBoxAspectRatio[6][2];
+	HI_FLOAT af32PriorBoxStepWidth[6];
+	HI_FLOAT af32PriorBoxStepHeight[6];
+	HI_FLOAT f32Offset;
+	HI_BOOL bFlip;
+	HI_BOOL bClip;
+	HI_S32 as32PriorBoxVar[4];
+	/*----------------- Softmax Parameters ---------------*/
+	HI_U32 au32SoftMaxInChn[6];
+	HI_U32 u32SoftMaxInHeight;
+	HI_U32 u32ConcatNum;
+	HI_U32 u32SoftMaxOutWidth;
+	HI_U32 u32SoftMaxOutHeight;
+	HI_U32 u32SoftMaxOutChn;
+	/*----------------- DetectionOut Parameters ---------------*/
+	HI_U32 u32ClassNum;
+	HI_U32 u32TopK;
+	HI_U32 u32KeepTopK;
+	HI_U32 u32NmsThresh;
+	HI_U32 u32ConfThresh;
+	HI_U32 au32DetectInputChn[6];
+	HI_U32 au32ConvStride[6];
+	SVP_MEM_INFO_S stPriorBoxTmpBuf;
+	SVP_MEM_INFO_S stSoftMaxTmpBuf;
+	SVP_DST_BLOB_S stClassRoiNum;
+	SVP_DST_BLOB_S stDstRoi;
+	SVP_DST_BLOB_S stDstScore;
+	SVP_MEM_INFO_S stGetResultTmpBuf;
+}SAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S;
+</code></pre>
+</div>
+
+<h3 id="sample_comm_svp_checksysinit系统初始化">SAMPLE_COMM_SVP_CheckSysInit系统初始化</h3>
+
+<p>具体内容资料太少无法理解，只能知道是用于初始化系统。</p>
+
+<h3 id="sample_svp_nnie_ssd_paraminit-用于初始化ssd需要的参数">SAMPLE_SVP_NNIE_Ssd_ParamInit 用于初始化ssd需要的参数</h3>
+
+<p>其中分别初始化硬件参数和软件参数。硬件参数指的是NNIE的参数，软件参数指的是实现NNIE不支持的层所需要的参数。</p>
+
+<h4 id="硬件参数初始化">硬件参数初始化</h4>
+
+<p>硬件参数放在<code class="highlighter-rouge">SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam</code>中</p>
+
+<h6 id="sample_svp_nnie_fillforwardinfo">SAMPLE_SVP_NNIE_FillForwardInfo</h6>
+
+<p>因为我们这里用的是SSD的例子，所以填充的是参数<code class="highlighter-rouge">astForwardCtrl</code>。
+猜测 : 参数<code class="highlighter-rouge">astForwardCtrl</code>只是一个备用，留档。除了NnieCoreId是从其他地方读取的，其余参数都是自己给自己赋值。</p>
+
+<p>同时用读取到的<code class="highlighter-rouge">pstModel</code>的参数填充了<code class="highlighter-rouge">astSegData</code>的参数。</p>
+
+<h6 id="sample_svp_nnie_gettaskandblobbufsize">SAMPLE_SVP_NNIE_GetTaskAndBlobBufSize</h6>
+
+<p>顾名思义，这个函数就是用来获取<code class="highlighter-rouge">task</code>和<code class="highlighter-rouge">blob</code>所需的大小
+得到所需大小后再根据其分配内存。</p>
+
+<h4 id="软件参数初始化">软件参数初始化</h4>
+
+<p>软件参数放在<code class="highlighter-rouge">SAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S* pstSoftWareParam</code>中</p>
+
+<h6 id="sample_svp_nnie_ssd_softwareinit">SAMPLE_SVP_NNIE_Ssd_SoftwareInit</h6>
+
+<p>该函数用来初始化Ssd需要的参数。</p>
+
+<p>需要了解的是<br />
+NNIE输出的是一连串的数据，需要你自己来截断（换句话说，就是NNIE的输出是最原始的数据，除了数据，其他信息一点没有）</p>
+
+<p>所以对于PriorBox层，需要提供各层的大小</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pstSoftWareParam-&gt;au32PriorBoxWidth[0] = 48;
+pstSoftWareParam-&gt;au32PriorBoxWidth[1] = 24;
+pstSoftWareParam-&gt;au32PriorBoxWidth[2] = 12;
+pstSoftWareParam-&gt;au32PriorBoxWidth[3] = 6;
+pstSoftWareParam-&gt;au32PriorBoxWidth[4] = 4;
+pstSoftWareParam-&gt;au32PriorBoxWidth[5] = 2;
+</code></pre>
+</div>
+
+<p>对于softmax层和detecionout层需要提供输入的参数数量。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pstSoftWareParam-&gt;au32SoftMaxInChn[0] = 92160;
+pstSoftWareParam-&gt;au32SoftMaxInChn[1] = 23040;
+pstSoftWareParam-&gt;au32SoftMaxInChn[2] = 5760;
+pstSoftWareParam-&gt;au32SoftMaxInChn[3] = 1440;
+pstSoftWareParam-&gt;au32SoftMaxInChn[4] = 640;
+pstSoftWareParam-&gt;au32SoftMaxInChn[5] = 160;
+
+pstSoftWareParam-&gt;au32DetectInputChn[0] = 552960;
+pstSoftWareParam-&gt;au32DetectInputChn[1] = 138240;
+pstSoftWareParam-&gt;au32DetectInputChn[2] = 34560;
+pstSoftWareParam-&gt;au32DetectInputChn[3] = 8640;
+pstSoftWareParam-&gt;au32DetectInputChn[4] = 3840;
+pstSoftWareParam-&gt;au32DetectInputChn[5] = 960;
+</code></pre>
+</div>
+
+<p>以上都需要自己手动计算。</p>
+
+<p>之后是根据上述参数计算所需内存并进行分配。</p>
+
+<h3 id="sample_svp_nnie_fillsrcdata读取图片数据">SAMPLE_SVP_NNIE_FillSrcData读取图片数据</h3>
+
+<p>就是很简单的读入数据，每次读一行，因为地址要对齐，所以地址每次需要<code class="highlighter-rouge">+u32Stride</code></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> s32Ret = fread(pu8PicAddr,u32Width*u32VarSize,1,fp);
+ pu8PicAddr += u32Stride;
+</code></pre>
+</div>
+
+<h3 id="sample_svp_nnie_ssd_getresult代码实现nnie不支持的层">SAMPLE_SVP_NNIE_Ssd_GetResult代码实现nnie不支持的层</h3>
+
+<p>最重要的部分，这里在cpu上实现了ssd需要的但nnie不支持的层（priorbox层、softmax层和detecionout层）。</p>
+
+<h3 id="nnie大致流程以ssd为例">nnie大致流程（以ssd为例）</h3>
+
+<ul>
+  <li>先对系统进行初始化（这一步目前只能按照sample给的例子来实现）。</li>
+  <li>载入模型。</li>
+  <li>再进行参数初始化，分别初始化硬件和软件的参数。硬件参数为NNIE所需要的参数，如内存分配地址，网络分割出来的输出数量等；软件参数为后续代码实现的层所需要的参数，在ssd中为priorbox、softmax和detectionout层所需要的参数。</li>
+  <li>然后读取二进制（bgr）图片数据。减均值和归一化操作似乎集成在nnie中了，这里只需要读取数据即可。</li>
+  <li>接着将数据送入NNIE进行forward。</li>
+  <li>NNIEforward结束后会返回最后的几个层（如果你有设置中间上报层的话它也会返回）。</li>
+  <li>得到这几层的数据后就可以着手处理了，手写priorbox层、softmax层和detecionout层来得到最后的结果。</li>
+</ul>
+
+<h3 id="网络切分">网络切分</h3>
+
+<p>当网络中存在 Non-support 层时，需要将网络进行切分，不支持的部分由用户使用 CPU 或者 DSP 等方式实现，统称为非 NNIE 方式。由此整个网络会出现 NNIE-&gt;非 NNIE- &gt;NNIE… 的分段执行方式。</p>
+
+<p>nnie_mapper 将 NNIE 的 Non-support 层分为两种，“Proposal”层和“Custom”层:</p>
+
+<h3 id="一些问题和使用细节">一些问题和使用细节</h3>
+
+<p>FlushCache应该是用来将虚拟地址上的数据映射到物理地址上（Hi3559A的NNIE硬件模块的物理地址和代码的虚拟地址应该是不对应的），所以每次参数变化时都需要FlushCache。</p>
+
+<p>Permute层目前只支持(0,1,2,3)-&gt;(0,2,3,1)</p>
+
+<p>Reshape层的第一维必须设为0，因为它只支持对C/H/W进行reshape。第一维设为0表示其与bottom一致。</p>
+
+<p>Slice层只支持分割C/H/W维度，所以不能设置axis=0（在rcnn的模型转换中，由于前置层Permute将timestep转到第一维，导致了Slice切分失败）</p>
+
+<p><code class="highlighter-rouge">pstNnieParam-&gt;astSegData[0].astDst[i].u64VirAddr;</code>就是第i个输出（如ssd中nnie有12个输出）。目前还不知道astSegData的num代表的意义。</p>
+
+<p>在输出时，report层是第一个输出的，然后才是没有后续层的输出。也就是说如果有report层，那么<code class="highlighter-rouge">pstNnieParam-&gt;astSegData[0].astDst[0].u64VirAddr;</code>必然是report层。</p>
+
+
+  </section>
+</article>
+
+<section>
+
+    <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/09/dockerfile/" data-toggle="tooltip" data-placement="top" title="DockerFile">上一篇：  <span>DockerFile</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/10/gdb/" data-toggle="tooltip" data-placement="top" title="GDB调试">下一篇：  <span>GDB调试</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '91743f9a28fe42c95eb6',
+            client_secret: '6cd3dcf61b359e04362b3d1ff09d4236e4e42bb3',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
+  
+
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/freshmou" title="@freshmou 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:jeremy.vast@outlook.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; SHL 2018 Theme changed from leopardpan |
+            <iframe
+                style="margin-left: 2px; margin-bottom:-5px;"
+                frameborder="0" scrolling="0" width="91px" height="20px"
+                src="https://ghbtns.com/github-btn.html?user=leopardpan&repo=leopardpan.github.io&type=star&count=true" >
+            </iframe>
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

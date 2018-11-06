@@ -7,16 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <title>torch学习</title>
-  <meta name="description" content="torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caff...">
+  <meta name="description" content="torch介绍torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe,...">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="torch学习">
-  <meta name="twitter:description" content="torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caff...">
+  <meta name="twitter:description" content="torch介绍torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe,...">
   
   <meta property="og:type" content="article">
   <meta property="og:title" content="torch学习">
-  <meta property="og:description" content="torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caff...">
+  <meta property="og:description" content="torch介绍torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe,...">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -173,7 +173,7 @@
   <section class="post">
     <h3 id="torch介绍">torch介绍</h3>
 
-<p>  <a href="http://torch.ch/">torch</a>是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了<a href="pytorch.org/">pytorch</a>提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。</p>
+<p><a href="http://torch.ch/">torch</a>是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了<a href="pytorch.org/">pytorch</a>提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。</p>
 
 <p><br /></p>
 
@@ -183,13 +183,13 @@
 
 <h3 id="torch项目克隆快速使用入门">torch项目克隆快速使用入门</h3>
 
-<p>  因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建的函数就先不详细了解了，先了解一下torch对现有模型的前向预测如何使用。之后也可能会涉及torch模型转出的问题。</p>
+<p>因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建的函数就先不详细了解了，先了解一下torch对现有模型的前向预测如何使用。之后也可能会涉及torch模型转出的问题。</p>
 
-<p>  在编译好 torch 环境后，在终端输入 <code class="highlighter-rouge">th</code> 就进入了 torch 的 shell 环境，在其中可以进行常规的 lua 命令和使用 torch 的包。</p>
+<p>在编译好 torch 环境后，在终端输入 <code class="highlighter-rouge">th</code> 就进入了 torch 的 shell 环境，在其中可以进行常规的 lua 命令和使用 torch 的包。</p>
 
 <h4 id="cmdline">CmdLine</h4>
 
-<p>  该类主要为了提供一种方便解析参数的框架，对于每个实验尤其是神经网络中要调参数上。同时还可以把输出重定向到log文件中。</p>
+<p>该类主要为了提供一种方便解析参数的框架，对于每个实验尤其是神经网络中要调参数上。同时还可以把输出重定向到log文件中。</p>
 
 <div class="language-lua highlighter-rouge"><pre class="highlight"><code><span class="n">cmd</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">CmdLine</span><span class="p">()</span>
 <span class="n">cmd</span><span class="p">:</span><span class="n">text</span><span class="p">()</span>

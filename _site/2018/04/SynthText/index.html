@@ -7,16 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <title>TextBoxes++使用SynthText数据集</title>
-  <meta name="description" content="SynthText数据集  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText...">
+  <meta name="description" content="SynthText数据集SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText，这...">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="TextBoxes++使用SynthText数据集">
-  <meta name="twitter:description" content="SynthText数据集  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText...">
+  <meta name="twitter:description" content="SynthText数据集SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText，这...">
   
   <meta property="og:type" content="article">
   <meta property="og:title" content="TextBoxes++使用SynthText数据集">
-  <meta property="og:description" content="SynthText数据集  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText...">
+  <meta property="og:description" content="SynthText数据集SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText，这...">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -173,11 +173,11 @@
   <section class="post">
     <h3 id="synthtext数据集">SynthText数据集</h3>
 
-<p>  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供<a href="http://www.robots.ox.ac.uk/~vgg/data/scenetext/">数据集SynthText</a>，这个数据集包含了80万张图像，其中融入了800万个文本。</p>
+<p>SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供<a href="http://www.robots.ox.ac.uk/~vgg/data/scenetext/">数据集SynthText</a>，这个数据集包含了80万张图像，其中融入了800万个文本。</p>
 
 <h3 id="数据格式转成适用于textboxes的xml格式">数据格式转成适用于TextBoxes++的xml格式</h3>
 
-<p>  有许多语言可以读取并处理mat格式文件，我在这里选用python来处理。</p>
+<p>有许多语言可以读取并处理mat格式文件，我在这里选用python来处理。</p>
 
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># 读取gt.mat数据</span>
 <span class="kn">import</span> <span class="nn">scipy.io</span> <span class="kn">as</span> <span class="nn">sio</span>
@@ -185,7 +185,7 @@
 </code></pre>
 </div>
 
-<p>  之前我直接用string来规范文本数据，但是并不如xml包来的好管理。</p>
+<p>之前我直接用string来规范文本数据，但是并不如xml包来的好管理。</p>
 
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">scipy.io</span> <span class="kn">as</span> <span class="nn">sio</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -271,7 +271,7 @@
 
 <h3 id="生成lmdb数据">生成lmdb数据</h3>
 
-<p>  将<code class="highlighter-rouge">train.txt</code>和<code class="highlighter-rouge">test.txt</code>移到<code class="highlighter-rouge">TextBoxes_plusplus/data/text</code>目录下，再执行<code class="highlighter-rouge">./create_data.sh</code>即可得到lmdb文件。</p>
+<p>将<code class="highlighter-rouge">train.txt</code>和<code class="highlighter-rouge">test.txt</code>移到<code class="highlighter-rouge">TextBoxes_plusplus/data/text</code>目录下，再执行<code class="highlighter-rouge">./create_data.sh</code>即可得到lmdb文件。</p>
 
 
   </section>

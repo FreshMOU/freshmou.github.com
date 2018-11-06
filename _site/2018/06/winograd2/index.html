@@ -173,20 +173,20 @@
   <section class="post">
     <h3 id="前言">前言</h3>
 
-<p>  winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于<code class="highlighter-rouge">Fast Algorithms for Convolutional Neural Networks</code>的<script type="math/tex">F(2\times 2, 3\times 3)</script>实现。</p>
+<p>winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于<code class="highlighter-rouge">Fast Algorithms for Convolutional Neural Networks</code>的<script type="math/tex">F(2\times 2, 3\times 3)</script>实现。</p>
 
-<p>  我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。</p>
+<p>我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。</p>
 
 <h3 id="代码示例">代码示例</h3>
 
-<p>  这里我设置<script type="math/tex">% <![CDATA[
+<p>这里我设置<script type="math/tex">% <![CDATA[
 G=\begin{bmatrix} 1 & 0 & 0 \\ 0.5 & 0.5 & 0.5 \\ 0.5&-0.5&0.5\\0&0&1\end{bmatrix} %]]></script>,<script type="math/tex">% <![CDATA[
 B^T=\begin{bmatrix} 1 & 0 & -1&0 \\ 0 &1 & 1&0 \\ 0&-1&1&0\\0&1&0&-1\end{bmatrix} %]]></script>,<script type="math/tex">% <![CDATA[
 A^T=\begin{bmatrix} 1& \quad1 &\quad1&\quad0\\0&\quad1&-1&-1\end{bmatrix} %]]></script>。以<script type="math/tex">4\times 4</script>的输入，<script type="math/tex">3\times 3</script>的卷积核为例。（注意输入是要加padding的）</p>
 
 <h2 id="gggt"><script type="math/tex">GgG^T</script></h2>
 
-<p>  这一步对于同一个卷积核的值来说是固定，因此是可以提前计算好的，是offline的。</p>
+<p>这一步对于同一个卷积核的值来说是固定，因此是可以提前计算好的，是offline的。</p>
 
 <pre><code class="language-C++">float **U_2x2_3x3(float *kernel)
 {
@@ -232,7 +232,7 @@ A^T=\begin{bmatrix} 1& \quad1 &\quad1&\quad0\\0&\quad1&-1&-1\end{bmatrix} %]]></
 
 <h2 id="btdb"><script type="math/tex">B^TdB</script></h2>
 
-<p>  因为我预设的输入是用一维数组来表示二维的矩阵，所以需要一个矩阵起始位置来推断分割的矩阵。</p>
+<p>因为我预设的输入是用一维数组来表示二维的矩阵，所以需要一个矩阵起始位置来推断分割的矩阵。</p>
 
 <pre><code class="language-C++">float **V_2x2_3x3(float *input, int start)
 {
@@ -279,7 +279,7 @@ A^T=\begin{bmatrix} 1& \quad1 &\quad1&\quad0\\0&\quad1&-1&-1\end{bmatrix} %]]></
 
 <h2 id="atuodot-va"><script type="math/tex">A^T[U\odot V]A</script></h2>
 
-<p>  这里输出的就是局部的最终结果。</p>
+<p>这里输出的就是局部的最终结果。</p>
 
 <pre><code class="language-C++">float **M_2x2_3x3(float **U, float **V)
 {
@@ -336,7 +336,7 @@ A^T=\begin{bmatrix} 1& \quad1 &\quad1&\quad0\\0&\quad1&-1&-1\end{bmatrix} %]]></
 
 <h2 id="winograd">Winograd</h2>
 
-<p>  因为我这里举的输入是<script type="math/tex">4\times 4</script>，卷积为<script type="math/tex">3\times 3</script>的例子，所以局部结果可以刚好拼成最终结果，而且padding也只要上下左右各加1就可以了。但如果是<script type="math/tex">7\times 7</script>的输入，那么padding在下面和右边都要加2才行，而且在局部结果拼最终结果时要舍去1行和1列。</p>
+<p>因为我这里举的输入是<script type="math/tex">4\times 4</script>，卷积为<script type="math/tex">3\times 3</script>的例子，所以局部结果可以刚好拼成最终结果，而且padding也只要上下左右各加1就可以了。但如果是<script type="math/tex">7\times 7</script>的输入，那么padding在下面和右边都要加2才行，而且在局部结果拼最终结果时要舍去1行和1列。</p>
 
 <pre><code class="language-C++">void winograd(float* input, float* kernel, float* output, int input_size)
 {
@@ -364,7 +364,7 @@ A^T=\begin{bmatrix} 1& \quad1 &\quad1&\quad0\\0&\quad1&-1&-1\end{bmatrix} %]]></
 
 <h2 id="剩余代码">剩余代码</h2>
 
-<p>  全部代码都在这里了。</p>
+<p>全部代码都在这里了。</p>
 
 <pre><code class="language-C++">void mm(float* input, float* kernel, float* output, int input_size, int kernel_size)
 {
@@ -422,7 +422,7 @@ int main() {
 
 <h3 id="最后">最后</h3>
 
-<p>  虽然结果是一样的，但是我实现的winograd比寻常卷积要慢好多╮(￣▽￣””)╭。具体原因应该还要我接下来摸索，应该可以考虑内存池优化、汇编优化、代码消冗余等。</p>
+<p>虽然结果是一样的，但是我实现的winograd比寻常卷积要慢好多╮(￣▽￣””)╭。具体原因应该还要我接下来摸索，应该可以考虑内存池优化、汇编优化、代码消冗余等。</p>
 
 
 

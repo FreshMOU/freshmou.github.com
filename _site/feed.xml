@@ -5,9 +5,640 @@
     <description>在学习DL性能优化的学生</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 22 Sep 2018 16:36:23 +0800</pubDate>
-    <lastBuildDate>Sat, 22 Sep 2018 16:36:23 +0800</lastBuildDate>
+    <pubDate>Sun, 04 Nov 2018 16:06:48 +0800</pubDate>
+    <lastBuildDate>Sun, 04 Nov 2018 16:06:48 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>ARMv8常用指令</title>
+        <description>&lt;h3 id=&quot;ld1&quot;&gt;LD1&lt;/h3&gt;
+
+&lt;p&gt;ld1指令可以从内存中load数据到一个或多个寄存器
+&lt;img src=&quot;/images/posts/2018-11-09-ARMv8/1.jpg&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;when opcode == 0111.
+LD1 { &amp;lt;Vt&amp;gt;.&amp;lt;T&amp;gt; }, [&amp;lt;Xn|SP&amp;gt;]
+when opcode == 1010.
+LD1 { &amp;lt;Vt&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vt2&amp;gt;.&amp;lt;T&amp;gt; }, [&amp;lt;Xn|SP&amp;gt;]
+when opcode == 0110.
+LD1 { &amp;lt;Vt&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vt2&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vt3&amp;gt;.&amp;lt;T&amp;gt; }, [&amp;lt;Xn|SP&amp;gt;]
+when opcode == 0010.
+LD1 { &amp;lt;Vt&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vt2&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vt3&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vt4&amp;gt;.&amp;lt;T&amp;gt; }, [&amp;lt;Xn|SP&amp;gt;]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;T可以为以下值，设置T时还会指定size和Q位置的值：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;8B when size = 00,Q = 0&lt;/li&gt;
+  &lt;li&gt;16B when size = 00,Q = 1&lt;/li&gt;
+  &lt;li&gt;4H when size = 01,Q = 0&lt;/li&gt;
+  &lt;li&gt;8H when size = 01,Q = 1&lt;/li&gt;
+  &lt;li&gt;2S when size = 10,Q = 0&lt;/li&gt;
+  &lt;li&gt;4S when size = 10,Q = 1&lt;/li&gt;
+  &lt;li&gt;1D when size = 11,Q = 0&lt;/li&gt;
+  &lt;li&gt;2D when size = 11,Q = 1&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;Xn|SP&amp;gt;&lt;/code&gt; Is the 64-bit name of the general-purpose base register or stack pointer, encoded in the “Rn” field.&lt;/p&gt;
+
+&lt;h3 id=&quot;ext&quot;&gt;EXT&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;EXT &amp;lt;Vd&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vn&amp;gt;.&amp;lt;T&amp;gt;, &amp;lt;Vm&amp;gt;.&amp;lt;T&amp;gt;, #&amp;lt;index&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这应该是指令的存储在寄存器上的格式（encode了所有所需要的信息）。
+&lt;img src=&quot;/images/posts/2018-11-09-ARMv8/2.jpg&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;ext实现的功能应该类似于neon函数&lt;code class=&quot;highlighter-rouge&quot;&gt;vextq_f32&lt;/code&gt;，就是将前后两个寄存器里存的值组合起来放到一个寄存器中，由最后一位index来指定，不过有点让人难以看懂。&lt;/p&gt;
+
+&lt;p&gt;vextq_f32例子如下。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;float _a[] = {1,2,3,4}, _b[] = {5,6,7,8} ;
+float32x4_t a = vld1q_f32(_a), b = vld1q_f32(_b);
+float32x4_t r1 = vextq_f32(a,b,1); //r1={2,3,4,5}
+float32x4_t r2 = vextq_f32(a,b,2); //r2={3,4,5,6}
+float32x4_t r3 = vextq_f32(a,b,3); //r3={4,5,6,7}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;ncnn中的使用例子如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;prfm       pldl1keep, [%4, #256]          \n&quot;
+&quot;ld1        {v9.4s, v10.4s}, [%4]          \n&quot;// v9 v10 = r10 r14
+&quot;ext        v11.16b, v9.16b, v10.16b, #4   \n&quot; //r11
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Vd, Vn, Vm&lt;/code&gt;即3个通用的寄存器，它们的信息分别被encode在&lt;code class=&quot;highlighter-rouge&quot;&gt;Rd, Rn, Rm&lt;/code&gt;中&lt;/p&gt;
+
+&lt;p&gt;根据arm文档所示，T只会是8b或者16b（这里的b表示byte，字节）&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;T = 8b,  when Q=0&lt;/li&gt;
+  &lt;li&gt;T = 16b, when Q=1&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个Q应该要同上文ld1进来时的Q相匹配。
+因为前面ld1指令指定了v9，v10寄存器为4s，即4个32位。所以Q=1，即T只能为16b。&lt;/p&gt;
+
+&lt;p&gt;同时，&lt;code class=&quot;highlighter-rouge&quot;&gt;index&lt;/code&gt;的信息被encode在imm4中（index基于字节表示偏移 index is the lowest numbered byte element to be extracted），&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;imm4&amp;lt;2:0&amp;gt; when Q = 0, imm4&amp;lt;3&amp;gt; = 0&lt;/li&gt;
+  &lt;li&gt;imm4 when Q = 1, imm4&amp;lt;3&amp;gt; = x
+The encoding Q = 0, imm4&amp;lt;3&amp;gt; = 1 is reserved.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;也就是说，当Q=0时，imm4只有3位是有效的（即index范围为0～7），即imm4&amp;lt;3&amp;gt;=0。Q=0，imm4&amp;lt;3&amp;gt;=1时无定义
+当Q=1时，imm4的4位都有效，即index范围为0～15。&lt;/p&gt;
+
+&lt;p&gt;具体EXT实现的功能如下所示，下图每一格表示一个字节（8位），则其为64位，如果是Q=1时，则是16格&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/posts/2018-11-09-ARMv8/3.jpg&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// Decode for this encoding
+integer d = UInt(Rd); 			//Vd的位置被encode在Rd中
+integer n = UInt(Rn); 			//同上
+integer m = UInt(Rm);			//同上
+if Q == '0' &amp;amp;&amp;amp; imm4&amp;lt;3&amp;gt; == '1' then UNDEFINED; 	//Q=0，imm4&amp;lt;3&amp;gt;=1时不存在
+integer datasize = if Q == '1' then 128 else 64;	//Q=1时用整个128位寄存器，Q=0用64位寄存器
+integer position = UInt(imm4) &amp;lt;&amp;lt; 3;				//偏移的位用imm4x8，即字节转位
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;fmlavector&quot;&gt;FMLA(vector)&lt;/h3&gt;
+
+&lt;p&gt;Floating-point fused Multiply-Add to accumulator (vector).&lt;/p&gt;
+
+&lt;h3 id=&quot;fmulvector&quot;&gt;FMUL(vector)&lt;/h3&gt;
+
+&lt;p&gt;Floating-point Multiply (vector).&lt;/p&gt;
+
+&lt;h3 id=&quot;以占位符方式访问向量寄存器&quot;&gt;以占位符方式访问向量寄存器&lt;/h3&gt;
+
+&lt;p&gt;直接在后面加后缀来指明立场的；如浮点乘法的时候就是%16.4s指明是单精度浮点（4个single精度浮点值），同样的&lt;code class=&quot;highlighter-rouge&quot;&gt;v21.s[3]&lt;/code&gt;是访问4个中的其中一个浮点值。（引自ncnn）&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// v寄存器单路使用 %.s[0] %.s[1] %.s[2] %.s[3]
+// a += b * c[0]
+// a += b * c[1]
+// a += b * c[2]
+// a += b * c[3]
+float32x4_t _a = vld1_f32(a);
+float32x4_t _b = vld1_f32(b);
+float32x4_t _c = vld1_f32(c);
+asm volatile(
+    &quot;fmla  %0.4s, %2.4s, %3.s[0]&quot;
+    &quot;fmla  %0.4s, %2.4s, %3.s[1]&quot;
+    &quot;fmla  %0.4s, %2.4s, %3.s[2]&quot;
+    &quot;fmla  %0.4s, %2.4s, %3.s[3]&quot;
+    : &quot;=w&quot;(_a) // %0
+    : &quot;0&quot;(_a),
+      &quot;w&quot;(_b), // %2
+      &quot;w&quot;(_c)  // %3
+    :
+);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Sat, 03 Nov 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/11/ARMv8/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/11/ARMv8/</guid>
+        
+        <category>ARM</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>TextBoxes_plusplus的NNIE实现文档</title>
+        <description>&lt;h3 id=&quot;模型转换&quot;&gt;模型转换&lt;/h3&gt;
+
+&lt;p&gt;在执行代码之前，我们先要将caffe的模型转换为nnie的模型（目前nnie只支持caffe模型转换）。&lt;/p&gt;
+
+&lt;p&gt;假设我们手上现在有tbpp的模型，即一个caffemodel文件和一个depoly.prototxt文件，现在要将模型转换为nnie的模型wk文件。&lt;font color=&quot;red&quot;&gt;下面是一些模型转换时需要注意的地方。&lt;/font&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;nnie_mapper配置&quot;&gt;nnie_mapper配置&lt;/h4&gt;
+
+&lt;p&gt;将二进制文件解压出来即可使用。&lt;/p&gt;
+
+&lt;h4 id=&quot;prototxt文件配置&quot;&gt;prototxt文件配置&lt;/h4&gt;
+
+&lt;p&gt;按照HiSVP开发指南的说法，prototxt需要遵循一定的格式。在这里我们只需要将需要CPU实现的层删除即可，这些层分别为&lt;font color=&quot;red&quot;&gt;PriorBox层、Softmax层和DetectionOutput层&lt;/font&gt;（虽然文档说似乎是支持的&lt;font color=&quot;red&quot;&gt;Flatten层&lt;/font&gt;的，但sample里是在CPU中实现的，所以也要删除）。
+网络从前往后只保留到各个Permute层，Permute后面的层要全部删除。&lt;/p&gt;
+
+&lt;p&gt;然后input层也需要遵循格式要求&lt;/p&gt;
+&lt;h6 id=&quot;deployprototxt-输入层格式&quot;&gt;deploy.prototxt 输入层格式&lt;/h6&gt;
+&lt;p&gt;deploy.prototxt 输入层支持如下两种格式，n 维度的 dim 值建议写 1，mapper 会根据参考图片路径中的图片张数自动生成 n 值: 
+格式一:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;input: &quot;data&quot;
+input_shape{
+   dim:1
+   dim:3
+   dim:224
+   dim:224
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;格式二:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;layer {
+name: &quot;data&quot;
+type: &quot;Input&quot;
+top: &quot;data&quot;
+input_param {
+   shape: {
+      dim: 1
+      dim: 3
+	  dim: 227
+	  dim: 227 
+    }
+  } 
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h6 id=&quot;中间上报层&quot;&gt;中间上报层&lt;/h6&gt;
+
+&lt;p&gt;如果想要将某些中间层的结果抽取出来，可以使用&lt;code class=&quot;highlighter-rouge&quot;&gt;report&lt;/code&gt;关键词&lt;/p&gt;
+
+&lt;p&gt;用户需要中间层结果输出时，需要对应层的&lt;code class=&quot;highlighter-rouge&quot;&gt;top&lt;/code&gt;域中添加&lt;code class=&quot;highlighter-rouge&quot;&gt;_report&lt;/code&gt;标识符进行标注。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;top 后续无节点，自然上报，_report 不增加上报点;&lt;/li&gt;
+  &lt;li&gt;top 对应的后续节点有多个 bottom，且其中一个 bottom 是 cpu 层，则该 top 上报;&lt;/li&gt;
+  &lt;li&gt;top 对应的后续节点是 cpu 层(其中，cpu 层指 proposal、custom、_cpu 层);&lt;/li&gt;
+  &lt;li&gt;top 有后续节点，_report 增加上报点;&lt;/li&gt;
+  &lt;li&gt;custom 有 top 加_report，报错;&lt;/li&gt;
+  &lt;li&gt;proposal 有 top 加_report，不报错，也不增加上报点;&lt;/li&gt;
+  &lt;li&gt;_cpu 有 top 加_report，不报错，也不增加上报点;&lt;/li&gt;
+  &lt;li&gt;data 层加_report，不会报错，也不会增加上报点;&lt;/li&gt;
+  &lt;li&gt;inplace 激活，_report 应加在 conv 层上，原因是多个激活共享了 conv 的 blob，因此这些层只输出一个 blob，加在激活层上不会报错，也不会增加上报点;&lt;/li&gt;
+  &lt;li&gt;conv 加激活，如果用户想在 conv 层上报，必须把两个节点拆开(激活写成 non- inplace 方式，即激活的 top、bottom 不同名);&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h6 id=&quot;指定任意层高精度&quot;&gt;指定任意层高精度&lt;/h6&gt;
+
+&lt;p&gt;用户指定自定义计算精度(compile_mode = 2)时，在对应层的层名后加上高精度&lt;code class=&quot;highlighter-rouge&quot;&gt;_hp&lt;/code&gt;(16 比特)标记，可实现指定任意层为高精度输入。格式如下所示&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;layer {
+    name: &quot;conv5_hp&quot;
+    type: &quot;Convolution&quot;
+    bottom: &quot;conv4&quot;
+    top: &quot;conv5&quot;
+    convolution_param {
+       num_output: 256
+       kernel_size: 3
+       pad: 1
+       stride: 1
+	} 
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;使用nnie_mapper生成模型&quot;&gt;使用nnie_mapper生成模型&lt;/h4&gt;
+
+&lt;p&gt;nnie_mapper需要用户提供一个cfg文件，如下是常用cnn的基本配置（ssd也一样）。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[prototxt_file]  ./lenet.prototxt
+[caffemodel_file] ./lenet_iter_10000.caffemodel
+[batch_num] 0
+[net_type] 0
+[sparse_rate] 0
+[compile_mode] 1
+[is_simulation] 0
+[log_level] 2
+[instruction_name] ./lenet
+[RGB_order] BGR
+[data_scale] 0.0039062
+[internal_stride] 16
+[image_list] ./image_ref_list.txt
+[image_type] 1
+[mean_file] ./lenetmean.txt
+[norm_type] 2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;具体的参数说明可以去文档中查看，这里只稍微介绍一些常常要改的重要参数。&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;[compile_mode]&lt;/code&gt;表示编译模式，默认为0，表示低精度高带宽。如果配置为1则是全网络高精度，这里的高精度其实也是有压缩的，是以16位int型计算的，如果配置为2的话则是部分层高精度，哪些层需要高精度需要用户自己配置，具体如何配置参照上面prototxt修改。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;[image_list]&lt;/code&gt;为NNIE mapper 用于数据量化的参考图像 list 文件或 feature map 文件。
+NNIE mapper 量化时需要的图片是典型场景图片，建议从网络模型 的测试场景随机选择 20~50 张作为参考图片进行量化，选择的图像要尽量覆盖模型的各个场景(比如检测人、车的模型，参考图像中必须由人、车，不能仅使用人或者无人无车的图像进行量化)。网络中如果存在多个输入层，则需要配置多个 image_list 项，顺 序、个数与 prototxt 完全对应。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;[mean_file]&lt;/code&gt; 均值文件&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;配置好cfg文件后执行&lt;code class=&quot;highlighter-rouge&quot;&gt;nnie_mapper xxx.cfg&lt;/code&gt;即可&lt;/p&gt;
+
+&lt;p&gt;模型转换基本的注意事项如上。&lt;/p&gt;
+
+&lt;h3 id=&quot;sample代码修改&quot;&gt;sample代码修改&lt;/h3&gt;
+
+&lt;p&gt;官方提供了ssd的sample代码，而TextBoxes_plusplus是基于ssd修改的，所以为了在NNIE上实现TextBoxes_plusplus，我基于官方的ssd代码进行了修改。&lt;/p&gt;
+
+&lt;p&gt;基本可以参照之前TextBoxes_plusplus基于ncnn实现的文档。&lt;font color=&quot;red&quot;&gt;（注意内存的分配）&lt;/font&gt;&lt;/p&gt;
+
+&lt;p&gt;不过还是有些不同的地方，ncnn处只需要修改PriorBoxes和DetectionOutput层，而nnie处还有其他地方代码需要修改，具体如下。&lt;/p&gt;
+
+&lt;p&gt;首先是&lt;code class=&quot;highlighter-rouge&quot;&gt;pstSoftWareParam&lt;/code&gt;参数初始化。&lt;/p&gt;
+
+&lt;p&gt;NNIE输出的是一连串的数据，需要你自己来截断（换句话说，就是NNIE的输出是最原始的数据，除了数据，其他信息一点没有）
+所以对于PriorBox层，需要提供各层的大小&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pstSoftWareParam-&amp;gt;au32PriorBoxWidth[0] = 48;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[1] = 24;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[2] = 12;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[3] = 6;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[4] = 4;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[5] = 2;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;对于softmax层和detecionout层需要提供输入的参数数量。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pstSoftWareParam-&amp;gt;au32SoftMaxInChn[0] = 92160;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[1] = 23040;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[2] = 5760;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[3] = 1440;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[4] = 640;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[5] = 160;
+
+pstSoftWareParam-&amp;gt;au32DetectInputChn[0] = 552960;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[1] = 138240;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[2] = 34560;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[3] = 8640;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[4] = 3840;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[5] = 960;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;由于TextBoxes_plusplus的ratio数量同ssd不同，它有5个ratio，所以对应也需要全部修改。反正同priorbox层相关的数据都是需要修改的。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pstSoftWareParam-&amp;gt;au32InputAspectRatioNum[0] = 4;
+pstSoftWareParam-&amp;gt;af32PriorBoxAspectRatio[0][0] = 2;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;以上都需要自己手动计算。
+之后是根据上述参数计算所需内存并进行分配。&lt;/p&gt;
+
+&lt;h3 id=&quot;输入的格式&quot;&gt;输入的格式&lt;/h3&gt;
+
+&lt;p&gt;输入的格式文档中并没有说，我是根据后缀这些猜出来的，确实也是如此。直接依次排序保存像素值，图片大小需要自己记录下来。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 31 Oct 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/10/NNIE_TextBoxes/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/10/NNIE_TextBoxes/</guid>
+        
+        <category>HiSi</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>GDB调试</title>
+        <description>&lt;p&gt;因为一般都是在linux命令行下直接编译代码，已经不太使用ide了，所以gdb这个调试神器也应该学习一下。
+（一直用fprintf也实现显示不出专业性^_^）&lt;/p&gt;
+
+&lt;p&gt;gdb调试其实就相当于另开了一个shell，在其中你可以输入各种命令来对程序进行操作。&lt;/p&gt;
+
+&lt;h3 id=&quot;基础命令&quot;&gt;基础命令&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;run&lt;br /&gt;
+缩写为 r ，表示执行程序（如果程序已经在执行了，则重新开始执行程序）。&lt;/li&gt;
+  &lt;li&gt;continue&lt;br /&gt;
+缩写为 c ，表示程序执行到下一个断点处停止。&lt;/li&gt;
+  &lt;li&gt;break&lt;br /&gt;
+缩写为 b ，设置断点。&lt;br /&gt;
+用法：
+    &lt;ul&gt;
+      &lt;li&gt;b [行号]  -&amp;gt;  b 12&lt;/li&gt;
+      &lt;li&gt;b [函数名]  -&amp;gt; b compute&lt;/li&gt;
+      &lt;li&gt;b [条件]  -&amp;gt; b 7 if i==99&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;info&lt;br /&gt;
+查看信息，用法为info [name] -&amp;gt; info b 表示查看断点信息。&lt;/li&gt;
+  &lt;li&gt;step&lt;br /&gt;
+缩写为 s ，表步进，如果当前执行的为函数，则进入函数内部。&lt;/li&gt;
+  &lt;li&gt;next&lt;br /&gt;
+缩写为 n ，单步执行，不会进入函数。&lt;/li&gt;
+  &lt;li&gt;clear&lt;br /&gt;
+用法：
+    &lt;ul&gt;
+      &lt;li&gt;clear 删除所有断点&lt;/li&gt;
+      &lt;li&gt;clear [行号] 删除该行断点&lt;/li&gt;
+      &lt;li&gt;clear [函数名] 删除该函数处断点&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;quit&lt;br /&gt;
+退出gdb调试&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;进阶命令&quot;&gt;进阶命令&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;watch&lt;br /&gt;
+watch也是设置断点的一种方式，它可以跟踪变量，非常方便。（注意改变量在当前行应已被定义）
+如 &lt;code class=&quot;highlighter-rouge&quot;&gt;watch i == 1&lt;/code&gt;，那么当&lt;code class=&quot;highlighter-rouge&quot;&gt;i=1&lt;/code&gt;时程序就会自动停下。&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Mon, 29 Oct 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/10/gdb/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/10/gdb/</guid>
+        
+        <category>工具</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>NNIE</title>
+        <description>&lt;p&gt;NNIE 是 Neural Network Inference Engine 的简称，是海思媒体 SoC 中专门针对神经网 络特别是深度学习卷积神经网络进行加速处理的硬件单元，支持现有大部分的公开网 络，如 Alexnet、VGG16、Googlenet、Resnet18、Resnet50 等分类网络，Faster R- CNN、YOLO、SSD、RFCN 等检测网络，以及 SegNet、FCN 等场景分割网络。目前 NNIE 配套软件及工具链仅支持以 Caffe 框架，使用其他框架的网络模型需要转化 为 Caffe 框架下的模型。&lt;/p&gt;
+
+&lt;h3 id=&quot;linux下模型转换工具nnie_mapper&quot;&gt;linux下模型转换工具nnie_mapper&lt;/h3&gt;
+
+&lt;p&gt;通过设置不同的模式，&lt;code class=&quot;highlighter-rouge&quot;&gt;mapper&lt;/code&gt; 将 &lt;code class=&quot;highlighter-rouge&quot;&gt;*.caffemodel&lt;/code&gt; 转化成在仿真器、仿真库或板端上可加载执行的数据指令文件。&lt;/p&gt;
+
+&lt;h3 id=&quot;量化方法&quot;&gt;量化方法&lt;/h3&gt;
+
+&lt;p&gt;猜测:&lt;br /&gt;
+应该是根据所提供的图片数据来进行分析，用的是非线性量化，应该是针对典型场景图片所有的像素值，将密集出现的像素值划区域压缩在一个值上。
+应该跟输入的大小有关，用压缩过的图片来进行量化。&lt;/p&gt;
+
+&lt;h3 id=&quot;信息存储结构体&quot;&gt;信息存储结构体&lt;/h3&gt;
+
+&lt;p&gt;NNIE中定义了很多的结构体，并用这些结构体来存储信息，如果光看代码，很容易看着看着忘了上面的，所以记录下来。&lt;/p&gt;
+
+&lt;h4 id=&quot;sample_svp_nnie_param_s-pstnnieparam&quot;&gt;SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam&lt;/h4&gt;
+
+&lt;p&gt;这是NNIE中最重要的结构体，它保存了最关键的信息，包括网络参数，输入输出等。&lt;/p&gt;
+
+&lt;div class=&quot;language-cpp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/*NNIE Execution parameters */&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hiSAMPLE_SVP_NNIE_PARAM_S&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;SVP_NNIE_MODEL_S&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;pstModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;HI_U32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u32TmpBufSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;HI_U32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;au32TaskBufSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SVP_NNIE_MAX_NET_SEG_NUM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;SVP_MEM_INFO_S&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;stTaskBuf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;SVP_MEM_INFO_S&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;stTmpBuf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;SVP_MEM_INFO_S&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;stStepBuf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//store Lstm step info
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;SAMPLE_SVP_NNIE_SEG_DATA_S&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;astSegData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SVP_NNIE_MAX_NET_SEG_NUM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//each seg's input and output blob
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;SVP_NNIE_FORWARD_CTRL_S&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;astForwardCtrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SVP_NNIE_MAX_NET_SEG_NUM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;SVP_NNIE_FORWARD_WITHBBOX_CTRL_S&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;astForwardWithBboxCtrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SVP_NNIE_MAX_NET_SEG_NUM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SAMPLE_SVP_NNIE_PARAM_S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pstModel&lt;/code&gt;是读取进来的模型&lt;code class=&quot;highlighter-rouge&quot;&gt;.wk&lt;/code&gt;文件&lt;/p&gt;
+
+&lt;h6 id=&quot;sample_svp_nnie_seg_data_s-astsegdatasvp_nnie_max_net_seg_num&quot;&gt;SAMPLE_SVP_NNIE_SEG_DATA_S astSegData[SVP_NNIE_MAX_NET_SEG_NUM]&lt;/h6&gt;
+
+&lt;p&gt;该结构体嵌套上结构体内，用于保存输入输出的信息。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*each seg input and output memory*/
+typedef struct hiSAMPLE_SVP_NNIE_SEG_DATA_S
+{
+	SVP_SRC_BLOB_S astSrc[SVP_NNIE_MAX_INPUT_NUM];
+	SVP_DST_BLOB_S astDst[SVP_NNIE_MAX_OUTPUT_NUM];
+}SAMPLE_SVP_NNIE_SEG_DATA_S;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;astSrc&lt;/code&gt;保存的是输入数据
+&lt;code class=&quot;highlighter-rouge&quot;&gt;astDst&lt;/code&gt;保存的是输出数据&lt;/p&gt;
+
+&lt;h4 id=&quot;sample_svp_nnie_cfg_s-pstnniecfg&quot;&gt;SAMPLE_SVP_NNIE_CFG_S *pstNnieCfg&lt;/h4&gt;
+
+&lt;div class=&quot;language-cpp highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/*NNIE configuration parameter*/&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hiSAMPLE_SVP_NNIE_CFG_S&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;HI_CHAR&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pszPic&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;HI_U32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u32MaxInputNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;HI_U32&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u32MaxRoiNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;HI_U64&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;au64StepVirAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SAMPLE_SVP_NNIE_EACH_SEG_STEP_ADDR_NUM&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SVP_NNIE_MAX_NET_SEG_NUM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//virtual addr of LSTM's or RNN's step buffer
+&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;SVP_NNIE_ID_E&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;aenNnieCoreId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SVP_NNIE_MAX_NET_SEG_NUM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SAMPLE_SVP_NNIE_CFG_S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;对于ssd来说，这个结构体中只有&lt;code class=&quot;highlighter-rouge&quot;&gt;pszPic&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;aenNnieCoreId&lt;/code&gt;是有用的。&lt;/p&gt;
+
+&lt;h4 id=&quot;sample_svp_nnie_ssd_software_param_s-pstsoftwareparam&quot;&gt;SAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S* pstSoftwareParam&lt;/h4&gt;
+
+&lt;p&gt;ssd所需参数保存的结构体。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*SSD software parameter*/
+typedef struct hiSAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S
+{
+	/*----------------- Model Parameters ---------------*/
+	HI_U32 au32ConvHeight[12];
+	HI_U32 au32ConvWidth[12];
+	HI_U32 au32ConvChannel[12];
+	/*----------------- PriorBox Parameters ---------------*/
+	HI_U32 au32PriorBoxWidth[6];
+	HI_U32 au32PriorBoxHeight[6];
+	HI_FLOAT af32PriorBoxMinSize[6][1];
+	HI_FLOAT af32PriorBoxMaxSize[6][1];
+	HI_U32 u32MinSizeNum;
+	HI_U32 u32MaxSizeNum;
+	HI_U32 u32OriImHeight;
+	HI_U32 u32OriImWidth;
+	HI_U32 au32InputAspectRatioNum[6];
+	HI_FLOAT af32PriorBoxAspectRatio[6][2];
+	HI_FLOAT af32PriorBoxStepWidth[6];
+	HI_FLOAT af32PriorBoxStepHeight[6];
+	HI_FLOAT f32Offset;
+	HI_BOOL bFlip;
+	HI_BOOL bClip;
+	HI_S32 as32PriorBoxVar[4];
+	/*----------------- Softmax Parameters ---------------*/
+	HI_U32 au32SoftMaxInChn[6];
+	HI_U32 u32SoftMaxInHeight;
+	HI_U32 u32ConcatNum;
+	HI_U32 u32SoftMaxOutWidth;
+	HI_U32 u32SoftMaxOutHeight;
+	HI_U32 u32SoftMaxOutChn;
+	/*----------------- DetectionOut Parameters ---------------*/
+	HI_U32 u32ClassNum;
+	HI_U32 u32TopK;
+	HI_U32 u32KeepTopK;
+	HI_U32 u32NmsThresh;
+	HI_U32 u32ConfThresh;
+	HI_U32 au32DetectInputChn[6];
+	HI_U32 au32ConvStride[6];
+	SVP_MEM_INFO_S stPriorBoxTmpBuf;
+	SVP_MEM_INFO_S stSoftMaxTmpBuf;
+	SVP_DST_BLOB_S stClassRoiNum;
+	SVP_DST_BLOB_S stDstRoi;
+	SVP_DST_BLOB_S stDstScore;
+	SVP_MEM_INFO_S stGetResultTmpBuf;
+}SAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;sample_comm_svp_checksysinit系统初始化&quot;&gt;SAMPLE_COMM_SVP_CheckSysInit系统初始化&lt;/h3&gt;
+
+&lt;p&gt;具体内容资料太少无法理解，只能知道是用于初始化系统。&lt;/p&gt;
+
+&lt;h3 id=&quot;sample_svp_nnie_ssd_paraminit-用于初始化ssd需要的参数&quot;&gt;SAMPLE_SVP_NNIE_Ssd_ParamInit 用于初始化ssd需要的参数&lt;/h3&gt;
+
+&lt;p&gt;其中分别初始化硬件参数和软件参数。硬件参数指的是NNIE的参数，软件参数指的是实现NNIE不支持的层所需要的参数。&lt;/p&gt;
+
+&lt;h4 id=&quot;硬件参数初始化&quot;&gt;硬件参数初始化&lt;/h4&gt;
+
+&lt;p&gt;硬件参数放在&lt;code class=&quot;highlighter-rouge&quot;&gt;SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam&lt;/code&gt;中&lt;/p&gt;
+
+&lt;h6 id=&quot;sample_svp_nnie_fillforwardinfo&quot;&gt;SAMPLE_SVP_NNIE_FillForwardInfo&lt;/h6&gt;
+
+&lt;p&gt;因为我们这里用的是SSD的例子，所以填充的是参数&lt;code class=&quot;highlighter-rouge&quot;&gt;astForwardCtrl&lt;/code&gt;。
+猜测 : 参数&lt;code class=&quot;highlighter-rouge&quot;&gt;astForwardCtrl&lt;/code&gt;只是一个备用，留档。除了NnieCoreId是从其他地方读取的，其余参数都是自己给自己赋值。&lt;/p&gt;
+
+&lt;p&gt;同时用读取到的&lt;code class=&quot;highlighter-rouge&quot;&gt;pstModel&lt;/code&gt;的参数填充了&lt;code class=&quot;highlighter-rouge&quot;&gt;astSegData&lt;/code&gt;的参数。&lt;/p&gt;
+
+&lt;h6 id=&quot;sample_svp_nnie_gettaskandblobbufsize&quot;&gt;SAMPLE_SVP_NNIE_GetTaskAndBlobBufSize&lt;/h6&gt;
+
+&lt;p&gt;顾名思义，这个函数就是用来获取&lt;code class=&quot;highlighter-rouge&quot;&gt;task&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;blob&lt;/code&gt;所需的大小
+得到所需大小后再根据其分配内存。&lt;/p&gt;
+
+&lt;h4 id=&quot;软件参数初始化&quot;&gt;软件参数初始化&lt;/h4&gt;
+
+&lt;p&gt;软件参数放在&lt;code class=&quot;highlighter-rouge&quot;&gt;SAMPLE_SVP_NNIE_SSD_SOFTWARE_PARAM_S* pstSoftWareParam&lt;/code&gt;中&lt;/p&gt;
+
+&lt;h6 id=&quot;sample_svp_nnie_ssd_softwareinit&quot;&gt;SAMPLE_SVP_NNIE_Ssd_SoftwareInit&lt;/h6&gt;
+
+&lt;p&gt;该函数用来初始化Ssd需要的参数。&lt;/p&gt;
+
+&lt;p&gt;需要了解的是&lt;br /&gt;
+NNIE输出的是一连串的数据，需要你自己来截断（换句话说，就是NNIE的输出是最原始的数据，除了数据，其他信息一点没有）&lt;/p&gt;
+
+&lt;p&gt;所以对于PriorBox层，需要提供各层的大小&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pstSoftWareParam-&amp;gt;au32PriorBoxWidth[0] = 48;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[1] = 24;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[2] = 12;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[3] = 6;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[4] = 4;
+pstSoftWareParam-&amp;gt;au32PriorBoxWidth[5] = 2;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;对于softmax层和detecionout层需要提供输入的参数数量。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pstSoftWareParam-&amp;gt;au32SoftMaxInChn[0] = 92160;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[1] = 23040;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[2] = 5760;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[3] = 1440;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[4] = 640;
+pstSoftWareParam-&amp;gt;au32SoftMaxInChn[5] = 160;
+
+pstSoftWareParam-&amp;gt;au32DetectInputChn[0] = 552960;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[1] = 138240;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[2] = 34560;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[3] = 8640;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[4] = 3840;
+pstSoftWareParam-&amp;gt;au32DetectInputChn[5] = 960;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;以上都需要自己手动计算。&lt;/p&gt;
+
+&lt;p&gt;之后是根据上述参数计算所需内存并进行分配。&lt;/p&gt;
+
+&lt;h3 id=&quot;sample_svp_nnie_fillsrcdata读取图片数据&quot;&gt;SAMPLE_SVP_NNIE_FillSrcData读取图片数据&lt;/h3&gt;
+
+&lt;p&gt;就是很简单的读入数据，每次读一行，因为地址要对齐，所以地址每次需要&lt;code class=&quot;highlighter-rouge&quot;&gt;+u32Stride&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; s32Ret = fread(pu8PicAddr,u32Width*u32VarSize,1,fp);
+ pu8PicAddr += u32Stride;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;sample_svp_nnie_ssd_getresult代码实现nnie不支持的层&quot;&gt;SAMPLE_SVP_NNIE_Ssd_GetResult代码实现nnie不支持的层&lt;/h3&gt;
+
+&lt;p&gt;最重要的部分，这里在cpu上实现了ssd需要的但nnie不支持的层（priorbox层、softmax层和detecionout层）。&lt;/p&gt;
+
+&lt;h3 id=&quot;nnie大致流程以ssd为例&quot;&gt;nnie大致流程（以ssd为例）&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;先对系统进行初始化（这一步目前只能按照sample给的例子来实现）。&lt;/li&gt;
+  &lt;li&gt;载入模型。&lt;/li&gt;
+  &lt;li&gt;再进行参数初始化，分别初始化硬件和软件的参数。硬件参数为NNIE所需要的参数，如内存分配地址，网络分割出来的输出数量等；软件参数为后续代码实现的层所需要的参数，在ssd中为priorbox、softmax和detectionout层所需要的参数。&lt;/li&gt;
+  &lt;li&gt;然后读取二进制（bgr）图片数据。减均值和归一化操作似乎集成在nnie中了，这里只需要读取数据即可。&lt;/li&gt;
+  &lt;li&gt;接着将数据送入NNIE进行forward。&lt;/li&gt;
+  &lt;li&gt;NNIEforward结束后会返回最后的几个层（如果你有设置中间上报层的话它也会返回）。&lt;/li&gt;
+  &lt;li&gt;得到这几层的数据后就可以着手处理了，手写priorbox层、softmax层和detecionout层来得到最后的结果。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;网络切分&quot;&gt;网络切分&lt;/h3&gt;
+
+&lt;p&gt;当网络中存在 Non-support 层时，需要将网络进行切分，不支持的部分由用户使用 CPU 或者 DSP 等方式实现，统称为非 NNIE 方式。由此整个网络会出现 NNIE-&amp;gt;非 NNIE- &amp;gt;NNIE… 的分段执行方式。&lt;/p&gt;
+
+&lt;p&gt;nnie_mapper 将 NNIE 的 Non-support 层分为两种，“Proposal”层和“Custom”层:&lt;/p&gt;
+
+&lt;h3 id=&quot;一些问题和使用细节&quot;&gt;一些问题和使用细节&lt;/h3&gt;
+
+&lt;p&gt;FlushCache应该是用来将虚拟地址上的数据映射到物理地址上（Hi3559A的NNIE硬件模块的物理地址和代码的虚拟地址应该是不对应的），所以每次参数变化时都需要FlushCache。&lt;/p&gt;
+
+&lt;p&gt;Permute层目前只支持(0,1,2,3)-&amp;gt;(0,2,3,1)&lt;/p&gt;
+
+&lt;p&gt;Reshape层的第一维必须设为0，因为它只支持对C/H/W进行reshape。第一维设为0表示其与bottom一致。&lt;/p&gt;
+
+&lt;p&gt;Slice层只支持分割C/H/W维度，所以不能设置axis=0（在rcnn的模型转换中，由于前置层Permute将timestep转到第一维，导致了Slice切分失败）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pstNnieParam-&amp;gt;astSegData[0].astDst[i].u64VirAddr;&lt;/code&gt;就是第i个输出（如ssd中nnie有12个输出）。目前还不知道astSegData的num代表的意义。&lt;/p&gt;
+
+&lt;p&gt;在输出时，report层是第一个输出的，然后才是没有后续层的输出。也就是说如果有report层，那么&lt;code class=&quot;highlighter-rouge&quot;&gt;pstNnieParam-&amp;gt;astSegData[0].astDst[0].u64VirAddr;&lt;/code&gt;必然是report层。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 03 Oct 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/10/NNIE/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/10/NNIE/</guid>
+        
+        <category>HiSi</category>
+        
+        
+      </item>
     
       <item>
         <title>DockerFile</title>
@@ -54,6 +685,61 @@
 &lt;h4 id=&quot;workdir切换目录&quot;&gt;WORKDIR（切换目录）&lt;/h4&gt;
 
 &lt;p&gt;用法：&lt;code class=&quot;highlighter-rouge&quot;&gt;WORKDIR &amp;lt;dir&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;dockerfile用docker-build命令来构建镜像&quot;&gt;DockerFile用docker build命令来构建镜像&lt;/h3&gt;
+
+&lt;p&gt;docker build 命令用于使用 Dockerfile 创建镜像。&lt;/p&gt;
+
+&lt;p&gt;一般常用：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;docker build -t &amp;lt;name&amp;gt; DockerFilePath&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;语法
+&lt;code class=&quot;highlighter-rouge&quot;&gt;docker build [OPTIONS] PATH | URL | -&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;OPTIONS说明：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;--build-arg=[] :设置镜像创建时的变量；
+
+--cpu-shares :设置 cpu 使用权重；
+
+--cpu-period :限制 CPU CFS周期；
+
+--cpu-quota :限制 CPU CFS配额；
+
+--cpuset-cpus :指定使用的CPU id；
+
+--cpuset-mems :指定使用的内存 id；
+
+--disable-content-trust :忽略校验，默认开启；
+
+-f :指定要使用的Dockerfile路径；
+
+--force-rm :设置镜像过程中删除中间容器；
+
+--isolation :使用容器隔离技术；
+
+--label=[] :设置镜像使用的元数据；
+
+-m :设置内存最大值；
+
+--memory-swap :设置Swap的最大值为内存+swap，&quot;-1&quot;表示不限swap；
+
+--no-cache :创建镜像的过程不使用缓存；
+
+--pull :尝试去更新镜像的新版本；
+
+--quiet, -q :安静模式，成功后只输出镜像 ID；
+
+--rm :设置镜像成功后删除中间容器；
+
+--shm-size :设置/dev/shm的大小，默认值是64M；
+
+--ulimit :Ulimit配置。
+
+--tag, -t: 镜像的名字及标签，通常 name:tag 或者 name 格式；可以在一次构建中为一个镜像设置多个标签。
+
+--network: 默认 default。在构建期间设置RUN指令的网络模式
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h3 id=&quot;textboxes_plusplus的cpu版dockerfile&quot;&gt;TextBoxes_plusplus的CPU版DockerFile&lt;/h3&gt;
 
@@ -120,7 +806,7 @@ WORKDIR /workspace
 &lt;/div&gt;
 
 &lt;p&gt;使用方法：
-&lt;code class=&quot;highlighter-rouge&quot;&gt;docker build -t tbpp:cpu --build-arg CLONE_REPO=$(git remote get-url --all origin) YOURPATH&lt;/code&gt;&lt;/p&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;docker build -t tbpp:cpu --build-arg CLONE_REPO=$(git remote get-url --all origin) DockerFilePATH&lt;/code&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 22 Sep 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2018/09/dockerfile/</link>
@@ -300,9 +986,9 @@ docker run -it bvlc/caffe:cpu /bin/bash
         <title>optimization（一）</title>
         <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
-&lt;p&gt;  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如&lt;a href=&quot;https://github.com/Tencent/ncnn&quot;&gt;ncnn&lt;/a&gt;，&lt;a href=&quot;https://github.com/ARM-software/ComputeLibrary&quot;&gt;ARM Compute Library&lt;/a&gt;等。&lt;/p&gt;
+&lt;p&gt;为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如&lt;a href=&quot;https://github.com/Tencent/ncnn&quot;&gt;ncnn&lt;/a&gt;，&lt;a href=&quot;https://github.com/ARM-software/ComputeLibrary&quot;&gt;ARM Compute Library&lt;/a&gt;等。&lt;/p&gt;
 
-&lt;p&gt;  一般CNN性能优化的方向有下面几种。&lt;/p&gt;
+&lt;p&gt;一般CNN性能优化的方向有下面几种。&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;算法层面的优化
     &lt;ul&gt;
@@ -319,14 +1005,14 @@ docker run -it bvlc/caffe:cpu /bin/bash
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;  算法层面的优化需要太多的数学基础，对做工程的我们来说太难了，只能等业界大佬的论文。模型的优化现在很多大佬都在做，现在主要用mobilenet，shufflenet等轻量模型做主干特征提取网络，还有用剪枝的操作来减少模型参数。&lt;br /&gt;
-  卷积计算的优化主要有两种方法，&lt;/p&gt;
+&lt;p&gt;算法层面的优化需要太多的数学基础，对做工程的我们来说太难了，只能等业界大佬的论文。模型的优化现在很多大佬都在做，现在主要用mobilenet，shufflenet等轻量模型做主干特征提取网络，还有用剪枝的操作来减少模型参数。&lt;br /&gt;
+卷积计算的优化主要有两种方法，&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;im2col: 目前几乎所有的主流计算框架包括Caffe, MXNet等都实现了该方法。该方法把卷积变成矩阵和矩阵的乘法，然后通过各种BLAS库来计算，因为BLAS库优化的非常好，所以这个方法速度是比较快的。&lt;/li&gt;
   &lt;li&gt;winograd: 由于乘法和加法在硬件实现上的时间复杂度一般是不一样的，乘法运算所需的时间通常远大于加法所需的时间。因此，用廉价运算代替昂贵运算也是加速运算。winograd就是通过变换来用加法来替换部分乘法以达到优化增速的目的。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;  对于工程师而言，主要是针对系统级的优化，需要考虑&lt;/p&gt;
+&lt;p&gt;对于工程师而言，主要是针对系统级的优化，需要考虑&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;代码是否有冗余&lt;/li&gt;
   &lt;li&gt;代码是否缓存友好&lt;/li&gt;
@@ -337,7 +1023,7 @@ docker run -it bvlc/caffe:cpu /bin/bash
 
 &lt;h3 id=&quot;im2colgemm&quot;&gt;im2col+gemm&lt;/h3&gt;
 
-&lt;p&gt;  我这里就先&lt;/p&gt;
+&lt;p&gt;我这里就先&lt;/p&gt;
 </description>
         <pubDate>Sat, 09 Jun 2018 00:00:00 +0800</pubDate>
         <link>http://localhost:4000/2018/06/optimization/</link>
@@ -352,20 +1038,20 @@ docker run -it bvlc/caffe:cpu /bin/bash
         <title>Winograd for CNN（二）</title>
         <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
-&lt;p&gt;  winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于&lt;code class=&quot;highlighter-rouge&quot;&gt;Fast Algorithms for Convolutional Neural Networks&lt;/code&gt;的&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;实现。&lt;/p&gt;
+&lt;p&gt;winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于&lt;code class=&quot;highlighter-rouge&quot;&gt;Fast Algorithms for Convolutional Neural Networks&lt;/code&gt;的&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;实现。&lt;/p&gt;
 
-&lt;p&gt;  我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。&lt;/p&gt;
+&lt;p&gt;我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。&lt;/p&gt;
 
 &lt;h3 id=&quot;代码示例&quot;&gt;代码示例&lt;/h3&gt;
 
-&lt;p&gt;  这里我设置&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+&lt;p&gt;这里我设置&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
 G=\begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0.5 &amp; 0.5 &amp; 0.5 \\ 0.5&amp;-0.5&amp;0.5\\0&amp;0&amp;1\end{bmatrix} %]]&gt;&lt;/script&gt;,&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
 B^T=\begin{bmatrix} 1 &amp; 0 &amp; -1&amp;0 \\ 0 &amp;1 &amp; 1&amp;0 \\ 0&amp;-1&amp;1&amp;0\\0&amp;1&amp;0&amp;-1\end{bmatrix} %]]&gt;&lt;/script&gt;,&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
 A^T=\begin{bmatrix} 1&amp; \quad1 &amp;\quad1&amp;\quad0\\0&amp;\quad1&amp;-1&amp;-1\end{bmatrix} %]]&gt;&lt;/script&gt;。以&lt;script type=&quot;math/tex&quot;&gt;4\times 4&lt;/script&gt;的输入，&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的卷积核为例。（注意输入是要加padding的）&lt;/p&gt;
 
 &lt;h2 id=&quot;gggt&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;GgG^T&lt;/script&gt;&lt;/h2&gt;
 
-&lt;p&gt;  这一步对于同一个卷积核的值来说是固定，因此是可以提前计算好的，是offline的。&lt;/p&gt;
+&lt;p&gt;这一步对于同一个卷积核的值来说是固定，因此是可以提前计算好的，是offline的。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float **U_2x2_3x3(float *kernel)
 {
@@ -411,7 +1097,7 @@ A^T=\begin{bmatrix} 1&amp; \quad1 &amp;\quad1&amp;\quad0\\0&amp;\quad1&amp;-1&am
 
 &lt;h2 id=&quot;btdb&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;B^TdB&lt;/script&gt;&lt;/h2&gt;
 
-&lt;p&gt;  因为我预设的输入是用一维数组来表示二维的矩阵，所以需要一个矩阵起始位置来推断分割的矩阵。&lt;/p&gt;
+&lt;p&gt;因为我预设的输入是用一维数组来表示二维的矩阵，所以需要一个矩阵起始位置来推断分割的矩阵。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float **V_2x2_3x3(float *input, int start)
 {
@@ -458,7 +1144,7 @@ A^T=\begin{bmatrix} 1&amp; \quad1 &amp;\quad1&amp;\quad0\\0&amp;\quad1&amp;-1&am
 
 &lt;h2 id=&quot;atuodot-va&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;A^T[U\odot V]A&lt;/script&gt;&lt;/h2&gt;
 
-&lt;p&gt;  这里输出的就是局部的最终结果。&lt;/p&gt;
+&lt;p&gt;这里输出的就是局部的最终结果。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float **M_2x2_3x3(float **U, float **V)
 {
@@ -515,7 +1201,7 @@ A^T=\begin{bmatrix} 1&amp; \quad1 &amp;\quad1&amp;\quad0\\0&amp;\quad1&amp;-1&am
 
 &lt;h2 id=&quot;winograd&quot;&gt;Winograd&lt;/h2&gt;
 
-&lt;p&gt;  因为我这里举的输入是&lt;script type=&quot;math/tex&quot;&gt;4\times 4&lt;/script&gt;，卷积为&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的例子，所以局部结果可以刚好拼成最终结果，而且padding也只要上下左右各加1就可以了。但如果是&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的输入，那么padding在下面和右边都要加2才行，而且在局部结果拼最终结果时要舍去1行和1列。&lt;/p&gt;
+&lt;p&gt;因为我这里举的输入是&lt;script type=&quot;math/tex&quot;&gt;4\times 4&lt;/script&gt;，卷积为&lt;script type=&quot;math/tex&quot;&gt;3\times 3&lt;/script&gt;的例子，所以局部结果可以刚好拼成最终结果，而且padding也只要上下左右各加1就可以了。但如果是&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的输入，那么padding在下面和右边都要加2才行，而且在局部结果拼最终结果时要舍去1行和1列。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void winograd(float* input, float* kernel, float* output, int input_size)
 {
@@ -543,7 +1229,7 @@ A^T=\begin{bmatrix} 1&amp; \quad1 &amp;\quad1&amp;\quad0\\0&amp;\quad1&amp;-1&am
 
 &lt;h2 id=&quot;剩余代码&quot;&gt;剩余代码&lt;/h2&gt;
 
-&lt;p&gt;  全部代码都在这里了。&lt;/p&gt;
+&lt;p&gt;全部代码都在这里了。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void mm(float* input, float* kernel, float* output, int input_size, int kernel_size)
 {
@@ -601,7 +1287,7 @@ int main() {
 
 &lt;h3 id=&quot;最后&quot;&gt;最后&lt;/h3&gt;
 
-&lt;p&gt;  虽然结果是一样的，但是我实现的winograd比寻常卷积要慢好多╮(￣▽￣””)╭。具体原因应该还要我接下来摸索，应该可以考虑内存池优化、汇编优化、代码消冗余等。&lt;/p&gt;
+&lt;p&gt;虽然结果是一样的，但是我实现的winograd比寻常卷积要慢好多╮(￣▽￣””)╭。具体原因应该还要我接下来摸索，应该可以考虑内存池优化、汇编优化、代码消冗余等。&lt;/p&gt;
 
 </description>
         <pubDate>Tue, 05 Jun 2018 00:00:00 +0800</pubDate>
@@ -619,81 +1305,81 @@ int main() {
         <title>Winograd for CNN（一）</title>
         <description>&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
-&lt;p&gt;  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法在小卷积上计算复杂度最小，这使得它在滤波器和batch小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并展示了批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
+&lt;p&gt;虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法在小卷积上计算复杂度最小，这使得它在滤波器和batch小的情况下更快。论文使用VGG网络对算法的GPU实现进行基准测试，并展示了批处理大小从1到64的时时吞吐量。[1]&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;Cong和Xiao使用Strassen算法进行快速矩阵乘法，以减少卷积网络层中的调度次数，从而降低其总算术复杂度。 作者还提出，来自算术复杂性理论的更多技术可能适用于衔接。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;  原始的Winograd算法，前置了很多数论方面的知识，为了效率我就没有深入的去阅读了。本文主要针对阅读了&lt;code class=&quot;highlighter-rouge&quot;&gt;Fast Algorithms for Convolutional Neural Networks&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;原始的Winograd算法，前置了很多数论方面的知识，为了效率我就没有深入的去阅读了。本文主要针对阅读了&lt;code class=&quot;highlighter-rouge&quot;&gt;Fast Algorithms for Convolutional Neural Networks&lt;/code&gt;。&lt;/p&gt;
 
 &lt;h3 id=&quot;卷积公式&quot;&gt;卷积公式&lt;/h3&gt;
 
-&lt;p&gt;  假设卷积为G，图像为D，输入参数数量N，通道C，高H，宽W &lt;br /&gt;
+&lt;p&gt;假设卷积为G，图像为D，输入参数数量N，通道C，高H，宽W &lt;br /&gt;
 卷积核参数通道C，高R，宽S，则卷积公式如下&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex1.png&quot; alt=&quot;&quot; height=&quot;40%&quot; width=&quot;40%&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;  我们可以将整个图像的输出写作（其中*指代2D相关性）&lt;/p&gt;
+&lt;p&gt;我们可以将整个图像的输出写作（其中*指代2D相关性）&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex2.png&quot; alt=&quot;&quot; height=&quot;20%&quot; width=&quot;20%&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;算法&quot;&gt;算法&lt;/h3&gt;
 
-&lt;p&gt;  假设用长度为r的FIR滤波器来得到输出m的式子为&lt;script type=&quot;math/tex&quot;&gt;F(m, r)&lt;/script&gt;，传统的winograd算法需要&lt;script type=&quot;math/tex&quot;&gt;µ(F(m,r)) = m + r - 1&lt;/script&gt;次乘法。我们可以通过堆叠一维算法来得到二维的最小算法——假设&lt;script type=&quot;math/tex&quot;&gt;F(m\times n, r\times s)&lt;/script&gt;指代用&lt;script type=&quot;math/tex&quot;&gt;r\times s&lt;/script&gt;的滤波器来计算得到&lt;script type=&quot;math/tex&quot;&gt;m\times n&lt;/script&gt;的输出，则它需要
+&lt;p&gt;假设用长度为r的FIR滤波器来得到输出m的式子为&lt;script type=&quot;math/tex&quot;&gt;F(m, r)&lt;/script&gt;，传统的winograd算法需要&lt;script type=&quot;math/tex&quot;&gt;µ(F(m,r)) = m + r - 1&lt;/script&gt;次乘法。我们可以通过堆叠一维算法来得到二维的最小算法——假设&lt;script type=&quot;math/tex&quot;&gt;F(m\times n, r\times s)&lt;/script&gt;指代用&lt;script type=&quot;math/tex&quot;&gt;r\times s&lt;/script&gt;的滤波器来计算得到&lt;script type=&quot;math/tex&quot;&gt;m\times n&lt;/script&gt;的输出，则它需要
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex3.png&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;
 次乘法。以此为例，我们可以继续堆叠一维算法来得到多维的最小算法。&lt;br /&gt;
-  &lt;strong&gt;&lt;font color=&quot;red&quot;&gt;但是需要注意不管是一维、二维还是多维的最快计算法，它要求输入的数量与所需乘法数一样。&lt;/font&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;strong&gt;&lt;font color=&quot;red&quot;&gt;但是需要注意不管是一维、二维还是多维的最快计算法，它要求输入的数量与所需乘法数一样。&lt;/font&gt;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;f2times-23times-3&quot;&gt;&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;&lt;/h2&gt;
 
-&lt;p&gt;  我们知道，乘法和加法在硬件实现上的时间复杂度一般是不一样的，乘法运算所需的时间通常远大于加法所需的时间。因此，用廉价运算代替昂贵运算也是加速运算的一种方法。原始的矩阵运算对于&lt;script type=&quot;math/tex&quot;&gt;F(2,3)&lt;/script&gt;需要6次乘法，而Winograd提出了如下算法，&lt;/p&gt;
+&lt;p&gt;我们知道，乘法和加法在硬件实现上的时间复杂度一般是不一样的，乘法运算所需的时间通常远大于加法所需的时间。因此，用廉价运算代替昂贵运算也是加速运算的一种方法。原始的矩阵运算对于&lt;script type=&quot;math/tex&quot;&gt;F(2,3)&lt;/script&gt;需要6次乘法，而Winograd提出了如下算法，&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex4.png&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;
-  其中，
+其中，
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex5.png&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;  该算法只用了&lt;script type=&quot;math/tex&quot;&gt;2+3-1=4&lt;/script&gt;个乘法就计算得到了&lt;script type=&quot;math/tex&quot;&gt;F(2,3)&lt;/script&gt;，不过它涉及了4个与输入数据有关的加法，还有与常数滤波器有关的3个加法（&lt;script type=&quot;math/tex&quot;&gt;g_0+g_2&lt;/script&gt;只要算一次就行了）和2个乘法（因为滤波器为常数，所以这3个加法和2个乘法可以认为不占用时间）。&lt;/p&gt;
+&lt;p&gt;该算法只用了&lt;script type=&quot;math/tex&quot;&gt;2+3-1=4&lt;/script&gt;个乘法就计算得到了&lt;script type=&quot;math/tex&quot;&gt;F(2,3)&lt;/script&gt;，不过它涉及了4个与输入数据有关的加法，还有与常数滤波器有关的3个加法（&lt;script type=&quot;math/tex&quot;&gt;g_0+g_2&lt;/script&gt;只要算一次就行了）和2个乘法（因为滤波器为常数，所以这3个加法和2个乘法可以认为不占用时间）。&lt;/p&gt;
 
-&lt;p&gt;  我们可以将矩阵公式写成
+&lt;p&gt;我们可以将矩阵公式写成
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex6.png&quot; alt=&quot;&quot; height=&quot;30%&quot; width=&quot;30%&quot; /&gt;
-  其中，&lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt;指逐元素的乘法（就是点乘，卷积用的）。对于&lt;script type=&quot;math/tex&quot;&gt;F(2,3)&lt;/script&gt;而言，上述公式各元素表示的意义如下&lt;/p&gt;
+其中，&lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt;指逐元素的乘法（就是点乘，卷积用的）。对于&lt;script type=&quot;math/tex&quot;&gt;F(2,3)&lt;/script&gt;而言，上述公式各元素表示的意义如下&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex7.png&quot; alt=&quot;&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;  堆叠一维算法可以得到二维算法&lt;script type=&quot;math/tex&quot;&gt;F(m\times m, r\times r)&lt;/script&gt;如下（这一步论文没有具体的分析，不是很懂为什么，估计是各种线性变换(￣▽￣) ）
+&lt;p&gt;堆叠一维算法可以得到二维算法&lt;script type=&quot;math/tex&quot;&gt;F(m\times m, r\times r)&lt;/script&gt;如下（这一步论文没有具体的分析，不是很懂为什么，估计是各种线性变换(￣▽￣) ）
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex8.png&quot; alt=&quot;&quot; height=&quot;30%&quot; width=&quot;30%&quot; /&gt;
-  其中，&lt;script type=&quot;math/tex&quot;&gt;g&lt;/script&gt;是一个&lt;script type=&quot;math/tex&quot;&gt;r\times r&lt;/script&gt;的滤波器，&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;是一个&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;的输入图像块。&lt;/p&gt;
+其中，&lt;script type=&quot;math/tex&quot;&gt;g&lt;/script&gt;是一个&lt;script type=&quot;math/tex&quot;&gt;r\times r&lt;/script&gt;的滤波器，&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;是一个&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;的输入图像块。&lt;/p&gt;
 
-&lt;p&gt;  &lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;用winograd只需要&lt;script type=&quot;math/tex&quot;&gt;4\times 4=16&lt;/script&gt;次乘法，而原始矩阵运算则需要&lt;script type=&quot;math/tex&quot;&gt;2\times 2\times 3\times 3=36&lt;/script&gt;次乘法运算。尽管winograd法还需要用32次加法来进行数据转换，用28个浮点运算指令来进行滤波器转换，用24次加法来进行反转变换，但是相比原始矩阵运算法还是提升很大。&lt;/p&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;用winograd只需要&lt;script type=&quot;math/tex&quot;&gt;4\times 4=16&lt;/script&gt;次乘法，而原始矩阵运算则需要&lt;script type=&quot;math/tex&quot;&gt;2\times 2\times 3\times 3=36&lt;/script&gt;次乘法运算。尽管winograd法还需要用32次加法来进行数据转换，用28个浮点运算指令来进行滤波器转换，用24次加法来进行反转变换，但是相比原始矩阵运算法还是提升很大。&lt;/p&gt;
 
-&lt;p&gt;  &lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;可以被用来计算卷积核为&lt;script type=&quot;math/tex&quot;&gt;r\times r&lt;/script&gt;的卷积操作。其中，输入图像的每个通道需要被切割成&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;大小的块（每个块与相邻块间有&lt;script type=&quot;math/tex&quot;&gt;r-1&lt;/script&gt;的重叠区域），则每个通道可以有&lt;script type=&quot;math/tex&quot;&gt;P=\left\lceil H/m\right\rceil\times\left\lceil W/m\right\rceil&lt;/script&gt;个块。然后&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;可以分别计算所有块然后累加得到最终结果。&lt;/p&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;可以被用来计算卷积核为&lt;script type=&quot;math/tex&quot;&gt;r\times r&lt;/script&gt;的卷积操作。其中，输入图像的每个通道需要被切割成&lt;script type=&quot;math/tex&quot;&gt;(m+r-1)\times(m+r-1)&lt;/script&gt;大小的块（每个块与相邻块间有&lt;script type=&quot;math/tex&quot;&gt;r-1&lt;/script&gt;的重叠区域），则每个通道可以有&lt;script type=&quot;math/tex&quot;&gt;P=\left\lceil H/m\right\rceil\times\left\lceil W/m\right\rceil&lt;/script&gt;个块。然后&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2,3\times 3)&lt;/script&gt;可以分别计算所有块然后累加得到最终结果。&lt;/p&gt;
 
-&lt;p&gt;  假设&lt;script type=&quot;math/tex&quot;&gt;U=G_gG^T&lt;/script&gt;和&lt;script type=&quot;math/tex&quot;&gt;V=B^{T}dB&lt;/script&gt;，则
+&lt;p&gt;假设&lt;script type=&quot;math/tex&quot;&gt;U=G_gG^T&lt;/script&gt;和&lt;script type=&quot;math/tex&quot;&gt;V=B^{T}dB&lt;/script&gt;，则
 &lt;script type=&quot;math/tex&quot;&gt;Y=A^{T}[U\odot V]A&lt;/script&gt;&lt;/p&gt;
 
-&lt;p&gt;  以&lt;script type=&quot;math/tex&quot;&gt;(\widetilde {x},\widetilde {y})&lt;/script&gt;为各个块坐标，&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;指单张图片，&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;为滤波器，则可以将上述卷积公式改写成，
+&lt;p&gt;以&lt;script type=&quot;math/tex&quot;&gt;(\widetilde {x},\widetilde {y})&lt;/script&gt;为各个块坐标，&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;指单张图片，&lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;为滤波器，则可以将上述卷积公式改写成，
 &lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex11.png&quot; alt=&quot;&quot; height=&quot;40%&quot; width=&quot;40%&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;  以下是具体实现的伪代码&lt;/p&gt;
+&lt;p&gt;以下是具体实现的伪代码&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex12.png&quot; alt=&quot;&quot; height=&quot;70%&quot; width=&quot;70%&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;  论文接下来的算法介绍主要提供了&lt;script type=&quot;math/tex&quot;&gt;F(3\times 3,2\times 2)&lt;/script&gt;和&lt;script type=&quot;math/tex&quot;&gt;F(4\times 4,3\times 3)&lt;/script&gt;的&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;矩阵。&lt;/p&gt;
+&lt;p&gt;论文接下来的算法介绍主要提供了&lt;script type=&quot;math/tex&quot;&gt;F(3\times 3,2\times 2)&lt;/script&gt;和&lt;script type=&quot;math/tex&quot;&gt;F(4\times 4,3\times 3)&lt;/script&gt;的&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;矩阵。&lt;/p&gt;
 
 &lt;h3 id=&quot;理解&quot;&gt;理解&lt;/h3&gt;
 
-&lt;p&gt;  下面这个公式是最重要的一块。&lt;/p&gt;
+&lt;p&gt;下面这个公式是最重要的一块。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/posts/2018-05-31-Winograd/tex8.png&quot; alt=&quot;&quot; height=&quot;30%&quot; width=&quot;30%&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;根据不同的卷积核有不同的值，而且是提前计算好的，可以用&lt;a href=&quot;https://github.com/andravin/wincnn&quot;&gt;https://github.com/andravin/wincnn&lt;/a&gt;的脚本计算。不过，&lt;script type=&quot;math/tex&quot;&gt;A,G,B&lt;/script&gt;也不是可以通过脚本直接得到的，还需要自己确定&lt;script type=&quot;math/tex&quot;&gt;m+r-2&lt;/script&gt;个插值点，wincnn的作者推荐了&lt;a href=&quot;https://openreview.net/forum?id=H1ZaRZVKg&amp;amp;noteId=H1ZaRZVKg&quot;&gt;https://openreview.net/forum?id=H1ZaRZVKg&amp;amp;noteId=H1ZaRZVKg&lt;/a&gt;可以帮助确定插值点。（感觉好难啊（−＿−；））&lt;/p&gt;
 
-&lt;p&gt;  自己推了好久，发现根本就没办法算，之后只能找代码看（&lt;a href=&quot;https://github.com/NervanaSystems/neon/blob/master/neon/backends/winograd.py&quot;&gt;winograd.py&lt;/a&gt;），原来winograd是一定要加padding补全的，加多少padding视情况而定。所以其实这个算法就是针对卷积套公式，不过卷积计算选择不同算法，速度会不太一样。（现在有许多版本的winograd）&lt;/p&gt;
+&lt;p&gt;自己推了好久，发现根本就没办法算，之后只能找代码看（&lt;a href=&quot;https://github.com/NervanaSystems/neon/blob/master/neon/backends/winograd.py&quot;&gt;winograd.py&lt;/a&gt;），原来winograd是一定要加padding补全的，加多少padding视情况而定。所以其实这个算法就是针对卷积套公式，不过卷积计算选择不同算法，速度会不太一样。（现在有许多版本的winograd）&lt;/p&gt;
 
-&lt;p&gt;  对于不同的输入用不同的padding补全，最后会选择性地舍弃部分数据。如&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的输入，在用&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;计算时，会在左边补一个padding，在右边补两个padding，最后winograd卷积得到一个&lt;script type=&quot;math/tex&quot;&gt;8\times 8&lt;/script&gt;的输出，这时就要舍弃最右边的一列。&lt;/p&gt;
+&lt;p&gt;对于不同的输入用不同的padding补全，最后会选择性地舍弃部分数据。如&lt;script type=&quot;math/tex&quot;&gt;7\times 7&lt;/script&gt;的输入，在用&lt;script type=&quot;math/tex&quot;&gt;F(2\times 2, 3\times 3)&lt;/script&gt;计算时，会在左边补一个padding，在右边补两个padding，最后winograd卷积得到一个&lt;script type=&quot;math/tex&quot;&gt;8\times 8&lt;/script&gt;的输出，这时就要舍弃最右边的一列。&lt;/p&gt;
 
-&lt;p&gt;  我尝试写了一下自己版本的winograd算法，以便后面学习优化，具体可以看&lt;a href=&quot;/2018/06/winograd2&quot;&gt;下一篇&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;我尝试写了一下自己版本的winograd算法，以便后面学习优化，具体可以看&lt;a href=&quot;/2018/06/winograd2&quot;&gt;下一篇&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
@@ -712,396 +1398,6 @@ int main() {
         <category>深度学习</category>
         
         <category>性能优化</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Pytorch自定义Loss函数</title>
-        <description>&lt;p&gt;  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。&lt;/p&gt;
-
-&lt;h3 id=&quot;只定义loss函数的前向计算公式&quot;&gt;只定义loss函数的前向计算公式&lt;/h3&gt;
-
-&lt;p&gt;  在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch.nn&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;nn&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;YourLoss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;pass&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;forward&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;pass&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;自定义loss函数的forward和backward&quot;&gt;自定义loss函数的forward和backward&lt;/h3&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy.fft&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rfft2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;irfft2&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;BadFFTFunction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;forward&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;numpy_input&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rfft2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;backward&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;numpy_go&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;irfft2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;numpy_go&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_output&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;自己写一个pytorch的c扩展&quot;&gt;自己写一个pytorch的C扩展&lt;/h3&gt;
-
-&lt;p&gt;  这个了解不多，所以也不太会&lt;/p&gt;
-
-&lt;h3 id=&quot;简单定义&quot;&gt;简单定义&lt;/h3&gt;
-
-&lt;p&gt;  看网上有说直接定义一个简单函数就可以了，可以尝试一下，与只定义forward类似。&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;......&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;#模型操作&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;loss&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Sat, 21 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/04/pytorch_loss/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/04/pytorch_loss/</guid>
-        
-        <category>pytorch</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>TextBoxes++使用SynthText数据集</title>
-        <description>&lt;h3 id=&quot;synthtext数据集&quot;&gt;SynthText数据集&lt;/h3&gt;
-
-&lt;p&gt;  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供&lt;a href=&quot;http://www.robots.ox.ac.uk/~vgg/data/scenetext/&quot;&gt;数据集SynthText&lt;/a&gt;，这个数据集包含了80万张图像，其中融入了800万个文本。&lt;/p&gt;
-
-&lt;h3 id=&quot;数据格式转成适用于textboxes的xml格式&quot;&gt;数据格式转成适用于TextBoxes++的xml格式&lt;/h3&gt;
-
-&lt;p&gt;  有许多语言可以读取并处理mat格式文件，我在这里选用python来处理。&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 读取gt.mat数据&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;scipy.io&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sio&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sio&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadmat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'gt.mat'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;  之前我直接用string来规范文本数据，但是并不如xml包来的好管理。&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;scipy.io&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sio&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;xml.dom.minidom&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;random&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;MatRead&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matfile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sio&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadmat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matfile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;train_file&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'train.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'w'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test_file&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'test.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'w'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])):&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;extend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]))&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stderr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;No.{} data&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wordBB'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dtype&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transpose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transpose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;newaxis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;
-
-        &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xml&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dom&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;minidom&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'annotation'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
-        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;start to process {} object&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
-        
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;nodeobject&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'object'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;nodecontent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'content'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;nodecontent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createTextNode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])))&lt;/span&gt;
-
-            &lt;span class=&quot;n&quot;&gt;nodename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'name'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;nodename&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createTextNode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'text'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'xmin'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'xmax'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'x4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ymin'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ymax'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'y4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-
-            &lt;span class=&quot;n&quot;&gt;nodebndbox&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'bndbox'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;nodecoord&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;nodecoord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createTextNode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])))&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;nodebndbox&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodecoord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-            &lt;span class=&quot;n&quot;&gt;nodeobject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodecontent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;nodeobject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;nodeobject&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodebndbox&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nodeobject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-        &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'imnames'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'.jpg'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'.xml'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;fp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'w'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;writexml&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;indent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;addindent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;newl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;fp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;rad&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uniform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;pwd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getcwd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;img_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'imnames'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;xml_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;file_line&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;img_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xml_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rad&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;18&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;train_file&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;file_line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;test_file&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;file_line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;    
-
-    &lt;span class=&quot;n&quot;&gt;train_file&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test_file&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;生成lmdb数据&quot;&gt;生成lmdb数据&lt;/h3&gt;
-
-&lt;p&gt;  将&lt;code class=&quot;highlighter-rouge&quot;&gt;train.txt&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;test.txt&lt;/code&gt;移到&lt;code class=&quot;highlighter-rouge&quot;&gt;TextBoxes_plusplus/data/text&lt;/code&gt;目录下，再执行&lt;code class=&quot;highlighter-rouge&quot;&gt;./create_data.sh&lt;/code&gt;即可得到lmdb文件。&lt;/p&gt;
-</description>
-        <pubDate>Fri, 06 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/04/SynthText/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/04/SynthText/</guid>
-        
-        <category>深度学习</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>TextBoxe++的VGGnet用Mobilenet替换</title>
-        <description>&lt;p&gt;  现在一般的检测网络都会用VggNet来作骨架，而Vgg网络的体量有点大，不太适合嵌入式实现。Mobilenet是google提出的一个轻量网络，可以在保持较高精度的同时极大地降低网络运算量，因此Mobilenet就成了在嵌入式设备上实现深度学习的首选。&lt;/p&gt;
-
-&lt;p&gt;  由于TextBoxes使用的是pycaffe来生成网络，所以我也基于pycaffe来生成Mobilenet的网络，对照&lt;code class=&quot;highlighter-rouge&quot;&gt;./python/caffe/model_libs&lt;/code&gt;下的VGGNetBody来写我自己的MobileNet。因为原始的ConvBNlayer没有添加group参数，所以需要自己来添加，并且还需要添加engine参数。&lt;/p&gt;
-
-&lt;p&gt;  Caffe中用group来实现Mobilenet的深度可分离卷积，速度比较慢，并且其CUDNN似乎不太支持，需要使用CAFFE engine。否则会报Check failed: status == CUDNN_STATUS_SUCCESS (4 vs. 0)，刚开始我以为是内存不足，但我一直将batch_size减小到1都不行，所以去网上查找资料，然后发现并解决了这个问题。&lt;/p&gt;
-
-&lt;p&gt;  直接开始测试，报错Check failed: shape[i] &amp;gt;= 0 (-1 vs. 0)。&lt;/p&gt;
-
-&lt;p&gt;  显然这是卷积到最后卷不下去了（stride！=1的情况下一般会缩小feature map）。所以我先尝试着将input_size调大，这样可以多卷几次。将input_size从384调整搭到768，可以实现训练，不过这和我们想的加速不太符合，因为输入变大，需要处理的数据也就变多了。那就只能修改网络的结构了，虽然不知道这样做好不好，但还是先改了吧，我将最后几层的pad改成1，这样可以让卷积可以卷1x1的feature map。&lt;/p&gt;
-
-&lt;p&gt;  如果报了Out of memory的错误，那么就是需要处理的数据太多了，要么减少batch_size，要么降低输入的图片分辨率。&lt;/p&gt;
-
-&lt;p&gt;  只用ICDAR2015的数据来训练，效果不是很好。&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/posts/2018-04-05-VGG2Mobile/1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;最终结果&quot;&gt;最终结果&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/posts/2018-04-05-VGG2Mobile/demo_det_result.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;  如果你的效果没有那么好，那么可以注意置信度的取值&lt;/p&gt;
-</description>
-        <pubDate>Tue, 03 Apr 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/04/VGG2Mobile/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/04/VGG2Mobile/</guid>
-        
-        <category>深度学习</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>对不规则四边形使用nms</title>
-        <description>&lt;h3 id=&quot;nms非极大抑制&quot;&gt;nms非极大抑制&lt;/h3&gt;
-
-&lt;p&gt;  非极大值抑制顾名思义就是抑制不是极大值的元素，搜索局部的极大值。这个局部代表的是一个邻域，邻域有两个参数可变，一是邻域的维数，二是邻域的大小。这里不讨论通用的NMS算法，而是用于在目标检测中用于提取分数最高的窗口的。例如在行人检测中，滑动窗口经提取特征，经分类器分类识别后，每个窗口都会得到一个分数。但是滑动窗口会导致很多窗口与其他窗口存在包含或者大部分交叉的情况。这时就需要用到NMS来选取那些邻域里分数最高（是行人的概率最大），并且抑制那些分数低的窗口。&lt;/p&gt;
-
-&lt;h2 id=&quot;iou&quot;&gt;IOU&lt;/h2&gt;
-
-&lt;p&gt;  nms主要是基于一个评价指标，IOU，简单来讲就是模型产生的目标窗口和原来标记窗口的交叠率。具体我们可以简单的理解为： 即检测结果(DetectionResult)与 Ground Truth 的交集比上它们的并集，即为检测的准确率 IoU :&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/posts/2018-03-31-compute_iou/formula.jpg&quot; alt=&quot;&quot; height=&quot;40%&quot; width=&quot;40%&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;  具体就如下图所示，&lt;code class=&quot;highlighter-rouge&quot;&gt;iou = (area1 + area2) / inter_area&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/posts/2018-03-31-compute_iou/iou.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;  矩形的iou很好算，代码也很好写，网上代码很多，就不介绍了。&lt;/p&gt;
-
-&lt;h3 id=&quot;不规则四边形的nms&quot;&gt;不规则四边形的nms&lt;/h3&gt;
-
-&lt;p&gt;  虽然矩形也是四边形，也有四个点，但矩形很特殊。虽然矩形有4个点，但它只有4个值[xmin, xmax, ymin, ymax]，只需要知道这四个值就可以确定一个矩形了。所以对于矩形而言并没有多少情况需要考虑，而四边形不一样，四边形需要8个值，[x1, y1, x2, y2, x3, y3, x4, y4]，所以它的情况比较复杂。&lt;/p&gt;
-
-&lt;h2 id=&quot;四边形iou计算&quot;&gt;四边形IOU计算&lt;/h2&gt;
-
-&lt;p&gt;  首先我们要先知道在已知4个点的坐标情况下，如何计算一个四边形的面积，这里我是将它分成两个三角形然后用公式求解。这个函数当然不只可以求四边形面积，它计算的是多边形的面积。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;typedef struct point_sh{
-    int x,y;
-    float sina;
-    int q;
-}Point;
-
-inline int compute_q(std::vector&amp;lt;point_sh&amp;gt;&amp;amp; pt, float x0, float y0)
-{
-    for (int i=0; i&amp;lt;pt.size(); i++)
-    {
-        point_sh*p = &amp;amp;pt[i];
-        if (p-&amp;gt;x - x0 &amp;gt; 0)
-        {
-            if (p-&amp;gt;y - y0 &amp;gt; 0)
-                p-&amp;gt;q = 1;
-            else
-                p-&amp;gt;q = 4;
-        }
-        else
-        {
-            if (p-&amp;gt;y - y0 &amp;gt; 0)
-                p-&amp;gt;q = 2;
-            else
-                p-&amp;gt;q = 3;        
-        }
-    }
-
-    return 0;
-}
-
-float polygon_area(std::vector&amp;lt;point_sh&amp;gt; pt)
-{
-    if (pt.size() &amp;lt; 3)
-        return -100;
-
-    float x0,y0;
-    x0 = (pt[0].x + pt[1].x + pt[2].x) / 3.0;
-    y0 = (pt[0].y + pt[1].y + pt[2].y) / 3.0;
-    //std::vector&amp;lt;float&amp;gt; sins;
-    float dx, dy, ds, sina;
-    for (int i=0; i&amp;lt;pt.size(); i++)
-    {
-        dx = pt[i].x - x0;
-        dy = pt[i].y - y0;
-        ds = std::sqrt(dx * dx + dy * dy);
-        pt[i].sina = dy / ds;
-    }
-
-    compute_q(pt, x0, y0);
-    //简单排序，如有需要可以优化
-    int j=0;
-    while(1)
-    {
-        if (j &amp;gt; pt.size())
-            break;
-
-        for (int i=1; i&amp;lt;pt.size(); i++)
-        {
-            if (pt[j].q &amp;lt; pt[i].q)
-                continue;
-            
-            if (pt[j].q &amp;gt; pt[i].q)
-                std::swap(pt[j], pt[i]);
-            else if ((pt[j].q == 1 || pt[j].q == 4) &amp;amp;&amp;amp; pt[j].sina &amp;gt; pt[i].sina ||
-                     (pt[j].q == 1 || pt[j].q == 4) &amp;amp;&amp;amp; pt[j].sina &amp;lt; pt[i].sina)
-                        std::swap(pt[j], pt[i]);
-        }
-        j++;
-    }
-
-    point_sh Fpt = pt[0];
-    float area = 0;
-    for (int i=1; i&amp;lt;pt.size()-1; i++)
-    {
-        area += std::fabs(0.5f * (Fpt.x * (pt[i].y - pt[i+1].y) + pt[i].x * (Fpt.y - pt[i].y) + pt[i+1].x * (pt[i+1].y - Fpt.y)));
-    }
-
-    return area;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;  这样，其实两个四边形的面积就可以直接求出来了，也就是&lt;code class=&quot;highlighter-rouge&quot;&gt;area1 + area2&lt;/code&gt;的值，接下来需要找出两个四边形的相交区域的顶点，这部分代码我主要参考了 &lt;a href=&quot;https://www.cnblogs.com/dwdxdy/p/3232110.html&quot;&gt;https://www.cnblogs.com/dwdxdy/p/3232110.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;  同理得到顶点集合后直接代入函数即可得到交集面积。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;float polygon_iou(bbox polygon1, bbox polygon2)
-{
-    float iou, inter_area, area1, area2;
-    std::vector&amp;lt;point_sh&amp;gt; ps1, ps2;
-    ps1 = poly2point(polygon1);
-    ps2 = poly2point(polygon2);
-    std::vector&amp;lt;Point&amp;gt; inter_poly;
-    if (PolygonClip(ps1, ps2, inter_poly))
-    {
-        area1 = polygon_area(ps1);
-        area2 = polygon_area(ps2);
-        inter_area = polygon_area(inter_poly);
-        iou = inter_area / (area1 + area2);
-    }
-    else
-        iou = 0;
-    return iou;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;nms&quot;&gt;nms&lt;/h2&gt;
-
-&lt;p&gt;  nms的话还是要先根据框的分数(score)来确定一个基准框，然后再计算iou来消除其他的框。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;bool compare(bbox a, bbox b)
-{
-    return a.score &amp;lt; b.score;
-}
-
-static int nms(std::vector&amp;lt;bbox&amp;gt;&amp;amp; polygons, float overlap)
-{
-    std::sort(polygons.begin(), polygons.end(), compare);
-    int j=0;
-    while(1)
-    {
-        bbox Fpolygon = polygons[j];//try..catch
-        j++;
-        if (j &amp;gt; polygons.size())
-            break;
-        
-        for (int i=j; i&amp;lt;polygons.size(); i++)
-        {
-            float iou = polygon_iou(Fpolygon, polygons[i]);
-            if (iou &amp;gt; overlap)
-                polygons.erase(polygons.begin() + i);
-        }
-    }
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;end&quot;&gt;END&lt;/h2&gt;
-
-&lt;p&gt;  完整的代码可以&lt;a href=&quot;https://github.com/FreshMOU/ncnn/blob/master/examples/ssd/textboxes.cpp&quot;&gt;点击这里&lt;/a&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sat, 31 Mar 2018 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2018/03/compute_iou_of_quad/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/compute_iou_of_quad/</guid>
-        
-        <category>深度学习</category>
         
         
       </item>

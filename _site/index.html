@@ -163,6 +163,90 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/11/ARMv8/" title="访问 ARMv8常用指令">ARMv8常用指令</a></h2>
+      <p class="excerpt">LD1ld1指令可以从内存中load数据到一个或多个寄存器when opcode == 0111.LD1 { &lt;Vt&gt;.&lt;T&gt; }, [&lt;Xn|SP&gt;]when opcode == 1010.LD1 { &lt;Vt&gt;.&lt;T&gt;, &lt;Vt2&gt;.&lt;T&gt; }, [&lt;Xn|SP&gt;]when opcode == 0110.LD1 { &lt;Vt&gt;.&lt;T&gt;, &lt;Vt2&gt;.&lt;T...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-11-03 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-11-03</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ARM</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/11/ARMv8/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/10/NNIE_TextBoxes/" title="访问 TextBoxes_plusplus的NNIE实现文档">TextBoxes_plusplus的NNIE实现文档</a></h2>
+      <p class="excerpt">模型转换在执行代码之前，我们先要将caffe的模型转换为nnie的模型（目前nnie只支持caffe模型转换）。假设我们手上现在有tbpp的模型，即一个caffemodel文件和一个depoly.prototxt文件，现在要将模型转换为nnie的模型wk文件。下面是一些模型转换时需要注意的地方。nnie_mapper配置将二进制文件解压出来即可使用。prototxt文件配置按照HiSVP开发指南的说法，prototxt需要遵循一定的格式。在这里我们只需要将需要CPU实现的层删除即可，这些层...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-10-31 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-10-31</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">HiSi</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/10/NNIE_TextBoxes/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/10/gdb/" title="访问 GDB调试">GDB调试</a></h2>
+      <p class="excerpt">因为一般都是在linux命令行下直接编译代码，已经不太使用ide了，所以gdb这个调试神器也应该学习一下。（一直用fprintf也实现显示不出专业性^_^）gdb调试其实就相当于另开了一个shell，在其中你可以输入各种命令来对程序进行操作。基础命令  run缩写为 r ，表示执行程序（如果程序已经在执行了，则重新开始执行程序）。  continue缩写为 c ，表示程序执行到下一个断点处停止。  break缩写为 b ，设置断点。用法：          b [行号]  -&gt;  b...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-10-29 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-10-29</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">工具</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/10/gdb/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/10/NNIE/" title="访问 NNIE">NNIE</a></h2>
+      <p class="excerpt">NNIE 是 Neural Network Inference Engine 的简称，是海思媒体 SoC 中专门针对神经网 络特别是深度学习卷积神经网络进行加速处理的硬件单元，支持现有大部分的公开网 络，如 Alexnet、VGG16、Googlenet、Resnet18、Resnet50 等分类网络，Faster R- CNN、YOLO、SSD、RFCN 等检测网络，以及 SegNet、FCN 等场景分割网络。目前 NNIE 配套软件及工具链仅支持以 Caffe 框架，使用其他框架的网络...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-10-03 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-10-03</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">HiSi</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/10/NNIE/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/09/dockerfile/" title="访问 DockerFile">DockerFile</a></h2>
       <p class="excerpt">前言前面已经介绍了DockerFile的几个优点了，其实主要的优点就是它有一个系统的步骤，可以让别人很容易理解，并且很容易知道在基本映像中改变了什么确切的配置。DockerFile编写DockerFile其实就是一种被docker解释的脚本，由多条指令组成，每条指令对应linux下的指令。Dockerfile的指令是忽略大小写的，建议使用大写，使用#作为注释，每一行只支持一条指令，每条指令可以携带多个参数。常用命令如下。FROM（指定初始镜像）用法：FROM &lt;image&gt;:&...&hellip;</p>
       <div class="post-list__meta">        
@@ -227,7 +311,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/06/optimization/" title="访问 optimization（一）">optimization（一）</a></h2>
-      <p class="excerpt">前言  为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。  一般CNN性能优化的方向有下面几种。  算法层面的优化          模型优化      卷积计算优化        系统层面的优化          代码冗余优化      内存优化      并行计算      ...&hellip;</p>
+      <p class="excerpt">前言为什么需要做性能优化？因为深度学习需要大量的计算力，而嵌入式平台不像云端服务器平台一样有超额算力，嵌入式平台需要各种抠细节来充分发挥其性能以勉强提供计算能力。现有许多框架（仍在持续更新）提供给嵌入式平台加速，如ncnn，ARM Compute Library等。一般CNN性能优化的方向有下面几种。  算法层面的优化          模型优化      卷积计算优化        系统层面的优化          代码冗余优化      内存优化      并行计算      算法层面...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-06-09 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -248,7 +332,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/06/winograd2/" title="访问 Winograd for CNN（二）">Winograd for CNN（二）</a></h2>
-      <p class="excerpt">前言  winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于Fast Algorithms for Convolutional Neural Networks的实现。  我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。代码示例  这里我设置,,。以的输入，的卷积核为例。（注意输入是要加padding...&hellip;</p>
+      <p class="excerpt">前言winograd通过用加法代替乘法来加速运算，其需要预设部分矩阵来帮助计算，但矩阵的选择也是各有千秋，具体要如何选择大家可以网上搜索。算法对于不同的矩阵有着不同的速度和效果。而现在也有许多不同的winograd算法实现，我这里主要基于Fast Algorithms for Convolutional Neural Networks的实现。我这里只是粗略的实现了一下效果，代码就写的很简陋(￣▽￣)。代码示例这里我设置,,。以的输入，的卷积核为例。（注意输入是要加padding的）这一步对...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-06-05 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -269,7 +353,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/05/winograd/" title="访问 Winograd for CNN（一）">Winograd for CNN（一）</a></h2>
-      <p class="excerpt">前言  虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法在小卷积上计算复杂度最小，这使得它在滤波器和batch小的情况下更快。论文使用VGG...&hellip;</p>
+      <p class="excerpt">前言虽然现在深度卷积神经网络在计算机视觉领域表现的非常优秀，但它在大型数据集上训练时需要花费大量GPU计算时间，并且前向推理需要大量的计算力。我们希望深度卷积网络可以在嵌入式平台部署，并且希望在保证精度的情况下加快它的推理速度。常规的基于FFT的卷积对于大型滤波器是快速的，但是现有技术的卷积神经网络一般使用小的3×3滤波器。论文引入了基于Winograd的最小滤波算法，一种新的卷积神经网络快速算法。算法在小卷积上计算复杂度最小，这使得它在滤波器和batch小的情况下更快。论文使用VGG网络...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-05-31 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -290,7 +374,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/04/pytorch_loss/" title="访问 Pytorch自定义Loss函数">Pytorch自定义Loss函数</a></h2>
-      <p class="excerpt">  Pytorch定义自己的loss函数十分方便，有很多方法可以选择。只定义loss函数的前向计算公式  在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。import torch.nn as nnClass YourLoss(nn.Module):    def __init__():        pass    def forward():        pass自定义loss函数的forward和backwardfrom numpy.fft import r...&hellip;</p>
+      <p class="excerpt">Pytorch定义自己的loss函数十分方便，有很多方法可以选择。只定义loss函数的前向计算公式在pytorch中定义了前向计算的公式，在训练时它会自动帮你计算反向传播。import torch.nn as nnClass YourLoss(nn.Module):    def __init__():        pass    def forward():        pass自定义loss函数的forward和backwardfrom numpy.fft import rfft2...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-04-21 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -311,7 +395,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/04/SynthText/" title="访问 TextBoxes++使用SynthText数据集">TextBoxes++使用SynthText数据集</a></h2>
-      <p class="excerpt">SynthText数据集  SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText，这个数据集包含了80万张图像，其中融入了800万个文本。数据格式转成适用于TextBoxes++的xml格式  有许多语言可以读取并处理mat格式文件，我在这里选用python来...&hellip;</p>
+      <p class="excerpt">SynthText数据集SynthText(synthetic text)其实是指用代码合成的文本图像数据，它的源码在https://github.com/ankush-me/SynthText，如果有需要你可以用它的源码来合成自己的文本训练集。我们这里使用的是用这种方法得到的官方提供数据集SynthText，这个数据集包含了80万张图像，其中融入了800万个文本。数据格式转成适用于TextBoxes++的xml格式有许多语言可以读取并处理mat格式文件，我在这里选用python来处理。#...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-04-06 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -332,7 +416,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/04/VGG2Mobile/" title="访问 TextBoxe++的VGGnet用Mobilenet替换">TextBoxe++的VGGnet用Mobilenet替换</a></h2>
-      <p class="excerpt">  现在一般的检测网络都会用VggNet来作骨架，而Vgg网络的体量有点大，不太适合嵌入式实现。Mobilenet是google提出的一个轻量网络，可以在保持较高精度的同时极大地降低网络运算量，因此Mobilenet就成了在嵌入式设备上实现深度学习的首选。  由于TextBoxes使用的是pycaffe来生成网络，所以我也基于pycaffe来生成Mobilenet的网络，对照./python/caffe/model_libs下的VGGNetBody来写我自己的MobileNet。因为原始的...&hellip;</p>
+      <p class="excerpt">现在一般的检测网络都会用VggNet来作骨架，而Vgg网络的体量有点大，不太适合嵌入式实现。Mobilenet是google提出的一个轻量网络，可以在保持较高精度的同时极大地降低网络运算量，因此Mobilenet就成了在嵌入式设备上实现深度学习的首选。由于TextBoxes使用的是pycaffe来生成网络，所以我也基于pycaffe来生成Mobilenet的网络，对照./python/caffe/model_libs下的VGGNetBody来写我自己的MobileNet。因为原始的Conv...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-04-03 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -353,7 +437,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/compute_iou_of_quad/" title="访问 对不规则四边形使用nms">对不规则四边形使用nms</a></h2>
-      <p class="excerpt">nms非极大抑制  非极大值抑制顾名思义就是抑制不是极大值的元素，搜索局部的极大值。这个局部代表的是一个邻域，邻域有两个参数可变，一是邻域的维数，二是邻域的大小。这里不讨论通用的NMS算法，而是用于在目标检测中用于提取分数最高的窗口的。例如在行人检测中，滑动窗口经提取特征，经分类器分类识别后，每个窗口都会得到一个分数。但是滑动窗口会导致很多窗口与其他窗口存在包含或者大部分交叉的情况。这时就需要用到NMS来选取那些邻域里分数最高（是行人的概率最大），并且抑制那些分数低的窗口。IOU  nms...&hellip;</p>
+      <p class="excerpt">nms非极大抑制非极大值抑制顾名思义就是抑制不是极大值的元素，搜索局部的极大值。这个局部代表的是一个邻域，邻域有两个参数可变，一是邻域的维数，二是邻域的大小。这里不讨论通用的NMS算法，而是用于在目标检测中用于提取分数最高的窗口的。例如在行人检测中，滑动窗口经提取特征，经分类器分类识别后，每个窗口都会得到一个分数。但是滑动窗口会导致很多窗口与其他窗口存在包含或者大部分交叉的情况。这时就需要用到NMS来选取那些邻域里分数最高（是行人的概率最大），并且抑制那些分数低的窗口。IOUnms主要是基...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-31 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -374,7 +458,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/TextBoxes_in_ncnn/" title="访问 TextBoxes_plusplus基于ncnn实现">TextBoxes_plusplus基于ncnn实现</a></h2>
-      <p class="excerpt">TextBoxes_plusplus的实现  TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的denser_prior_boxes和detection_output层的use_polygon，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。TextBoxes...&hellip;</p>
+      <p class="excerpt">TextBoxes_plusplus的实现TextBoxes是基于caffe实现的。针对其网络，作者修改了caffe的源码，主要是prior_box层和detection_output层。为了区别普通caffe代码，作者为其添加了两个参数，分别是prior_box层的denser_prior_boxes和detection_output层的use_polygon，在这个两个参数下，作者添加了自己的算法代码，所以我们可以通过这部分算法代码来对TextBoxes进行移植。TextBoxes++...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-25 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -395,7 +479,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/TextBoxes_train/" title="访问 用ICDAR2015数据训练TextBoxes++">用ICDAR2015数据训练TextBoxes++</a></h2>
-      <p class="excerpt">ICDAR2015  国际文档分析与识别大会（ICDAR）是全球文档分析以及模式识别领域最重要的国际学术会议之一，由国际模式识别协会(International Association of Pattern Recognition, IAPR)主办。该会议每两年举办1次，同时会举办ICDAR竞赛。ICDAR竞赛主要是考验模型对文字的定位和识别的准确度。  在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。TextBoxes++训练  之前提到T...&hellip;</p>
+      <p class="excerpt">ICDAR2015国际文档分析与识别大会（ICDAR）是全球文档分析以及模式识别领域最重要的国际学术会议之一，由国际模式识别协会(International Association of Pattern Recognition, IAPR)主办。该会议每两年举办1次，同时会举办ICDAR竞赛。ICDAR竞赛主要是考验模型对文字的定位和识别的准确度。在ICDAR2015比赛中，官方提供标有转录文字及其位置的图像，这就是ICDAR2015数据集。TextBoxes++训练之前提到TextBox...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-21 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -416,7 +500,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/torch/" title="访问 torch学习">torch学习</a></h2>
-      <p class="excerpt">torch介绍  torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。torch项目克隆快速使用入门  因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建...&hellip;</p>
+      <p class="excerpt">torch介绍torch是在2015年的CVPR上推出的一个给ML使用的开发平台。现在已经更新至torch7，虽然 torch 团队在17年推出了pytorch提供了优雅的 python 接口，但是还是有很多团队会使用 torch 来进行它们的研究，所以了解 torch 框架还是很有必要的，当然其他如caffe, mxnet等框架对于深度学习方向的从业者也都是应该了解的。torch项目克隆快速使用入门因为目前不怎么要写网络，只需要管前向预测就好了，所以torch包的那些关于网络构建的函数就...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-19 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -437,7 +521,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/TextBoxes_plusplus/" title="访问 TextBoxes++在ubuntu14.04上的编译">TextBoxes++在ubuntu14.04上的编译</a></h2>
-      <p class="excerpt">TextBoxes_plusplus  TextBoxes_plusplus是基于TextBoxes改进的用于场景文字识别的项目，它用SSD来检测文字，然后对框出来的文字用CRNN进行识别。因为最近要用TextBoxes_plusplus，然后在编译它的过程中也遇到了一些问题，所以用这篇博客记录一下。  首先还是要先执行git clone https://github.com/MhLiao/TextBoxes_plusplus.git编译TextBoxes++  TextBoxes是在ca...&hellip;</p>
+      <p class="excerpt">TextBoxes_plusplusTextBoxes_plusplus是基于TextBoxes改进的用于场景文字识别的项目，它用SSD来检测文字，然后对框出来的文字用CRNN进行识别。因为最近要用TextBoxes_plusplus，然后在编译它的过程中也遇到了一些问题，所以用这篇博客记录一下。首先还是要先执行git clone https://github.com/MhLiao/TextBoxes_plusplus.git编译TextBoxes++TextBoxes是在caffe上实现...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-16 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -458,7 +542,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/lua/" title="访问 lua学习入门">lua学习入门</a></h2>
-      <p class="excerpt">Mac下安装 lua  brew作为Mac下非常好用的包管理工具，可以直接 install lua。直接在Mac终端输入 brew install lua ，lua就安装好了。成功后可以测试一下，执行命令 lua 进入 lua 脚本环境&gt; print('hello world')hello worldlua 一些常用名词  在看torch的代码中，我经常可以看到 require, ..等单词或符号，直接看教程有很多语法都是不太用得到的，所以下面我自己整理一下一些常见的语法。requi...&hellip;</p>
+      <p class="excerpt">Mac下安装 luabrew作为Mac下非常好用的包管理工具，可以直接 install lua。直接在Mac终端输入 brew install lua ，lua就安装好了。成功后可以测试一下，执行命令 lua 进入 lua 脚本环境&gt; print('hello world')hello worldlua 一些常用名词在看torch的代码中，我经常可以看到 require, ..等单词或符号，直接看教程有很多语法都是不太用得到的，所以下面我自己整理一下一些常见的语法。requirere...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-15 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 
@@ -479,7 +563,7 @@
     
     <li>
       <h2 class="post-list__post-title post-title"><a href="/2018/03/Target/" title="访问 第一篇博客">第一篇博客</a></h2>
-      <p class="excerpt">博客打算写什么  就记录一下自己在学习过程中遇到的问题，和自己学到的一些编程技巧。  应该还会含括一些框架的编译，相信一般人都会在框架编译的过程中蹉跎很久，像 caffe 当时我就编译很久，在网上查了很多资料才把它编出来。  深度学习框架网上有很多，大多数人好像都是在用的 Tensorflow ，不过 Tensorflow 我只是稍微了解过，并没有一直使用，因为 Tensorflow 的模型似乎比较难转出来。现在常用的框架就是 caffe 和 pytorch，接下来应该也会去熟悉了解一下...&hellip;</p>
+      <p class="excerpt">博客打算写什么就记录一下自己在学习过程中遇到的问题，和自己学到的一些编程技巧。应该还会含括一些框架的编译，相信一般人都会在框架编译的过程中蹉跎很久，像 caffe 当时我就编译很久，在网上查了很多资料才把它编出来。深度学习框架网上有很多，大多数人好像都是在用的 Tensorflow ，不过 Tensorflow 我只是稍微了解过，并没有一直使用，因为 Tensorflow 的模型似乎比较难转出来。现在常用的框架就是 caffe 和 pytorch，接下来应该也会去熟悉了解一下 mxnet ...&hellip;</p>
       <div class="post-list__meta">        
         <time datetime="2018-03-13 00:00:00 +0800" class="post-list__meta--date date">
           <img src="/images/calendar.png" width="20px" /> 

@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>文章</title>
-  <meta name="description" content="在学习DL性能优化的学生">
+  <title>GDB调试</title>
+  <meta name="description" content="因为一般都是在linux命令行下直接编译代码，已经不太使用ide了，所以gdb这个调试神器也应该学习一下。（一直用fprintf也实现显示不出专业性^_^）">
   <meta name="author" content="leopardpan">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="文章">
-  <meta name="twitter:description" content="在学习DL性能优化的学生">
+  <meta name="twitter:title" content="GDB调试">
+  <meta name="twitter:description" content="因为一般都是在linux命令行下直接编译代码，已经不太使用ide了，所以gdb这个调试神器也应该学习一下。（一直用fprintf也实现显示不出专业性^_^）">
   
   <meta property="og:type" content="article">
-  <meta property="og:title" content="文章">
-  <meta property="og:description" content="在学习DL性能优化的学生">
+  <meta property="og:title" content="GDB调试">
+  <meta property="og:description" content="因为一般都是在linux命令行下直接编译代码，已经不太使用ide了，所以gdb这个调试神器也应该学习一下。（一直用fprintf也实现显示不出专业性^_^）">
   
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://localhost:4000/archive/">
+  <link rel="canonical" href="http://localhost:4000/2018/10/gdb/">
   <link rel="alternate" type="application/rss+xml" title="SHL" href="http://localhost:4000/feed.xml">
   
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -160,436 +160,108 @@
         <div class="content-wrapper__inner">
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
+    <h1 class="post-title">GDB调试</h1>
     <div class="post-meta">
-      <time datetime="" itemprop="datePublished" class="post-meta__date date"></time>
-      <span class="post-meta__tags tags"></span>
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-10-29 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-10-29</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
     </div>
-    <h1 class="post-title">文章</h1>
   </header>
 
   <section class="post">
-    
+    <p>因为一般都是在linux命令行下直接编译代码，已经不太使用ide了，所以gdb这个调试神器也应该学习一下。
+（一直用fprintf也实现显示不出专业性^_^）</p>
+
+<p>gdb调试其实就相当于另开了一个shell，在其中你可以输入各种命令来对程序进行操作。</p>
+
+<h3 id="基础命令">基础命令</h3>
+
+<ul>
+  <li>run<br />
+缩写为 r ，表示执行程序（如果程序已经在执行了，则重新开始执行程序）。</li>
+  <li>continue<br />
+缩写为 c ，表示程序执行到下一个断点处停止。</li>
+  <li>break<br />
+缩写为 b ，设置断点。<br />
+用法：
+    <ul>
+      <li>b [行号]  -&gt;  b 12</li>
+      <li>b [函数名]  -&gt; b compute</li>
+      <li>b [条件]  -&gt; b 7 if i==99</li>
+    </ul>
+  </li>
+  <li>info<br />
+查看信息，用法为info [name] -&gt; info b 表示查看断点信息。</li>
+  <li>step<br />
+缩写为 s ，表步进，如果当前执行的为函数，则进入函数内部。</li>
+  <li>next<br />
+缩写为 n ，单步执行，不会进入函数。</li>
+  <li>clear<br />
+用法：
+    <ul>
+      <li>clear 删除所有断点</li>
+      <li>clear [行号] 删除该行断点</li>
+      <li>clear [函数名] 删除该函数处断点</li>
+    </ul>
+  </li>
+  <li>quit<br />
+退出gdb调试</li>
+</ul>
+
+<h3 id="进阶命令">进阶命令</h3>
+
+<ul>
+  <li>watch<br />
+watch也是设置断点的一种方式，它可以跟踪变量，非常方便。（注意改变量在当前行应已被定义）
+如 <code class="highlighter-rouge">watch i == 1</code>，那么当<code class="highlighter-rouge">i=1</code>时程序就会自动停下。</li>
+</ul>
 
 
-<div class="page card">
 
-
-
-  
-    
-    
-    
-    
-  
-    
-    
-    
-      <div class="hat_title">
-        <h3>2018</h3>
-      </div>
-      <div class="post_list">
-      <ul>
-      
-    
-  
-    <li>
-      <span>
-        2018-11- 3
-      </span>
-       &raquo; 
-      <a href="/2018/11/ARMv8/">ARMv8常用指令</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-10-31
-      </span>
-       &raquo; 
-      <a href="/2018/10/NNIE_TextBoxes/">TextBoxes_plusplus的NNIE实现文档</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-10-29
-      </span>
-       &raquo; 
-      <a href="/2018/10/gdb/">GDB调试</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-10- 3
-      </span>
-       &raquo; 
-      <a href="/2018/10/NNIE/">NNIE</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-09-22
-      </span>
-       &raquo; 
-      <a href="/2018/09/dockerfile/">DockerFile</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-09-18
-      </span>
-       &raquo; 
-      <a href="/2018/09/docker/">Docker使用</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-06-19
-      </span>
-       &raquo; 
-      <a href="/2018/06/optimizing-cpp/">C++代码优化</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-06- 9
-      </span>
-       &raquo; 
-      <a href="/2018/06/optimization/">optimization（一）</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-06- 5
-      </span>
-       &raquo; 
-      <a href="/2018/06/winograd2/">Winograd for CNN（二）</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-05-31
-      </span>
-       &raquo; 
-      <a href="/2018/05/winograd/">Winograd for CNN（一）</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-04-21
-      </span>
-       &raquo; 
-      <a href="/2018/04/pytorch_loss/">Pytorch自定义Loss函数</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-04- 6
-      </span>
-       &raquo; 
-      <a href="/2018/04/SynthText/">TextBoxes++使用SynthText数据集</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-04- 3
-      </span>
-       &raquo; 
-      <a href="/2018/04/VGG2Mobile/">TextBoxe++的VGGnet用Mobilenet替换</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-31
-      </span>
-       &raquo; 
-      <a href="/2018/03/compute_iou_of_quad/">对不规则四边形使用nms</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-25
-      </span>
-       &raquo; 
-      <a href="/2018/03/TextBoxes_in_ncnn/">TextBoxes_plusplus基于ncnn实现</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-21
-      </span>
-       &raquo; 
-      <a href="/2018/03/TextBoxes_train/">用ICDAR2015数据训练TextBoxes++</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-19
-      </span>
-       &raquo; 
-      <a href="/2018/03/torch/">torch学习</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-16
-      </span>
-       &raquo; 
-      <a href="/2018/03/TextBoxes_plusplus/">TextBoxes++在ubuntu14.04上的编译</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-15
-      </span>
-       &raquo; 
-      <a href="/2018/03/lua/">lua学习入门</a>
-    </li>
- 
-    
-          
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li>
-      <span>
-        2018-03-13
-      </span>
-       &raquo; 
-      <a href="/2018/03/Target/">第一篇博客</a>
-    </li>
- 
-    
-      </ul>
-      
-    
-  
-
-</div>
-</div>
   </section>
 </article>
+
+<section>
+
+    <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/10/NNIE/" data-toggle="tooltip" data-placement="top" title="NNIE">上一篇：  <span>NNIE</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/10/NNIE_TextBoxes/" data-toggle="tooltip" data-placement="top" title="TextBoxes_plusplus的NNIE实现文档">下一篇：  <span>TextBoxes_plusplus的NNIE实现文档</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: 'freshmou',
+        repo: 'freshmou.github.com',
+        oauth: {
+            client_id: '91743f9a28fe42c95eb6',
+            client_secret: '6cd3dcf61b359e04362b3d1ff09d4236e4e42bb3',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+
+  
+
+</section>
+
 
             <section class="footer">
     <footer>
